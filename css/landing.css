@@ -456,7 +456,7 @@ ul {
   font-size: 0.65rem;
   letter-spacing: 0.46em;
   text-transform: uppercase;
-  color: var(--color-dorado);
+  color: var(--color-off-blanco);
 }
 
 .linea-dorada {
@@ -926,6 +926,7 @@ ul {
   overflow-x: auto;
   padding: 0 clamp(20px, 4vw, 64px) 20px;
   scroll-snap-type: x mandatory;
+  scroll-padding-left: clamp(20px, 4vw, 64px);
 }
 
 .experiencias-tira::-webkit-scrollbar {
