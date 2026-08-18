@@ -76,6 +76,16 @@ class Reserva {
   +calcularSaldoPendiente(): decimal
 }
 
+class Cuenta {
+  -id: int
+  -estado: string
+  -fechaCreacion: datetime
+  +calcularTotal(): decimal
+  +calcularSaldoPendiente(): decimal
+  +registrarPago(): void
+  +cerrar(): void
+}
+
 class Servicio {
   -id: int
   -nombre: string
@@ -96,11 +106,19 @@ class ItemConsumo {
 
 ' ---- Relaciones ----
 Cliente "1" -- "0..*" Reserva : realiza >
+
 TipoHabitacion "1" -- "0..*" Habitacion : clasifica >
+
 Habitacion "1" -- "0..*" Reserva : es reservada en >
-Reserva "1" -- "0..*" ItemConsumo : genera >
-Servicio "1" -- "0..*" ItemConsumo : es consumido como >
+
+Reserva "1" *-- "1" Cuenta : tiene >
+
+Cuenta "1" *-- "0..*" ItemConsumo : contiene >
+
+Servicio "1" -- "0..*" ItemConsumo : corresponde a >
+
 Operador "1" -- "0..*" ItemConsumo : registra >
+
 Operador "1" -- "0..*" Reserva : cancela / gestiona >
 
 Administrador ..> Operador : administra (CRUD)
