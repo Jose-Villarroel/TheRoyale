@@ -264,12 +264,13 @@ ul {
 }
 
 .marca-logo {
-  height: clamp(32px, 3.4vw, 42px);
+  height: clamp(120px, 6vw, 120px);
+  width: auto;
   transition: height 0.5s ease;
 }
 
 .envoltorio-cabecera.cabecera-solida .marca-logo {
-  height: clamp(28px, 3vw, 36px);
+  height: clamp(50px, 5vw, 70px);
 }
 
 .marca-logo-movil {
