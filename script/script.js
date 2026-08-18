@@ -2,13 +2,9 @@
 const envoltorioCabecera = document.getElementById("envoltorioCabecera");
 const heroMedia = document.getElementById("heroMedia");
 const experienciasMedia = document.getElementById("experienciasMedia");
+const menuToggle = document.getElementById("menuToggle");
 const menuMovil = document.getElementById("menuMovil");
-
-// Instancia Bootstrap Offcanvas para el menú móvil
-let offcanvasMenu = null;
-if (menuMovil && typeof bootstrap !== "undefined") {
-  offcanvasMenu = bootstrap.Offcanvas.getOrCreateInstance(menuMovil);
-}
+const menuCerrar = document.getElementById("menuCerrar");
 
 // ===== Función: transición del header al hacer scroll (aparece sólido) =====
 function actualizarCabeceraEnScroll() {
@@ -33,11 +29,13 @@ function actualizarCabeceraEnScroll() {
   }
 }
 
-// ===== Función: cerrar el menú móvil (Bootstrap Offcanvas) =====
+// ===== Función: abrir/cerrar el menú móvil =====
+function abrirMenuMovil() {
+  menuMovil.classList.add("abierto");
+}
+
 function cerrarMenuMovil() {
-  if (offcanvasMenu) {
-    offcanvasMenu.hide();
-  }
+  menuMovil.classList.remove("abierto");
 }
 
 // ===== Función: animación de aparición al hacer scroll (IntersectionObserver) =====
@@ -104,6 +102,8 @@ function manejarFormularioNewsletter(evento) {
 
 // ===== Event listeners =====
 window.addEventListener("scroll", actualizarCabeceraEnScroll, { passive: true });
+menuToggle.addEventListener("click", abrirMenuMovil);
+menuCerrar.addEventListener("click", cerrarMenuMovil);
 document.getElementById("carruselAnterior").addEventListener("click", irHabitacionAnterior);
 document.getElementById("carruselSiguiente").addEventListener("click", irHabitacionSiguiente);
 document.getElementById("formularioReserva").addEventListener("submit", manejarFormularioReserva);
