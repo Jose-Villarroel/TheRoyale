@@ -835,7 +835,7 @@ ul {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1px;
-  background-color: var(--color-borde-claro);
+  background-color: var(--color-blanco);
 }
 
 .tarjeta-servicio {
