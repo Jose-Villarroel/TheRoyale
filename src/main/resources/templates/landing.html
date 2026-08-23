@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,34 +7,34 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/landing.css">
+  <link rel="stylesheet" th:href="@{/css/landing.css}">
 </head>
 <body>
 
-  <!-- ===== Barra utilitaria + navegación (se funden en un solo header fijo) ===== -->
+  <!-- ===== Barra utilitaria + navegación ===== -->
   <div class="envoltorio-cabecera" id="envoltorioCabecera">
 
     <div class="barra-utilitaria" id="barraUtilitaria">
       <div class="barra-utilitaria-derecha">
-        <a href="contact.html">+1 507 3165 232</a>
-        <a href="login.html">Sign In</a>
+        <a th:href="@{/contact}">+1 507 3165 232</a>
+        <a th:href="@{/login}">Sign In</a>
       </div>
     </div>
 
     <header class="cabecera" id="cabecera">
-      <a href="landing.html" class="marca">
-  <img src="../src/logo-removebg-preview.png" alt="The Royale" class="marca-logo">
-</a>
+      <a th:href="@{/}" class="marca">
+        <img th:src="@{/images/logo-removebg-preview.png}" alt="The Royale" class="marca-logo">
+      </a>
 
       <nav class="nav-principal" id="navPrincipal">
         <a href="#rooms">Rooms</a>
         <a href="#services">Services</a>
         <a href="#experiences">Experiences</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
       </nav>
 
-      <a href="login.html" class="btn-dorado btn-nav-reserva">Book Now</a>
+      <a th:href="@{/login}" class="btn-dorado btn-nav-reserva">Book Now</a>
 
       <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
         <span></span><span></span>
@@ -42,22 +42,22 @@
     </header>
   </div>
 
-  <!-- ===== Menú móvil a pantalla completa ===== -->
+  <!-- ===== Menú móvil ===== -->
   <div class="menu-movil" id="menuMovil">
     <div class="menu-movil-encabezado">
-  <img src="../src/logo.jpeg" alt="The Royale" class="marca-logo marca-logo-movil">
-  <button id="menuCerrar" aria-label="Cerrar menú">&times;</button>
-</div>
+      <img th:src="@{/images/logo.jpeg}" alt="The Royale" class="marca-logo marca-logo-movil">
+      <button id="menuCerrar" aria-label="Cerrar menú">&times;</button>
+    </div>
     <nav class="menu-movil-nav">
       <a href="#rooms" class="enlace-menu-movil">Rooms</a>
       <a href="#services" class="enlace-menu-movil">Services</a>
       <a href="#experiences" class="enlace-menu-movil">Experiences</a>
-      <a href="about.html" class="enlace-menu-movil">About</a>
-      <a href="contact.html" class="enlace-menu-movil">Contact</a>
+      <a th:href="@{/about}" class="enlace-menu-movil">About</a>
+      <a th:href="@{/contact}" class="enlace-menu-movil">Contact</a>
     </nav>
     <div class="menu-movil-pie">
-      <a href="login.html">Sign In</a>
-      <a href="login.html" class="btn-dorado">Book Now</a>
+      <a th:href="@{/login}">Sign In</a>
+      <a th:href="@{/login}" class="btn-dorado">Book Now</a>
     </div>
   </div>
 
@@ -66,7 +66,7 @@
     <!-- ===== Hero ===== -->
     <section class="hero" id="top">
       <div class="hero-media" id="heroMedia">
-        <img src="../src/entrada2.PNG" alt="Manhattan skyline al atardecer">
+        <img th:src="@{/images/entrada2.PNG}" alt="Entrada de The Royale">
       </div>
       <div class="hero-degradado"></div>
 
@@ -74,7 +74,7 @@
         <h1>Stay Above<br>the Ordinary.</h1>
         <p class="hero-subtexto">Experience refined luxury in the heart of New York.</p>
         <div class="hero-botones">
-          <a href="login.html" class="btn-dorado">Book Your Stay</a>
+          <a th:href="@{/login}" class="btn-dorado">Book Your Stay</a>
           <a href="#about" class="btn-contorno-claro">Explore The Royale</a>
         </div>
       </div>
@@ -140,15 +140,15 @@
               <span class="stat-label">Midtown Manhattan</span>
             </div>
           </div>
-          <a href="about.html" class="enlace-subrayado">About The Royale</a>
+          <a th:href="@{/about}" class="enlace-subrayado">About The Royale</a>
         </div>
 
         <div class="about-imagenes aparecer">
           <div class="about-imagen-grande">
-            <img src="../src/dinningroom-1.webp" alt="Lobby de The Royale">
+            <img th:src="@{/images/dinningroom-1.webp}" alt="Lobby de The Royale">
           </div>
           <div class="about-imagen-pequena">
-            <img src="../src/suite-2.webp" alt="Detalle de una suite de The Royale">
+            <img th:src="@{/images/suite-2.webp}" alt="Detalle de una suite de The Royale">
           </div>
         </div>
       </div>
@@ -183,7 +183,7 @@
 
             <article class="habitacion-slide">
               <div class="habitacion-imagen">
-                <img src="../src/suite-3.webp" alt="Habitación Normal">
+                <img th:src="@{/images/suite-3.webp}" alt="Habitación Normal">
               </div>
               <div class="habitacion-info">
                 <span class="numero-dorado">01 / Normal</span>
@@ -194,13 +194,13 @@
                   <li>Private bathroom</li>
                   <li>Premium Wi-Fi</li>
                 </ul>
-                <a href="rooms.html" class="enlace-subrayado">View Room</a>
+                <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
               </div>
             </article>
 
             <article class="habitacion-slide">
               <div class="habitacion-imagen">
-                <img src="../src/suite-1.webp" alt="Habitación Executive">
+                <img th:src="@{/images/suite-1.webp}" alt="Habitación Executive">
               </div>
               <div class="habitacion-info">
                 <span class="numero-dorado">02 / Executive</span>
@@ -211,13 +211,13 @@
                   <li>King bed</li>
                   <li>Premium Wi-Fi</li>
                 </ul>
-                <a href="rooms.html" class="enlace-subrayado">View Room</a>
+                <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
               </div>
             </article>
 
             <article class="habitacion-slide">
               <div class="habitacion-imagen">
-                <img src="../src/suite-2.webp" alt="Habitación VIP">
+                <img th:src="@{/images/suite-2.webp}" alt="Habitación VIP">
               </div>
               <div class="habitacion-info">
                 <span class="numero-dorado">03 / VIP</span>
@@ -228,13 +228,13 @@
                   <li>Premium amenities</li>
                   <li>City views</li>
                 </ul>
-                <a href="rooms.html" class="enlace-subrayado">View Room</a>
+                <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
               </div>
             </article>
 
             <article class="habitacion-slide">
               <div class="habitacion-imagen">
-                <img src="../src/suite-4.webp" alt="Suite Luxury">
+                <img th:src="@{/images/suite-4.webp}" alt="Suite Luxury">
               </div>
               <div class="habitacion-info">
                 <span class="numero-dorado">04 / Luxury</span>
@@ -245,7 +245,7 @@
                   <li>Jacuzzi</li>
                   <li>Privileged city view</li>
                 </ul>
-                <a href="rooms.html" class="enlace-subrayado">View Room</a>
+                <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
               </div>
             </article>
 
@@ -259,7 +259,7 @@
               <span class="carrusel-barra-relleno" id="carruselProgreso"></span>
             </span>
           </div>
-          <a href="rooms.html" class="btn-contorno-oscuro">Explore All Rooms</a>
+          <a th:href="@{/rooms}" class="btn-contorno-oscuro">Explore All Rooms</a>
         </div>
       </div>
     </section>
@@ -280,9 +280,9 @@
         </div>
 
         <div class="tarjetas-servicios aparecer">
-          <a href="servicio.html?id=wellness" class="tarjeta-servicio">
+          <a th:href="@{/servicios/1}" class="tarjeta-servicio">
             <div class="tarjeta-servicio-imagen">
-              <img src="../src/spa.webp" alt="Spa y bienestar">
+              <img th:src="@{/images/spa.webp}" alt="Spa y bienestar">
             </div>
             <div class="tarjeta-servicio-info">
               <span class="numero-romano">I</span>
@@ -290,9 +290,9 @@
               <p>Spa, sauna, Turkish bath, pool and gym.</p>
             </div>
           </a>
-          <a href="servicio.html?id=dining" class="tarjeta-servicio">
+          <a th:href="@{/servicios/2}" class="tarjeta-servicio">
             <div class="tarjeta-servicio-imagen">
-              <img src="../src/dinningroom-1.webp" alt="Restaurante y bar">
+              <img th:src="@{/images/dinningroom-1.webp}" alt="Restaurante y bar">
             </div>
             <div class="tarjeta-servicio-info">
               <span class="numero-romano">II</span>
@@ -300,9 +300,9 @@
               <p>Room service, restaurant, bar and minibar.</p>
             </div>
           </a>
-          <a href="servicio.html?id=business" class="tarjeta-servicio">
+          <a th:href="@{/servicios/3}" class="tarjeta-servicio">
             <div class="tarjeta-servicio-imagen">
-              <img src="../src/meeting-room.jpg" alt="Sala de reuniones">
+              <img th:src="@{/images/meeting-room.jpg}" alt="Sala de reuniones">
             </div>
             <div class="tarjeta-servicio-info">
               <span class="numero-romano">III</span>
@@ -310,9 +310,9 @@
               <p>Business center, meeting rooms and executive services.</p>
             </div>
           </a>
-          <a href="servicio.html?id=concierge" class="tarjeta-servicio">
+          <a th:href="@{/servicios/4}" class="tarjeta-servicio">
             <div class="tarjeta-servicio-imagen">
-              <img src="../src/concierge.jpg" alt="Recepción de conserjería">
+              <img th:src="@{/images/concierge.jpg}" alt="Recepción de conserjería">
             </div>
             <div class="tarjeta-servicio-info">
               <span class="numero-romano">IV</span>
@@ -322,16 +322,14 @@
           </a>
         </div>
 
-        <a href="services.html" class="btn-contorno-oscuro btn-centrado aparecer">Explore Services</a>
+        <a th:href="@{/servicios/tarjetas}" class="btn-contorno-oscuro btn-centrado aparecer">Explore Services</a>
       </div>
     </section>
 
-    <!-- ===== 04 — Experiences (tira con scroll horizontal) ===== -->
+    <!-- ===== 04 — Experiences ===== -->
     <section class="seccion seccion-oscura seccion-experiencias" id="experiences">
-      <div class="experiencias-media" id="experienciasMedia">
-        <img src="imagenes/experiencias-fondo.jpg" alt="">
-      </div>
-      <div class="experiencias-degradado"></div>
+      <div class="experiencias-media" id="experienciasMedia"></div>
+       <div class="experiencias-degradado"></div>
 
       <div class="contenedor experiencias-encabezado aparecer">
         <div>
@@ -342,36 +340,36 @@
             partners make exploring the city effortless.
           </p>
         </div>
-        <a href="experiences.html" class="btn-dorado">Discover Experiences</a>
+        <a th:href="@{/experiences}" class="btn-dorado">Discover Experiences</a>
       </div>
 
       <div class="experiencias-tira aparecer" id="experienciasTira">
-        <a href="experiences.html" class="experiencia-tarjeta">
-          <img src="../src/nyc-tour.jpg" alt="Tour guiado por la ciudad">
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/nyc-tour.jpg}" alt="Tour guiado por la ciudad">
           <span>Guided city tours</span>
         </a>
-        <a href="experiences.html" class="experiencia-tarjeta">
-          <img src="../src/private-transport.jpg" alt="Transporte privado">
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/private-transport.jpg}" alt="Transporte privado">
           <span>Private transportation</span>
         </a>
-        <a href="experiences.html" class="experiencia-tarjeta">
-          <img src="../src/airport-transfer.jpg" alt="Traslado al aeropuerto">
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/airport-transfer.jpg}" alt="Traslado al aeropuerto">
           <span>Airport transfers</span>
         </a>
-        <a href="experiences.html" class="experiencia-tarjeta">
-          <img src="../src/bike-rental.jpg" alt="Alquiler de bicicletas">
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/bike-rental.jpg}" alt="Alquiler de bicicletas">
           <span>Bicycle rentals</span>
         </a>
-        <a href="experiences.html" class="experiencia-tarjeta">
-          <img src="../src/broadway.jpg" alt="Entradas para Broadway">
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/broadway.jpg}" alt="Entradas para Broadway">
           <span>Broadway tickets</span>
         </a>
-        <a href="experiences.html" class="experiencia-tarjeta">
-          <img src="../src/the-MET.jpg" alt="Museos y atracciones">
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/the-MET.jpg}" alt="Museos y atracciones">
           <span>Museums &amp; attractions</span>
         </a>
-        <a href="experiences.html" class="experiencia-tarjeta">
-          <img src="../src/private-chef.jpg" alt="Experiencias privadas en Nueva York">
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/private-chef.jpg}" alt="Experiencias privadas en Nueva York">
           <span>Private experiences</span>
         </a>
       </div>
@@ -382,7 +380,7 @@
     <section class="seccion">
       <div class="contenedor grid-business">
         <div class="business-imagen aparecer">
-          <img src="../src/meeting-room.jpg" alt="Espacio de trabajo en habitación ejecutiva">
+          <img th:src="@{/images/meeting-room.jpg}" alt="Espacio de trabajo en habitación ejecutiva">
         </div>
         <div class="business-texto aparecer">
           <p class="eyebrow">05 — Business Travel</p>
@@ -396,7 +394,7 @@
             <p>High-speed Wi-Fi</p>
             <p>Concierge assistance</p>
           </div>
-          <a href="rooms.html" class="enlace-subrayado">View Executive Rooms</a>
+          <a th:href="@{/rooms}" class="enlace-subrayado">View Executive Rooms</a>
         </div>
       </div>
     </section>
@@ -410,15 +408,15 @@
         </div>
 
         <div class="galeria-bento aparecer">
-          <div class="galeria-item galeria-grande"><img src="../src/fachada-exterior.jpg" alt="Fachada exterior de The Royale"></div>
-          <div class="galeria-item galeria-alta"><img src="../src/lobby.jpg" alt="Lobby de The Royale"></div>
-          <div class="galeria-item"><img src="../src/suite-2.webp" alt="Habitación de huéspedes"></div>
-          <div class="galeria-item"><img src="../src/architecture.jpg" alt="Detalle arquitectónico"></div>
-          <div class="galeria-item galeria-ancha"><img src="../src/suite-3.webp" alt="Suite de lujo"></div>
-          <div class="galeria-item"><img src="../src/restaurant.jpg" alt="Restaurante de The Royale"></div>
-          <div class="galeria-item"><img src="../src/spa.webp" alt="Spa de The Royale"></div>
-          <div class="galeria-item galeria-ancha"><img src="../src/skyline.jpg" alt="Vista al skyline de Manhattan"></div>
-          <div class="galeria-item galeria-ancha"><img src="../src/vessel.jpg" alt="The Vessel, New York"></div>
+          <div class="galeria-item galeria-grande"><img th:src="@{/images/fachada-exterior.jpg}" alt="Fachada exterior de The Royale"></div>
+          <div class="galeria-item galeria-alta"><img th:src="@{/images/lobby.jpg}" alt="Lobby de The Royale"></div>
+          <div class="galeria-item"><img th:src="@{/images/suite-2.webp}" alt="Habitación de huéspedes"></div>
+          <div class="galeria-item"><img th:src="@{/images/architecture.jpg}" alt="Detalle arquitectónico"></div>
+          <div class="galeria-item galeria-ancha"><img th:src="@{/images/suite-3.webp}" alt="Suite de lujo"></div>
+          <div class="galeria-item"><img th:src="@{/images/restaurant.jpg}" alt="Restaurante de The Royale"></div>
+          <div class="galeria-item"><img th:src="@{/images/spa.webp}" alt="Spa de The Royale"></div>
+          <div class="galeria-item galeria-ancha"><img th:src="@{/images/skyline.jpg}" alt="Vista al skyline de Manhattan"></div>
+          <div class="galeria-item galeria-ancha"><img th:src="@{/images/vessel.jpg}" alt="The Vessel, New York"></div>
         </div>
       </div>
     </section>
@@ -428,7 +426,7 @@
       <div class="linea-vertical-dorada aparecer"></div>
       <h2 class="aparecer">Your New York Story Starts Here.</h2>
       <p class="cta-subtexto aparecer">Stay at The Royale and experience New York with a different perspective.</p>
-      <a href="login.html" class="btn-dorado aparecer">Book Your Stay</a>
+      <a th:href="@{/login}" class="btn-dorado aparecer">Book Your Stay</a>
     </section>
 
   </main>
@@ -453,9 +451,9 @@
           <span class="marca-nombre footer-marca">The Royale</span>
           <p>Luxury Boutique Hotel<br>New York City</p>
           <div class="footer-redes">
-            <a href="contact.html" aria-label="Instagram">IG</a>
-            <a href="contact.html" aria-label="Facebook">FB</a>
-            <a href="contact.html" aria-label="LinkedIn">IN</a>
+            <a th:href="@{/contact}" aria-label="Instagram">IG</a>
+            <a th:href="@{/contact}" aria-label="Facebook">FB</a>
+            <a th:href="@{/contact}" aria-label="LinkedIn">IN</a>
           </div>
         </div>
         <div class="footer-columna">
@@ -463,14 +461,14 @@
           <a href="#rooms">Rooms</a>
           <a href="#services">Services</a>
           <a href="#experiences">Experiences</a>
-          <a href="about.html">About</a>
-          <a href="contact.html">Contact</a>
+          <a th:href="@{/about}">About</a>
+          <a th:href="@{/contact}">Contact</a>
         </div>
         <div class="footer-columna">
           <span class="footer-columna-titulo">Guest</span>
-          <a href="login.html">Sign In</a>
-          <a href="login.html">My Reservations</a>
-          <a href="login.html">Book a Room</a>
+          <a th:href="@{/login}">Sign In</a>
+          <a th:href="@{/login}">My Reservations</a>
+          <a th:href="@{/login}">Book a Room</a>
         </div>
         <div class="footer-columna">
           <span class="footer-columna-titulo">Contact</span>
@@ -486,6 +484,6 @@
     </div>
   </footer>
 
-  <script src="../script/script.js"></script>
+  <script th:src="@{/js/script.js}"></script>
 </body>
 </html>

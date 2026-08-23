@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Not Found')}"></head>
+<body>
+
+<header th:replace="~{layout :: cabecera}"></header>
+
+<main class="contenedor seccion">
+  <p class="eyebrow">Error 404</p>
+  <h1>Service Not Found</h1>
+  <p class="parrafo-cuerpo">The service you're looking for doesn't exist.</p>
+  <a th:href="@{/servicios/tarjetas}" class="enlace-subrayado">Back to Services</a>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+
+</body>
+</html>
