@@ -1,0 +1,163 @@
+/* ===== Paleta y tipografía de The Royale, reutilizada del frontend ===== */
+:root {
+  --color-oscuro: #252525;
+  --color-blanco: #ffffff;
+  --color-texto-cuerpo: #545454;
+  --color-texto-etiqueta: #7d7d7d;
+  --color-dorado: #c6a15b;
+  --color-borde-claro: #cfcfcf;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  color: var(--color-texto-cuerpo);
+}
+
+h1, h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  color: var(--color-oscuro);
+}
+
+.contenedor {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.seccion {
+  padding: 60px 0;
+}
+
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+  margin-bottom: 12px;
+}
+
+.cabecera-simple {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--color-borde-claro);
+}
+
+.marca-nombre {
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-oscuro);
+  text-decoration: none;
+}
+
+.cabecera-simple nav {
+  display: flex;
+  gap: 24px;
+}
+
+.cabecera-simple nav a {
+  font-size: 0.8rem;
+  color: var(--color-texto-cuerpo);
+  text-decoration: none;
+}
+
+/* ===== Tabla de servicios ===== */
+.tabla-servicios {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+.tabla-servicios th,
+.tabla-servicios td {
+  text-align: left;
+  padding: 14px;
+  border-bottom: 1px solid var(--color-borde-claro);
+}
+
+.tabla-imagen {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+}
+
+/* ===== Tarjetas de servicios ===== */
+.tarjetas-servicios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.tarjeta-servicio {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--color-borde-claro);
+}
+
+.tarjeta-servicio-imagen img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.tarjeta-servicio-info {
+  padding: 20px;
+}
+
+.numero-dorado {
+  color: var(--color-dorado);
+  font-weight: 700;
+}
+
+/* ===== Detalle de un servicio ===== */
+.detalle-servicio {
+  display: flex;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+
+.detalle-servicio-imagen {
+  flex: 1 1 400px;
+}
+
+.detalle-servicio-imagen img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.detalle-servicio-info {
+  flex: 1 1 300px;
+}
+
+.enlace-subrayado {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-borde-claro);
+  padding-bottom: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.pie-simple {
+  text-align: center;
+  padding: 24px;
+  border-top: 1px solid var(--color-borde-claro);
+  font-size: 0.75rem;
+  color: var(--color-texto-etiqueta);
+}

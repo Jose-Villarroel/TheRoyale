@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${servicio.nombre})}"></head>
+<body>
+
+<header th:replace="~{layout :: cabecera}"></header>
+
+<main class="contenedor seccion detalle-servicio">
+  <div class="detalle-servicio-imagen">
+    <img th:src="${servicio.imagenUrl}" alt="">
+  </div>
+  <div class="detalle-servicio-info">
+    <p class="eyebrow">Service Detail</p>
+    <h1 th:text="${servicio.nombre}">Nombre</h1>
+    <p class="parrafo-cuerpo" th:text="${servicio.descripcion}">Descripción</p>
+    <p class="numero-dorado" th:text="'$' + ${servicio.precio}">Precio</p>
+    <a th:href="@{/servicios/tarjetas}" class="enlace-subrayado">Back to Services</a>
+  </div>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+
+</body>
+</html>

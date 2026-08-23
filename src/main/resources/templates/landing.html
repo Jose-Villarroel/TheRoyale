@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Royale | Boutique Luxury Hotel — New York</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/landing.css}">
+</head>
+<body>
+
+  <!-- ===== Barra utilitaria + navegación ===== -->
+  <div class="envoltorio-cabecera" id="envoltorioCabecera">
+
+    <div class="barra-utilitaria" id="barraUtilitaria">
+      <div class="barra-utilitaria-derecha">
+        <a th:href="@{/contact}">+1 507 3165 232</a>
+        <a th:href="@{/login}">Sign In</a>
+      </div>
+    </div>
+
+    <header class="cabecera" id="cabecera">
+      <a th:href="@{/}" class="marca">
+        <img th:src="@{/images/logo-removebg-preview.png}" alt="The Royale" class="marca-logo">
+      </a>
+
+      <nav class="nav-principal" id="navPrincipal">
+        <a href="#rooms">Rooms</a>
+        <a href="#services">Services</a>
+        <a href="#experiences">Experiences</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+      </nav>
+
+      <a th:href="@{/login}" class="btn-dorado btn-nav-reserva">Book Now</a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+        <span></span><span></span>
+      </button>
+    </header>
+  </div>
+
+  <!-- ===== Menú móvil ===== -->
+  <div class="menu-movil" id="menuMovil">
+    <div class="menu-movil-encabezado">
+      <img th:src="@{/images/logo.jpeg}" alt="The Royale" class="marca-logo marca-logo-movil">
+      <button id="menuCerrar" aria-label="Cerrar menú">&times;</button>
+    </div>
+    <nav class="menu-movil-nav">
+      <a href="#rooms" class="enlace-menu-movil">Rooms</a>
+      <a href="#services" class="enlace-menu-movil">Services</a>
+      <a href="#experiences" class="enlace-menu-movil">Experiences</a>
+      <a th:href="@{/about}" class="enlace-menu-movil">About</a>
+      <a th:href="@{/contact}" class="enlace-menu-movil">Contact</a>
+    </nav>
+    <div class="menu-movil-pie">
+      <a th:href="@{/login}">Sign In</a>
+      <a th:href="@{/login}" class="btn-dorado">Book Now</a>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ===== Hero ===== -->
+    <section class="hero" id="top">
+      <div class="hero-media" id="heroMedia">
+        <img th:src="@{/images/entrada2.PNG}" alt="Entrada de The Royale">
+      </div>
+      <div class="hero-degradado"></div>
+
+      <div class="hero-contenido aparecer">
+        <h1>Stay Above<br>the Ordinary.</h1>
+        <p class="hero-subtexto">Experience refined luxury in the heart of New York.</p>
+        <div class="hero-botones">
+          <a th:href="@{/login}" class="btn-dorado">Book Your Stay</a>
+          <a href="#about" class="btn-contorno-claro">Explore The Royale</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Formulario de reserva flotante ===== -->
+    <section class="seccion-formulario">
+      <form class="formulario-reserva aparecer" id="formularioReserva">
+        <label>
+          <span>Arrival</span>
+          <input type="date" name="llegada" required>
+        </label>
+        <label>
+          <span>Departure</span>
+          <input type="date" name="salida" required>
+        </label>
+        <label>
+          <span>Guests</span>
+          <select name="huespedes">
+            <option>1 guest</option>
+            <option>2 guests</option>
+            <option>3 guests</option>
+            <option>4 guests</option>
+          </select>
+        </label>
+        <label>
+          <span>Room</span>
+          <select name="habitacion">
+            <option>Normal</option>
+            <option>Executive</option>
+            <option>VIP</option>
+            <option>Luxury</option>
+          </select>
+        </label>
+        <button type="submit" class="btn-dorado">Check Availability</button>
+      </form>
+      <p class="formulario-nota">Sign in required to confirm a reservation.</p>
+    </section>
+
+    <!-- ===== 01 — The Hotel ===== -->
+    <section class="seccion" id="about">
+      <div class="contenedor grid-about">
+        <div class="about-texto aparecer">
+          <p class="eyebrow">01 — The Hotel</p>
+          <h2>A Different Kind of Luxury</h2>
+          <span class="linea-dorada-horizontal"></span>
+          <p class="parrafo-cuerpo">
+            The Royale brings together contemporary elegance, personalized service and the
+            unmistakable energy of New York. Every detail is designed for guests who expect
+            more from their stay.
+          </p>
+          <div class="stats-fila">
+            <div class="stat">
+              <span class="stat-numero">48</span>
+              <span class="stat-label">Rooms &amp; Suites</span>
+            </div>
+            <div class="stat">
+              <span class="stat-numero">24/7</span>
+              <span class="stat-label">Concierge</span>
+            </div>
+            <div class="stat">
+              <span class="stat-numero">5th Ave</span>
+              <span class="stat-label">Midtown Manhattan</span>
+            </div>
+          </div>
+          <a th:href="@{/about}" class="enlace-subrayado">About The Royale</a>
+        </div>
+
+        <div class="about-imagenes aparecer">
+          <div class="about-imagen-grande">
+            <img th:src="@{/images/dinningroom-1.webp}" alt="Lobby de The Royale">
+          </div>
+          <div class="about-imagen-pequena">
+            <img th:src="@{/images/suite-2.webp}" alt="Detalle de una suite de The Royale">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Cita destacada ===== -->
+    <section class="seccion seccion-oscura seccion-cita">
+      <div class="linea-vertical-dorada"></div>
+      <blockquote class="aparecer">
+        Luxury is not what is added. It is what is understood.
+      </blockquote>
+      <p class="cita-atribucion aparecer">The Royale, New York</p>
+    </section>
+
+    <!-- ===== 02 — Accommodation (carrusel de habitaciones) ===== -->
+    <section class="seccion" id="rooms">
+      <div class="contenedor">
+        <div class="rooms-encabezado aparecer">
+          <div>
+            <p class="eyebrow">02 — Accommodation</p>
+            <h2>Rooms &amp; Suites</h2>
+            <p class="parrafo-cuerpo">Spaces designed around the way you travel.</p>
+          </div>
+          <div class="carrusel-controles">
+            <button id="carruselAnterior" class="btn-carrusel" aria-label="Habitación anterior">&#8592;</button>
+            <button id="carruselSiguiente" class="btn-carrusel" aria-label="Siguiente habitación">&#8594;</button>
+          </div>
+        </div>
+
+        <div class="carrusel-ventana aparecer">
+          <div class="carrusel-track" id="carruselTrack">
+
+            <article class="habitacion-slide">
+              <div class="habitacion-imagen">
+                <img th:src="@{/images/suite-3.webp}" alt="Habitación Normal">
+              </div>
+              <div class="habitacion-info">
+                <span class="numero-dorado">01 / Normal</span>
+                <h3>Elegant essentials for a refined stay.</h3>
+                <ul class="habitacion-lista">
+                  <li>1–2 guests</li>
+                  <li>Double bed</li>
+                  <li>Private bathroom</li>
+                  <li>Premium Wi-Fi</li>
+                </ul>
+                <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
+              </div>
+            </article>
+
+            <article class="habitacion-slide">
+              <div class="habitacion-imagen">
+                <img th:src="@{/images/suite-1.webp}" alt="Habitación Executive">
+              </div>
+              <div class="habitacion-info">
+                <span class="numero-dorado">02 / Executive</span>
+                <h3>Designed for those who work while they travel.</h3>
+                <ul class="habitacion-lista">
+                  <li>1–2 guests</li>
+                  <li>Executive workspace</li>
+                  <li>King bed</li>
+                  <li>Premium Wi-Fi</li>
+                </ul>
+                <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
+              </div>
+            </article>
+
+            <article class="habitacion-slide">
+              <div class="habitacion-imagen">
+                <img th:src="@{/images/suite-2.webp}" alt="Habitación VIP">
+              </div>
+              <div class="habitacion-info">
+                <span class="numero-dorado">03 / VIP</span>
+                <h3>A private space to relax and unwind.</h3>
+                <ul class="habitacion-lista">
+                  <li>Up to 3 guests</li>
+                  <li>Separate living area</li>
+                  <li>Premium amenities</li>
+                  <li>City views</li>
+                </ul>
+                <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
+              </div>
+            </article>
+
+            <article class="habitacion-slide">
+              <div class="habitacion-imagen">
+                <img th:src="@{/images/suite-4.webp}" alt="Suite Luxury">
+              </div>
+              <div class="habitacion-info">
+                <span class="numero-dorado">04 / Luxury</span>
+                <h3>The ultimate expression of The Royale.</h3>
+                <ul class="habitacion-lista">
+                  <li>Up to 4 guests</li>
+                  <li>Full suite</li>
+                  <li>Jacuzzi</li>
+                  <li>Privileged city view</li>
+                </ul>
+                <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+        <div class="carrusel-pie aparecer">
+          <div class="carrusel-progreso-contenedor">
+            <span id="carruselContador">01 / 04</span>
+            <span class="carrusel-barra">
+              <span class="carrusel-barra-relleno" id="carruselProgreso"></span>
+            </span>
+          </div>
+          <a th:href="@{/rooms}" class="btn-contorno-oscuro">Explore All Rooms</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 03 — Services ===== -->
+    <section class="seccion seccion-off-blanca" id="services">
+      <div class="contenedor">
+        <div class="services-encabezado aparecer">
+          <div>
+            <p class="eyebrow">03 — Services</p>
+            <h2>Everything You Need. Nothing You Don't.</h2>
+          </div>
+          <p class="parrafo-cuerpo">
+            From wellness and dining to transportation and private experiences, The Royale
+            gives you the freedom to personalize your stay. Services are optional and charged
+            individually to your room account.
+          </p>
+        </div>
+
+        <div class="tarjetas-servicios aparecer">
+          <a th:href="@{/servicios/1}" class="tarjeta-servicio">
+            <div class="tarjeta-servicio-imagen">
+              <img th:src="@{/images/spa.webp}" alt="Spa y bienestar">
+            </div>
+            <div class="tarjeta-servicio-info">
+              <span class="numero-romano">I</span>
+              <h3>Wellness</h3>
+              <p>Spa, sauna, Turkish bath, pool and gym.</p>
+            </div>
+          </a>
+          <a th:href="@{/servicios/2}" class="tarjeta-servicio">
+            <div class="tarjeta-servicio-imagen">
+              <img th:src="@{/images/dinningroom-1.webp}" alt="Restaurante y bar">
+            </div>
+            <div class="tarjeta-servicio-info">
+              <span class="numero-romano">II</span>
+              <h3>Dining</h3>
+              <p>Room service, restaurant, bar and minibar.</p>
+            </div>
+          </a>
+          <a th:href="@{/servicios/3}" class="tarjeta-servicio">
+            <div class="tarjeta-servicio-imagen">
+              <img th:src="@{/images/meeting-room.jpg}" alt="Sala de reuniones">
+            </div>
+            <div class="tarjeta-servicio-info">
+              <span class="numero-romano">III</span>
+              <h3>Business</h3>
+              <p>Business center, meeting rooms and executive services.</p>
+            </div>
+          </a>
+          <a th:href="@{/servicios/4}" class="tarjeta-servicio">
+            <div class="tarjeta-servicio-imagen">
+              <img th:src="@{/images/concierge.jpg}" alt="Recepción de conserjería">
+            </div>
+            <div class="tarjeta-servicio-info">
+              <span class="numero-romano">IV</span>
+              <h3>Concierge</h3>
+              <p>Personalized assistance and premium guest services.</p>
+            </div>
+          </a>
+        </div>
+
+        <a th:href="@{/servicios/tarjetas}" class="btn-contorno-oscuro btn-centrado aparecer">Explore Services</a>
+      </div>
+    </section>
+
+    <!-- ===== 04 — Experiences ===== -->
+    <section class="seccion seccion-oscura seccion-experiencias" id="experiences">
+      <div class="experiencias-media" id="experienciasMedia"></div>
+       <div class="experiencias-degradado"></div>
+
+      <div class="contenedor experiencias-encabezado aparecer">
+        <div>
+          <p class="eyebrow eyebrow-claro">04 — Experiences</p>
+          <h2>New York, Your Way.</h2>
+          <p class="parrafo-cuerpo parrafo-claro">
+            Discover New York beyond your room. Our curated experiences and trusted
+            partners make exploring the city effortless.
+          </p>
+        </div>
+        <a th:href="@{/experiences}" class="btn-dorado">Discover Experiences</a>
+      </div>
+
+      <div class="experiencias-tira aparecer" id="experienciasTira">
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/nyc-tour.jpg}" alt="Tour guiado por la ciudad">
+          <span>Guided city tours</span>
+        </a>
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/private-transport.jpg}" alt="Transporte privado">
+          <span>Private transportation</span>
+        </a>
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/airport-transfer.jpg}" alt="Traslado al aeropuerto">
+          <span>Airport transfers</span>
+        </a>
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/bike-rental.jpg}" alt="Alquiler de bicicletas">
+          <span>Bicycle rentals</span>
+        </a>
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/broadway.jpg}" alt="Entradas para Broadway">
+          <span>Broadway tickets</span>
+        </a>
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/the-MET.jpg}" alt="Museos y atracciones">
+          <span>Museums &amp; attractions</span>
+        </a>
+        <a th:href="@{/experiences}" class="experiencia-tarjeta">
+          <img th:src="@{/images/private-chef.jpg}" alt="Experiencias privadas en Nueva York">
+          <span>Private experiences</span>
+        </a>
+      </div>
+      <p class="experiencias-scroll-hint">Scroll →</p>
+    </section>
+
+    <!-- ===== 05 — Business Travel ===== -->
+    <section class="seccion">
+      <div class="contenedor grid-business">
+        <div class="business-imagen aparecer">
+          <img th:src="@{/images/meeting-room.jpg}" alt="Espacio de trabajo en habitación ejecutiva">
+        </div>
+        <div class="business-texto aparecer">
+          <p class="eyebrow">05 — Business Travel</p>
+          <h2>Designed for Business. Made for Living.</h2>
+          <span class="linea-dorada-horizontal"></span>
+          <div class="business-lista">
+            <p>Executive rooms</p>
+            <p>Workspaces</p>
+            <p>Business center</p>
+            <p>Meeting rooms</p>
+            <p>High-speed Wi-Fi</p>
+            <p>Concierge assistance</p>
+          </div>
+          <a th:href="@{/rooms}" class="enlace-subrayado">View Executive Rooms</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 06 — Gallery ===== -->
+    <section class="seccion" id="gallery">
+      <div class="contenedor">
+        <div class="aparecer">
+          <p class="eyebrow">06 — Gallery</p>
+          <h2>The Royale in Detail</h2>
+        </div>
+
+        <div class="galeria-bento aparecer">
+          <div class="galeria-item galeria-grande"><img th:src="@{/images/fachada-exterior.jpg}" alt="Fachada exterior de The Royale"></div>
+          <div class="galeria-item galeria-alta"><img th:src="@{/images/lobby.jpg}" alt="Lobby de The Royale"></div>
+          <div class="galeria-item"><img th:src="@{/images/suite-2.webp}" alt="Habitación de huéspedes"></div>
+          <div class="galeria-item"><img th:src="@{/images/architecture.jpg}" alt="Detalle arquitectónico"></div>
+          <div class="galeria-item galeria-ancha"><img th:src="@{/images/suite-3.webp}" alt="Suite de lujo"></div>
+          <div class="galeria-item"><img th:src="@{/images/restaurant.jpg}" alt="Restaurante de The Royale"></div>
+          <div class="galeria-item"><img th:src="@{/images/spa.webp}" alt="Spa de The Royale"></div>
+          <div class="galeria-item galeria-ancha"><img th:src="@{/images/skyline.jpg}" alt="Vista al skyline de Manhattan"></div>
+          <div class="galeria-item galeria-ancha"><img th:src="@{/images/vessel.jpg}" alt="The Vessel, New York"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA final ===== -->
+    <section class="seccion seccion-oscura seccion-cta">
+      <div class="linea-vertical-dorada aparecer"></div>
+      <h2 class="aparecer">Your New York Story Starts Here.</h2>
+      <p class="cta-subtexto aparecer">Stay at The Royale and experience New York with a different perspective.</p>
+      <a th:href="@{/login}" class="btn-dorado aparecer">Book Your Stay</a>
+    </section>
+
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="pie-pagina">
+    <div class="contenedor">
+
+      <div class="newsletter-fila">
+        <div>
+          <p class="eyebrow">Newsletter</p>
+          <p class="newsletter-titulo">Stay close to The Royale.</p>
+        </div>
+        <form class="formulario-newsletter" id="formularioNewsletter">
+          <input type="email" placeholder="Email address" required>
+          <button type="submit" class="btn-contorno-oscuro">Subscribe</button>
+        </form>
+      </div>
+
+      <div class="footer-columnas">
+        <div class="footer-columna">
+          <span class="marca-nombre footer-marca">The Royale</span>
+          <p>Luxury Boutique Hotel<br>New York City</p>
+          <div class="footer-redes">
+            <a th:href="@{/contact}" aria-label="Instagram">IG</a>
+            <a th:href="@{/contact}" aria-label="Facebook">FB</a>
+            <a th:href="@{/contact}" aria-label="LinkedIn">IN</a>
+          </div>
+        </div>
+        <div class="footer-columna">
+          <span class="footer-columna-titulo">Navigation</span>
+          <a href="#rooms">Rooms</a>
+          <a href="#services">Services</a>
+          <a href="#experiences">Experiences</a>
+          <a th:href="@{/about}">About</a>
+          <a th:href="@{/contact}">Contact</a>
+        </div>
+        <div class="footer-columna">
+          <span class="footer-columna-titulo">Guest</span>
+          <a th:href="@{/login}">Sign In</a>
+          <a th:href="@{/login}">My Reservations</a>
+          <a th:href="@{/login}">Book a Room</a>
+        </div>
+        <div class="footer-columna">
+          <span class="footer-columna-titulo">Contact</span>
+          <p>New York, NY<br>+1 XXX XXX XXXX</p>
+          <a href="mailto:reservations@theroyale.com">reservations@theroyale.com</a>
+        </div>
+      </div>
+
+      <div class="footer-inferior">
+        <span>© 2026 The Royale. All rights reserved.</span>
+        <span>Fifth Avenue · New York City</span>
+      </div>
+    </div>
+  </footer>
+
+  <script th:src="@{/js/script.js}"></script>
+</body>
+</html>
