@@ -52,4 +52,10 @@ public class ServicioRepository {
                 .filter(servicio -> servicio.getId().equals(id))
                 .findFirst();
     }
+
+    public Optional<Servicio> obtenerPorNombre(String nombre) {
+        return servicios.stream()
+                .filter(servicio -> servicio.getNombre().equalsIgnoreCase(nombre))
+                .findFirst();
+    }
 }

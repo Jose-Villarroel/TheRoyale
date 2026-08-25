@@ -24,4 +24,8 @@ public class ServicioService {
     public Optional<Servicio> buscarPorId(Long id) {
         return servicioRepository.obtenerPorId(id);
     }
+
+    public Optional<Servicio> buscarPorNombre(String nombre) {
+        return servicioRepository.obtenerPorNombre(nombre);
+    }
 }

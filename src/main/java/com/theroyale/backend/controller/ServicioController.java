@@ -18,21 +18,21 @@ public class ServicioController {
         this.servicioService = servicioService;
     }
 
-    @GetMapping("/servicios/tabla")
+    @GetMapping("/services/table")
     public String mostrarTabla(Model model) {
         model.addAttribute("servicios", servicioService.listarServicios());
         return "servicios-tabla";
     }
 
-    @GetMapping("/servicios/tarjetas")
+    @GetMapping("/services/cards")
     public String mostrarTarjetas(Model model) {
         model.addAttribute("servicios", servicioService.listarServicios());
         return "servicios-tarjetas";
     }
 
-    @GetMapping("/servicios/{id}")
-    public String mostrarDetalle(@PathVariable Long id, Model model) {
-        Optional<Servicio> servicioEncontrado = servicioService.buscarPorId(id);
+    @GetMapping("/services/{nombre}")
+    public String mostrarDetalle(@PathVariable String nombre, Model model) {
+        Optional<Servicio> servicioEncontrado = servicioService.buscarPorNombre(nombre);
 
         if (servicioEncontrado.isEmpty()) {
             return "servicio-no-encontrado";

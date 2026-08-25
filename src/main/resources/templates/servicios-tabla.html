@@ -25,7 +25,7 @@
         <td th:text="${servicio.nombre}">Nombre</td>
         <td th:text="${servicio.descripcion}">Descripción</td>
         <td th:text="'$' + ${servicio.precio}">Precio</td>
-        <td><a th:href="@{/servicios/{id}(id=${servicio.id})}" class="enlace-subrayado">View Detail</a></td>
+        <td><a th:href="@{/services/{nombre}(nombre=${servicio.nombre})}" class="enlace-subrayado">View Detail</a></td>
       </tr>
     </tbody>
   </table>

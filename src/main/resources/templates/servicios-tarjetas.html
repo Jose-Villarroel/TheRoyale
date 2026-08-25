@@ -11,7 +11,7 @@
 
   <div class="tarjetas-servicios">
     <a th:each="servicio : ${servicios}"
-       th:href="@{/servicios/{id}(id=${servicio.id})}"
+       th:href="@{/services/{nombre}(nombre=${servicio.nombre})}"
        class="tarjeta-servicio">
       <div class="tarjeta-servicio-imagen">
         <img th:src="${servicio.imagenUrl}" alt="">
