@@ -10,10 +10,12 @@ const menuCerrar = document.getElementById("menuCerrar");
 function actualizarCabeceraEnScroll() {
   const y = window.scrollY || 0;
 
-  if (y > 90) {
-    envoltorioCabecera.classList.add("cabecera-solida");
-  } else {
-    envoltorioCabecera.classList.remove("cabecera-solida");
+  if (envoltorioCabecera) {
+    if (y > 90) {
+      envoltorioCabecera.classList.add("cabecera-solida");
+    } else {
+      envoltorioCabecera.classList.remove("cabecera-solida");
+    }
   }
 
   // Efecto parallax suave en la imagen del hero
@@ -68,6 +70,8 @@ let habitacionActual = 0;
 
 // ===== Función: mostrar la habitación según el índice actual =====
 function actualizarCarrusel() {
+  if (!carruselTrack) return;
+
   carruselTrack.style.transform = "translateX(-" + (habitacionActual * 100) + "%)";
   carruselProgreso.style.transform = "translateX(" + (habitacionActual * 100) + "%)";
 
@@ -102,12 +106,18 @@ function manejarFormularioNewsletter(evento) {
 
 // ===== Event listeners =====
 window.addEventListener("scroll", actualizarCabeceraEnScroll, { passive: true });
-menuToggle.addEventListener("click", abrirMenuMovil);
-menuCerrar.addEventListener("click", cerrarMenuMovil);
-document.getElementById("carruselAnterior").addEventListener("click", irHabitacionAnterior);
-document.getElementById("carruselSiguiente").addEventListener("click", irHabitacionSiguiente);
-document.getElementById("formularioReserva").addEventListener("submit", manejarFormularioReserva);
-document.getElementById("formularioNewsletter").addEventListener("submit", manejarFormularioNewsletter);
+if (menuToggle) menuToggle.addEventListener("click", abrirMenuMovil);
+if (menuCerrar) menuCerrar.addEventListener("click", cerrarMenuMovil);
+
+const carruselAnterior = document.getElementById("carruselAnterior");
+const carruselSiguiente = document.getElementById("carruselSiguiente");
+const formularioReserva = document.getElementById("formularioReserva");
+const formularioNewsletter = document.getElementById("formularioNewsletter");
+
+if (carruselAnterior) carruselAnterior.addEventListener("click", irHabitacionAnterior);
+if (carruselSiguiente) carruselSiguiente.addEventListener("click", irHabitacionSiguiente);
+if (formularioReserva) formularioReserva.addEventListener("submit", manejarFormularioReserva);
+if (formularioNewsletter) formularioNewsletter.addEventListener("submit", manejarFormularioNewsletter);
 
 // Cierra el menú móvil automáticamente al hacer clic en cualquiera de sus enlaces
 document.querySelectorAll(".enlace-menu-movil, .menu-movil-pie a").forEach(function (enlace) {

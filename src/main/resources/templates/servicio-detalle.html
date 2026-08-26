@@ -3,22 +3,101 @@
 <head th:replace="~{layout :: head(${servicio.nombre})}"></head>
 <body>
 
-<header th:replace="~{layout :: cabecera}"></header>
+<div th:replace="~{layout :: cabecera}"></div>
 
-<main class="contenedor seccion detalle-servicio">
-  <div class="detalle-servicio-imagen">
-    <img th:src="${servicio.imagenUrl}" alt="">
-  </div>
-  <div class="detalle-servicio-info">
-    <p class="eyebrow">Service Detail</p>
-    <h1 th:text="${servicio.nombre}">Nombre</h1>
-    <p class="parrafo-cuerpo" th:text="${servicio.descripcion}">Descripción</p>
-    <p class="numero-dorado" th:text="'$' + ${servicio.precio}">Precio</p>
-    <a th:href="@{/services/cards}" class="enlace-subrayado">Back to Services</a>
-  </div>
+<main>
+
+  <section class="hero-interior" id="top">
+    <div class="hero-media" id="heroMedia">
+      <img th:src="${servicio.imagenUrl}" alt="">
+    </div>
+    <div class="hero-degradado"></div>
+    <div class="contenedor hero-interior-contenido">
+      <a th:href="@{/services/cards}" class="hero-interior-volver">&larr; All Services</a>
+      <span class="eyebrow eyebrow-claro">Service Detail</span>
+      <h1 th:text="${servicio.nombre}">Nombre</h1>
+
+      <div class="hero-interior-meta">
+        <div class="hero-interior-stat">
+          <span class="hero-interior-stat-etiqueta">Charged to</span>
+          <span class="hero-interior-stat-valor">Room account</span>
+        </div>
+        <div class="hero-interior-stat">
+          <span class="hero-interior-stat-etiqueta">From</span>
+          <span class="hero-interior-stat-valor precio-destacado" th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 0)}">$0</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor detalle-servicio">
+      <div class="detalle-servicio-texto aparecer">
+        <span class="eyebrow">About This Service</span>
+        <p class="parrafo-cuerpo" th:text="${servicio.descripcion}">Descripción</p>
+      </div>
+
+      <div class="detalle-servicio-panel aparecer">
+        <span class="detalle-servicio-panel-titulo">Details</span>
+        <div>
+          <div class="detalle-servicio-panel-fila">
+            <span class="detalle-servicio-panel-etiqueta">Service</span>
+            <span th:text="${servicio.nombre}">Nombre</span>
+          </div>
+          <div class="detalle-servicio-panel-fila">
+            <span class="detalle-servicio-panel-etiqueta">Price</span>
+            <span th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 0)}">Precio</span>
+          </div>
+          <div class="detalle-servicio-panel-fila">
+            <span class="detalle-servicio-panel-etiqueta">Charged to</span>
+            <span>Room account</span>
+          </div>
+        </div>
+        <a th:href="@{/login}" class="btn-dorado btn-ancho">Request This Service</a>
+        <p class="detalle-servicio-nota">Sign in required to request a service.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion seccion-off-blanca" th:if="${servicios != null and servicios.size() > 1}">
+    <div class="contenedor">
+      <div class="services-encabezado aparecer">
+        <div>
+          <p class="eyebrow">Also at The Royale</p>
+          <h2>Other Services</h2>
+        </div>
+        <a th:href="@{/services/cards}" class="btn-contorno-oscuro">Explore Services</a>
+      </div>
+
+      <div class="tarjetas-servicios aparecer">
+        <a th:each="otro : ${servicios}"
+           th:if="${otro.nombre != servicio.nombre}"
+           th:href="@{/services/{nombre}(nombre=${otro.nombre})}"
+           class="tarjeta-servicio">
+          <div class="tarjeta-servicio-imagen">
+            <img th:src="${otro.imagenUrl}" alt="">
+          </div>
+          <div class="tarjeta-servicio-info">
+            <h3 th:text="${otro.nombre}">Nombre</h3>
+            <p th:text="${otro.descripcion}">Descripción</p>
+            <span class="precio-servicio" th:text="'$' + ${#numbers.formatDecimal(otro.precio, 1, 0)}">Precio</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion seccion-oscura seccion-cta">
+    <div class="linea-vertical-dorada"></div>
+    <h2>Request This Service.</h2>
+    <p class="cta-subtexto">Sign in to request it before you arrive, or ask your concierge to arrange it.</p>
+    <a th:href="@{/login}" class="btn-dorado">Request This Service</a>
+  </section>
+
 </main>
 
 <footer th:replace="~{layout :: pie}"></footer>
 
+<script th:src="@{/js/script.js}"></script>
 </body>
 </html>

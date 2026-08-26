@@ -5,21 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title th:text="${titulo} + ' | The Royale'">The Royale</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/landing.css}">
   <link rel="stylesheet" th:href="@{/css/servicios.css}">
 </head>
 <body>
 
-<header th:fragment="cabecera" class="cabecera-simple">
-  <a th:href="@{/}" class="marca-nombre">The Royale</a>
-  <nav>
-    <a th:href="@{/services/table}">Services (table)</a>
-    <a th:href="@{/services/cards}">Services (cards)</a>
-  </nav>
-</header>
+<!-- ===== Cabecera global (idéntica a la landing) ===== -->
+<th:block th:fragment="cabecera">
+  <div class="envoltorio-cabecera" id="envoltorioCabecera">
 
-<footer th:fragment="pie" class="pie-simple">
-  <span>© 2026 The Royale. All rights reserved.</span>
+    <div class="barra-utilitaria" id="barraUtilitaria">
+      <div class="barra-utilitaria-derecha">
+        <a th:href="@{/contact}">+1 507 3165 232</a>
+        <a th:href="@{/login}">Sign In</a>
+      </div>
+    </div>
+
+    <header class="cabecera" id="cabecera">
+      <a th:href="@{/}" class="marca">
+        <img th:src="@{/images/logo-removebg-preview.png}" alt="The Royale" class="marca-logo">
+      </a>
+
+      <nav class="nav-principal" id="navPrincipal">
+        <a th:href="@{/#rooms}">Rooms</a>
+        <a th:href="@{/services/cards}" class="activo">Services</a>
+        <a th:href="@{/#experiences}">Experiences</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+      </nav>
+
+      <a th:href="@{/login}" class="btn-dorado btn-nav-reserva">Book Now</a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+        <span></span><span></span>
+      </button>
+    </header>
+  </div>
+
+  <div class="menu-movil" id="menuMovil">
+    <div class="menu-movil-encabezado">
+      <img th:src="@{/images/logo.jpeg}" alt="The Royale" class="marca-logo marca-logo-movil">
+      <button id="menuCerrar" aria-label="Cerrar menú">&times;</button>
+    </div>
+    <nav class="menu-movil-nav">
+      <a th:href="@{/#rooms}" class="enlace-menu-movil">Rooms</a>
+      <a th:href="@{/services/cards}" class="enlace-menu-movil">Services</a>
+      <a th:href="@{/#experiences}" class="enlace-menu-movil">Experiences</a>
+      <a th:href="@{/about}" class="enlace-menu-movil">About</a>
+      <a th:href="@{/contact}" class="enlace-menu-movil">Contact</a>
+    </nav>
+    <div class="menu-movil-pie">
+      <a th:href="@{/login}">Sign In</a>
+      <a th:href="@{/login}" class="btn-dorado">Book Now</a>
+    </div>
+  </div>
+</th:block>
+
+<!-- ===== Pie de página global (idéntico a la landing) ===== -->
+<footer th:fragment="pie" class="pie-pagina">
+  <div class="contenedor">
+
+    <div class="newsletter-fila">
+      <div>
+        <p class="eyebrow">Newsletter</p>
+        <p class="newsletter-titulo">Stay close to The Royale.</p>
+      </div>
+      <form class="formulario-newsletter" id="formularioNewsletter">
+        <input type="email" placeholder="Email address" required>
+        <button type="submit" class="btn-contorno-oscuro">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="footer-columnas">
+      <div class="footer-columna">
+        <span class="marca-nombre footer-marca">The Royale</span>
+        <p>Luxury Boutique Hotel<br>New York City</p>
+        <div class="footer-redes">
+          <a th:href="@{/contact}" aria-label="Instagram">IG</a>
+          <a th:href="@{/contact}" aria-label="Facebook">FB</a>
+          <a th:href="@{/contact}" aria-label="LinkedIn">IN</a>
+        </div>
+      </div>
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Navigation</span>
+        <a th:href="@{/#rooms}">Rooms</a>
+        <a th:href="@{/services/cards}">Services</a>
+        <a th:href="@{/#experiences}">Experiences</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+      </div>
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Guest</span>
+        <a th:href="@{/login}">Sign In</a>
+        <a th:href="@{/login}">My Reservations</a>
+        <a th:href="@{/login}">Book a Room</a>
+      </div>
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Contact</span>
+        <p>New York, NY<br>+1 XXX XXX XXXX</p>
+        <a href="mailto:reservations@theroyale.com">reservations@theroyale.com</a>
+      </div>
+    </div>
+
+    <div class="footer-inferior">
+      <span>© 2026 The Royale. All rights reserved.</span>
+      <span>Fifth Avenue · New York City</span>
+    </div>
+  </div>
 </footer>
 
 </body>

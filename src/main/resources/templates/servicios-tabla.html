@@ -3,35 +3,61 @@
 <head th:replace="~{layout :: head('Services')}"></head>
 <body>
 
-<header th:replace="~{layout :: cabecera}"></header>
+<div th:replace="~{layout :: cabecera}"></div>
 
-<main class="contenedor seccion">
-  <p class="eyebrow">Services</p>
-  <h1>All Services</h1>
+<main>
 
-  <table class="tabla-servicios">
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Price</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="servicio : ${servicios}">
-        <td><img th:src="${servicio.imagenUrl}" alt="" class="tabla-imagen"></td>
-        <td th:text="${servicio.nombre}">Nombre</td>
-        <td th:text="${servicio.descripcion}">Descripción</td>
-        <td th:text="'$' + ${servicio.precio}">Precio</td>
-        <td><a th:href="@{/services/{nombre}(nombre=${servicio.nombre})}" class="enlace-subrayado">View Detail</a></td>
-      </tr>
-    </tbody>
-  </table>
+  <section class="hero-interior" id="top">
+    <div class="hero-media" id="heroMedia">
+      <img th:src="@{/images/spa.webp}" alt="The Royale services">
+    </div>
+    <div class="hero-degradado"></div>
+    <div class="contenedor hero-interior-contenido">
+      <span class="eyebrow eyebrow-claro">Services</span>
+      <h1>Everything You Need. Nothing You Don't.</h1>
+      <p class="parrafo-cuerpo parrafo-claro">
+        From wellness and dining to business and concierge care, every service is optional
+        and charged individually to your room account.
+      </p>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor">
+      <nav class="selector-vista aparecer">
+        <a th:href="@{/services/table}" class="activo">Table View</a>
+        <a th:href="@{/services/cards}">Card View</a>
+      </nav>
+
+      <div class="tabla-servicios-envoltorio aparecer">
+        <table class="tabla-servicios">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="servicio : ${servicios}">
+              <td><img th:src="${servicio.imagenUrl}" alt="" class="tabla-imagen"></td>
+              <td><span class="nombre-servicio" th:text="${servicio.nombre}">Nombre</span></td>
+              <td><span class="descripcion-servicio" th:text="${servicio.descripcion}">Descripción</span></td>
+              <td><span class="precio-servicio" th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 0)}">Precio</span></td>
+              <td><a th:href="@{/services/{nombre}(nombre=${servicio.nombre})}" class="enlace-subrayado">View Detail</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer th:replace="~{layout :: pie}"></footer>
 
+<script th:src="@{/js/script.js}"></script>
 </body>
 </html>

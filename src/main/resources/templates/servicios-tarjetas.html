@@ -3,29 +3,54 @@
 <head th:replace="~{layout :: head('Services')}"></head>
 <body>
 
-<header th:replace="~{layout :: cabecera}"></header>
+<div th:replace="~{layout :: cabecera}"></div>
 
-<main class="contenedor seccion">
-  <p class="eyebrow">Services</p>
-  <h1>All Services</h1>
+<main>
 
-  <div class="tarjetas-servicios">
-    <a th:each="servicio : ${servicios}"
-       th:href="@{/services/{nombre}(nombre=${servicio.nombre})}"
-       class="tarjeta-servicio">
-      <div class="tarjeta-servicio-imagen">
-        <img th:src="${servicio.imagenUrl}" alt="">
+  <section class="hero-interior" id="top">
+    <div class="hero-media" id="heroMedia">
+      <img th:src="@{/images/spa.webp}" alt="The Royale services">
+    </div>
+    <div class="hero-degradado"></div>
+    <div class="contenedor hero-interior-contenido">
+      <span class="eyebrow eyebrow-claro">Services</span>
+      <h1>Everything You Need. Nothing You Don't.</h1>
+      <p class="parrafo-cuerpo parrafo-claro">
+        From wellness and dining to business and concierge care, every service is optional
+        and charged individually to your room account.
+      </p>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor">
+      <nav class="selector-vista aparecer">
+        <a th:href="@{/services/table}">Table View</a>
+        <a th:href="@{/services/cards}" class="activo">Card View</a>
+      </nav>
+
+      <div class="tarjetas-servicios aparecer">
+        <a th:each="servicio, iter : ${servicios}"
+           th:href="@{/services/{nombre}(nombre=${servicio.nombre})}"
+           class="tarjeta-servicio">
+          <div class="tarjeta-servicio-imagen">
+            <img th:src="${servicio.imagenUrl}" alt="">
+          </div>
+          <div class="tarjeta-servicio-info">
+            <span class="indice-servicio" th:text="${#numbers.formatInteger(iter.count, 2)}">01</span>
+            <h3 th:text="${servicio.nombre}">Nombre</h3>
+            <p th:text="${servicio.descripcion}">Descripción</p>
+            <span class="precio-servicio" th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 0)}">Precio</span>
+          </div>
+        </a>
       </div>
-      <div class="tarjeta-servicio-info">
-        <h3 th:text="${servicio.nombre}">Nombre</h3>
-        <p th:text="${servicio.descripcion}">Descripción</p>
-        <p class="numero-dorado" th:text="'$' + ${servicio.precio}">Precio</p>
-      </div>
-    </a>
-  </div>
+    </div>
+  </section>
+
 </main>
 
 <footer th:replace="~{layout :: pie}"></footer>
 
+<script th:src="@{/js/script.js}"></script>
 </body>
 </html>

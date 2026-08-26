@@ -1,22 +1,21 @@
 package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.Servicio;
-import com.theroyale.backend.service.ServicioService;
+import com.theroyale.backend.service.InterfazService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import java.util.Optional;
 
 @Controller
 public class ServicioController {
+    @Autowired
+    private InterfazService servicioService;
 
-    private final ServicioService servicioService;
 
-    public ServicioController(ServicioService servicioService) {
-        this.servicioService = servicioService;
-    }
 
     @GetMapping("/services/table")
     public String mostrarTabla(Model model) {
@@ -39,6 +38,7 @@ public class ServicioController {
         }
 
         model.addAttribute("servicio", servicioEncontrado.get());
+        model.addAttribute("servicios", servicioService.listarServicios());
         return "servicio-detalle";
     }
 }
