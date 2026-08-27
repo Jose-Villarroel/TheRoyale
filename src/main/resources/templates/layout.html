@@ -12,8 +12,9 @@
 </head>
 <body>
 
-<!-- ===== Cabecera global (idéntica a la landing) ===== -->
+<!-- ===== Header real (idéntico al de la landing), reutilizable en todas las páginas ===== -->
 <th:block th:fragment="cabecera">
+
   <div class="envoltorio-cabecera" id="envoltorioCabecera">
 
     <div class="barra-utilitaria" id="barraUtilitaria">
@@ -29,9 +30,9 @@
       </a>
 
       <nav class="nav-principal" id="navPrincipal">
-        <a th:href="@{/#rooms}">Rooms</a>
-        <a th:href="@{/services/cards}" class="activo">Services</a>
-        <a th:href="@{/#experiences}">Experiences</a>
+        <a href="/#rooms">Rooms</a>
+        <a href="/#services">Services</a>
+        <a href="/#experiences">Experiences</a>
         <a th:href="@{/about}">About</a>
         <a th:href="@{/contact}">Contact</a>
       </nav>
@@ -50,9 +51,9 @@
       <button id="menuCerrar" aria-label="Cerrar menú">&times;</button>
     </div>
     <nav class="menu-movil-nav">
-      <a th:href="@{/#rooms}" class="enlace-menu-movil">Rooms</a>
-      <a th:href="@{/services/cards}" class="enlace-menu-movil">Services</a>
-      <a th:href="@{/#experiences}" class="enlace-menu-movil">Experiences</a>
+      <a href="/#rooms" class="enlace-menu-movil">Rooms</a>
+      <a href="/#services" class="enlace-menu-movil">Services</a>
+      <a href="/#experiences" class="enlace-menu-movil">Experiences</a>
       <a th:href="@{/about}" class="enlace-menu-movil">About</a>
       <a th:href="@{/contact}" class="enlace-menu-movil">Contact</a>
     </nav>
@@ -61,9 +62,10 @@
       <a th:href="@{/login}" class="btn-dorado">Book Now</a>
     </div>
   </div>
+
 </th:block>
 
-<!-- ===== Pie de página global (idéntico a la landing) ===== -->
+<!-- ===== Footer real (idéntico al de la landing), reutilizable en todas las páginas ===== -->
 <footer th:fragment="pie" class="pie-pagina">
   <div class="contenedor">
 
@@ -90,9 +92,9 @@
       </div>
       <div class="footer-columna">
         <span class="footer-columna-titulo">Navigation</span>
-        <a th:href="@{/#rooms}">Rooms</a>
-        <a th:href="@{/services/cards}">Services</a>
-        <a th:href="@{/#experiences}">Experiences</a>
+        <a href="/#rooms">Rooms</a>
+        <a href="/#services">Services</a>
+        <a href="/#experiences">Experiences</a>
         <a th:href="@{/about}">About</a>
         <a th:href="@{/contact}">Contact</a>
       </div>
@@ -115,6 +117,11 @@
     </div>
   </div>
 </footer>
+
+<!-- ===== Script, reutilizable en todas las páginas ===== -->
+<th:block th:fragment="script">
+  <script th:src="@{/js/script.js}"></script>
+</th:block>
 
 </body>
 </html>

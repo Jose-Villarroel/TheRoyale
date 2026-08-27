@@ -1,284 +1,473 @@
-/* =====================================================================
-   Estilos adicionales para las páginas de servicios.
-   Se cargan siempre después de landing.css y sólo añaden lo que falta:
-   la paleta, tipografía, header, footer y utilidades ya viven allí.
-   ===================================================================== */
-
-/* ===== Estado activo en la navegación principal ===== */
-.nav-principal a.activo,
-.envoltorio-cabecera.cabecera-solida .nav-principal a.activo {
-  color: var(--color-dorado);
-  border-bottom-color: var(--color-dorado);
+/* ===== Paleta y tipografía de The Royale ===== */
+:root {
+  --color-oscuro: #252525;
+  --color-blanco: #ffffff;
+  --color-off-blanco: #fafaf9;
+  --color-texto-cuerpo: #545454;
+  --color-texto-etiqueta: #7d7d7d;
+  --color-texto-claro-secundario: #cfcfcf;
+  --color-dorado: #c6a15b;
+  --color-borde-claro: #cfcfcf;
+  --color-borde-oscuro: #3d3d3d;
 }
 
-/* ===== Header sólido para páginas sin foto de portada (ej. 404) ===== */
-body.pagina-sin-portada .envoltorio-cabecera {
-  position: static;
-  background-color: var(--color-blanco);
-  box-shadow: 0 1px 0 var(--color-borde-claro);
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body.pagina-sin-portada .barra-utilitaria {
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  color: var(--color-texto-cuerpo);
+}
+
+h1, h2, h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  color: var(--color-oscuro);
+  line-height: 1.1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.contenedor {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 64px);
+}
+
+.seccion {
+  padding: clamp(70px, 11vh, 130px) 0;
+}
+
+.seccion-off-blanca {
+  background-color: var(--color-off-blanco);
+  border-top: 1px solid var(--color-borde-claro);
+  border-bottom: 1px solid var(--color-borde-claro);
+}
+
+.seccion-oscura {
+  background-color: var(--color-oscuro);
+}
+
+.seccion-oscura h2 {
+  color: #fff;
+}
+
+.eyebrow {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
   color: var(--color-texto-etiqueta);
-  border-bottom-color: var(--color-borde-claro);
+  margin-bottom: 12px;
 }
 
-body.pagina-sin-portada .marca,
-body.pagina-sin-portada .nav-principal a {
-  color: var(--color-texto-oscuro);
+.eyebrow-claro {
+  color: var(--color-dorado);
 }
 
-body.pagina-sin-portada .marca-logo {
-  height: clamp(50px, 5vw, 70px);
+.parrafo-cuerpo {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--color-texto-cuerpo);
 }
 
-body.pagina-sin-portada .menu-toggle span {
-  background-color: var(--color-texto-oscuro);
+.parrafo-claro {
+  color: var(--color-texto-claro-secundario);
 }
 
-body.pagina-sin-portada main {
-  padding-top: clamp(90px, 12vh, 130px);
+.linea-dorada-horizontal {
+  display: block;
+  width: 60px;
+  height: 1px;
+  background-color: var(--color-dorado);
+  margin: 22px 0;
 }
 
-/* ===== Portada interior (hero reducido para páginas de servicios) ===== */
-.hero-interior {
+.enlace-subrayado {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-borde-claro);
+  padding-bottom: 8px;
+}
+
+.enlace-subrayado:hover {
+  border-color: var(--color-dorado);
+}
+
+.btn-dorado {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-oscuro);
+  background-color: var(--color-dorado);
+  border: 1px solid var(--color-dorado);
+  padding: 16px 32px;
+}
+
+.btn-dorado:hover {
+  background-color: transparent;
+  color: var(--color-dorado);
+}
+
+/* ===== Hero ===== */
+.servicios-hero {
   position: relative;
-  min-height: clamp(380px, 52vh, 560px);
+  min-height: clamp(420px, 60vh, 620px);
   display: flex;
   align-items: flex-end;
   overflow: hidden;
   background-color: var(--color-oscuro);
 }
 
-.hero-interior-contenido {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding-bottom: clamp(40px, 7vh, 72px);
+.servicios-hero-media {
+  position: absolute;
+  inset: 0;
 }
 
-.hero-interior-contenido h1 {
-  max-width: 820px;
-  color: var(--color-blanco);
-  font-size: clamp(38px, 5.6vw, 76px);
-  letter-spacing: -0.02em;
-}
-
-.hero-interior-contenido .parrafo-cuerpo {
-  max-width: 480px;
-}
-
-.hero-interior-volver {
-  font-size: 0.7rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.hero-interior-volver:hover {
-  color: var(--color-dorado);
-}
-
-.hero-interior-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(20px, 3vw, 48px);
-  align-items: baseline;
-  border-top: 1px solid var(--color-borde-oscuro);
-  padding-top: 22px;
-  margin-top: 8px;
-}
-
-.hero-interior-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.hero-interior-stat-etiqueta {
-  font-size: 0.62rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--color-texto-etiqueta);
-}
-
-.hero-interior-stat-valor {
-  font-size: 0.95rem;
-  font-weight: 300;
-  color: var(--color-blanco);
-}
-
-.hero-interior-stat-valor.precio-destacado {
-  font-family: var(--fuente-titulos);
-  font-size: 1.6rem;
-}
-
-/* ===== Selector de vista (Table / Cards) ===== */
-.selector-vista {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-bottom: clamp(32px, 5vh, 56px);
-}
-
-.selector-vista a {
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  border: 1px solid var(--color-borde-claro);
-  padding: 13px 26px;
-}
-
-.selector-vista a:hover {
-  border-color: var(--color-oscuro);
-}
-
-.selector-vista a.activo {
-  background-color: var(--color-oscuro);
-  border-color: var(--color-oscuro);
-  color: var(--color-blanco);
-}
-
-/* ===== Tabla de servicios ===== */
-.tabla-servicios-envoltorio {
-  overflow-x: auto;
-}
-
-.tabla-servicios {
+.servicios-hero-media img {
   width: 100%;
-  min-width: 640px;
-  border-collapse: collapse;
-}
-
-.tabla-servicios thead th {
-  text-align: left;
-  padding: 0 16px 16px;
-  font-size: 0.65rem;
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-texto-etiqueta);
-  border-bottom: 1px solid var(--color-oscuro);
-}
-
-.tabla-servicios tbody td {
-  padding: 22px 16px;
-  border-bottom: 1px solid var(--color-borde-claro);
-  vertical-align: middle;
-}
-
-.tabla-servicios tbody tr:hover {
-  background-color: var(--color-off-blanco);
-}
-
-.tabla-imagen {
-  width: 84px;
-  height: 84px;
+  height: 100%;
   object-fit: cover;
 }
 
-.tabla-servicios .nombre-servicio {
-  font-family: var(--fuente-titulos);
-  font-size: 1.3rem;
-  color: var(--color-texto-oscuro);
+.servicios-hero-degradado {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(37, 37, 37, 0.74) 0%, rgba(37, 37, 37, 0.28) 45%, rgba(37, 37, 37, 0.92) 100%);
+  pointer-events: none;
 }
 
-.tabla-servicios .descripcion-servicio {
-  max-width: 360px;
-  font-size: 0.9rem;
-  color: var(--color-texto-cuerpo);
+.servicios-hero-contenido {
+  position: relative;
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 64px) clamp(52px, 8vh, 90px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.precio-servicio {
-  font-family: var(--fuente-titulos);
-  font-size: 1.15rem;
-  color: var(--color-dorado);
-  white-space: nowrap;
+.servicios-hero-contenido h1 {
+  max-width: 820px;
+  font-size: clamp(40px, 6vw, 88px);
+  letter-spacing: -0.02em;
+  color: #fff;
 }
 
-/* ===== Índice numérico de las tarjetas de servicio ===== */
-.indice-servicio {
-  font-family: var(--fuente-titulos);
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
-  color: var(--color-dorado);
+.servicios-hero-contenido .parrafo-cuerpo {
+  max-width: 480px;
 }
 
-/* ===== Detalle de un servicio ===== */
-.detalle-servicio {
+/* ===== Navegación de categorías ===== */
+.servicios-nav-categorias {
+  padding: clamp(50px, 7vh, 80px) clamp(20px, 4vw, 64px) 0;
+}
+
+.categorias-fila {
+  max-width: 1340px;
+  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
-  gap: clamp(40px, 6vw, 100px);
-  align-items: flex-start;
+  gap: clamp(14px, 2vw, 26px);
+  border-bottom: 1px solid var(--color-borde-claro);
+  padding-bottom: 26px;
 }
 
-.detalle-servicio-texto {
-  flex: 1.3 1 420px;
-  min-width: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.detalle-servicio-panel {
-  flex: 1 1 300px;
-  min-width: 280px;
-  border: 1px solid var(--color-borde-claro);
-  padding: clamp(26px, 3vw, 38px);
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.detalle-servicio-panel-titulo {
+.categorias-fila a {
   font-size: 0.7rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-texto-etiqueta);
+  border: 1px solid var(--color-borde-claro);
+  padding: 13px 24px;
 }
 
-.detalle-servicio-panel-fila {
+.categorias-fila a:hover {
+  border-color: var(--color-oscuro);
+}
+
+/* ===== Encabezado de cada sección de servicio ===== */
+.servicios-encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(30px, 5vw, 90px);
+  align-items: flex-end;
+  margin-bottom: clamp(34px, 5vh, 56px);
+}
+
+.servicios-encabezado > div:first-child {
+  flex: 1 1 460px;
+}
+
+.servicios-encabezado h2 {
+  font-size: clamp(30px, 4vw, 56px);
+}
+
+.servicios-encabezado .parrafo-cuerpo {
+  flex: 1 1 320px;
+  max-width: 420px;
+}
+
+/* ===== Wellness: destacado + lista ===== */
+.wellness-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(20px, 3vw, 40px);
+}
+
+.wellness-destacado {
+  position: relative;
+  flex: 2 1 480px;
+  min-width: 280px;
+  height: clamp(340px, 54vh, 520px);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  background-color: var(--color-oscuro);
+}
+
+.wellness-destacado img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.wellness-destacado:hover img {
+  transform: scale(1.05);
+}
+
+.wellness-destacado-degradado {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(37, 37, 37, 0) 40%, rgba(37, 37, 37, 0.85) 100%);
+}
+
+.wellness-destacado-info {
+  position: relative;
+  padding: 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.numero-dorado {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-dorado);
+}
+
+.wellness-destacado-info h3 {
+  font-size: clamp(26px, 2.6vw, 38px);
+  color: #fff;
+}
+
+.ver-servicio {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-texto-claro-secundario);
+}
+
+/* ===== Lista de ítems en fila (Wellness, Business, Hotel Services) ===== */
+.lista-items {
+  flex: 1 1 300px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-fila {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   gap: 16px;
-  padding: 14px 0;
-  font-size: 0.85rem;
   border-top: 1px solid var(--color-borde-claro);
+  padding: 20px 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.4rem;
 }
 
-.detalle-servicio-panel-fila:last-child {
+.item-fila-ultimo {
   border-bottom: 1px solid var(--color-borde-claro);
 }
 
-.detalle-servicio-panel-etiqueta {
+.item-fila:hover {
+  color: var(--color-dorado);
+}
+
+.item-precio {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.75rem;
   color: var(--color-texto-etiqueta);
 }
 
-.btn-ancho {
-  display: block;
+.lista-items-oscura .item-fila {
+  border-top-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.lista-items-oscura .item-fila-ultimo {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== Tarjetas de servicios (Dining) ===== */
+.tarjetas-servicios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1px;
+  background-color: var(--color-borde-claro);
+}
+
+.tarjeta-servicio {
+  background-color: var(--color-blanco);
+  display: flex;
+  flex-direction: column;
+}
+
+.tarjeta-servicio-imagen {
+  height: clamp(210px, 28vh, 290px);
+  overflow: hidden;
+}
+
+.tarjeta-servicio-imagen img {
   width: 100%;
-  text-align: center;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.3s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.detalle-servicio-nota {
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
+.tarjeta-servicio:hover .tarjeta-servicio-imagen img {
+  transform: scale(1.05);
+}
+
+.tarjeta-servicio-info {
+  padding: 28px 26px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.numero-romano {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.85rem;
+  color: var(--color-dorado);
+}
+
+.tarjeta-servicio-info h3 {
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.tarjeta-servicio-info p {
+  font-size: 0.85rem;
   color: var(--color-texto-etiqueta);
+}
+
+/* ===== Business / Concierge (imagen + texto) ===== */
+.grid-business {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  gap: clamp(40px, 6vw, 96px);
+  align-items: center;
+}
+
+.grid-business-invertido {
+  flex-wrap: wrap;
+}
+
+.business-imagen {
+  flex: 1 1 400px;
+  min-width: 300px;
+  height: clamp(340px, 58vh, 560px);
+  overflow: hidden;
+}
+
+.business-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.business-texto {
+  flex: 1 1 380px;
+  min-width: 300px;
+}
+
+.business-texto h2 {
+  font-size: clamp(30px, 4vw, 56px);
+}
+
+.business-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin: 8px 0 20px;
+}
+
+.business-lista p {
+  border-bottom: 1px solid var(--color-borde-claro);
+  padding: 16px 0;
+  font-size: 0.9rem;
+}
+
+/* ===== Hotel Services (fondo oscuro, dos columnas) ===== */
+.grid-dos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(40px, 6vw, 96px);
+}
+
+.grid-dos > div:first-child {
+  flex: 1 1 380px;
+}
+
+.grid-dos > div:first-child h2 {
+  margin: 8px 0 18px;
+}
+
+/* ===== CTA final (versión clara) ===== */
+.seccion-cta-clara {
   text-align: center;
 }
 
-/* ===== Página de error (servicio no encontrado) ===== */
-.pagina-error {
-  text-align: center;
+.linea-vertical-dorada-clara {
+  width: 1px;
+  height: 44px;
+  background-color: var(--color-dorado);
+  margin: 0 auto 24px;
 }
 
-.pagina-error h1 {
-  font-size: clamp(32px, 4.6vw, 56px);
-  margin: 0 auto 18px;
+.seccion-cta-clara h2 {
+  font-size: clamp(34px, 5vw, 70px);
+  max-width: 780px;
+  margin: 0 auto 24px;
 }
 
-.pagina-error .parrafo-cuerpo {
+.cta-subtexto-claro {
   max-width: 460px;
   margin: 0 auto 30px;
+  color: var(--color-texto-cuerpo);
 }
