@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Services')}"></head>
+<body>
+
+<header th:replace="~{layout :: cabecera}"></header>
+
+<main class="contenedor seccion">
+  <p class="eyebrow">Services</p>
+  <h1>All Services</h1>
+
+  <table class="tabla-servicios">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="servicio : ${servicios}">
+        <td><img th:src="${servicio.imagenUrl}" alt="" class="tabla-imagen"></td>
+        <td th:text="${servicio.nombre}">Nombre</td>
+        <td th:text="${servicio.descripcion}">Descripción</td>
+        <td th:text="'$' + ${servicio.precio}">Precio</td>
+        <td><a th:href="@{/services/{nombre}(nombre=${servicio.nombre})}" class="enlace-subrayado">View Detail</a></td>
+      </tr>
+    </tbody>
+  </table>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+
+</body>
+</html>

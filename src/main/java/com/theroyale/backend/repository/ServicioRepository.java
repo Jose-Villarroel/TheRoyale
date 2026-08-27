@@ -2,7 +2,7 @@ package com.theroyale.backend.repository;
 
 import com.theroyale.backend.model.Servicio;
 import org.springframework.stereotype.Repository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

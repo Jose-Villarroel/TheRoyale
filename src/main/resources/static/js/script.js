@@ -10,22 +10,20 @@ const menuCerrar = document.getElementById("menuCerrar");
 function actualizarCabeceraEnScroll() {
   const y = window.scrollY || 0;
 
-  if (envoltorioCabecera) {
-    if (y > 90) {
-      envoltorioCabecera.classList.add("cabecera-solida");
-    } else {
-      envoltorioCabecera.classList.remove("cabecera-solida");
-    }
+  if (y > 90) {
+    envoltorioCabecera.classList.add("cabecera-solida");
+  } else {
+    envoltorioCabecera.classList.remove("cabecera-solida");
   }
 
-  // Efecto parallax suave en la imagen del hero (solo existe en la landing)
+  // Efecto parallax suave en la imagen del hero
   if (heroMedia) {
     const desplazamiento = Math.min(y * 0.13, 120);
     heroMedia.style.transform = "translateY(" + desplazamiento + "px)";
   }
 
-  // Efecto parallax suave en el fondo de experiencias (solo existe en la landing)
-  if (experienciasMedia && experienciasMedia.parentElement) {
+  // Efecto parallax suave en el fondo de la sección de experiencias
+  if (experienciasMedia) {
     const rect = experienciasMedia.parentElement.getBoundingClientRect();
     experienciasMedia.style.transform = "translateY(" + (-rect.top * 0.045) + "px)";
   }
@@ -33,24 +31,16 @@ function actualizarCabeceraEnScroll() {
 
 // ===== Función: abrir/cerrar el menú móvil =====
 function abrirMenuMovil() {
-  if (menuMovil) {
-    menuMovil.classList.add("abierto");
-  }
+  menuMovil.classList.add("abierto");
 }
 
 function cerrarMenuMovil() {
-  if (menuMovil) {
-    menuMovil.classList.remove("abierto");
-  }
+  menuMovil.classList.remove("abierto");
 }
 
 // ===== Función: animación de aparición al hacer scroll (IntersectionObserver) =====
 function activarAnimacionesAparicion() {
   const elementos = document.querySelectorAll(".aparecer");
-
-  if (elementos.length === 0) {
-    return;
-  }
 
   const observador = new IntersectionObserver(
     function (entradas) {
@@ -69,20 +59,15 @@ function activarAnimacionesAparicion() {
   });
 }
 
-// ===== Carrusel de habitaciones (solo existe en la landing) =====
+// ===== Carrusel de habitaciones =====
 const carruselTrack = document.getElementById("carruselTrack");
 const carruselProgreso = document.getElementById("carruselProgreso");
 const carruselContador = document.getElementById("carruselContador");
-const botonCarruselAnterior = document.getElementById("carruselAnterior");
-const botonCarruselSiguiente = document.getElementById("carruselSiguiente");
 const totalHabitaciones = document.querySelectorAll(".habitacion-slide").length;
 let habitacionActual = 0;
 
+// ===== Función: mostrar la habitación según el índice actual =====
 function actualizarCarrusel() {
-  if (!carruselTrack || !carruselProgreso || !carruselContador) {
-    return;
-  }
-
   carruselTrack.style.transform = "translateX(-" + (habitacionActual * 100) + "%)";
   carruselProgreso.style.transform = "translateX(" + (habitacionActual * 100) + "%)";
 
@@ -101,48 +86,30 @@ function irHabitacionSiguiente() {
   actualizarCarrusel();
 }
 
-// ===== Función: manejar el envío del formulario de reserva (solo en la landing) =====
+// ===== Función: manejar el envío del formulario de reserva =====
 function manejarFormularioReserva(evento) {
   evento.preventDefault();
+  // La confirmación de la reserva requiere haber iniciado sesión
   window.location.href = "login.html";
 }
 
-// ===== Función: manejar el envío del formulario de newsletter (en todas las páginas con footer) =====
+// ===== Función: manejar el envío del formulario de newsletter =====
 function manejarFormularioNewsletter(evento) {
   evento.preventDefault();
   alert("Thank you for subscribing to The Royale newsletter.");
   evento.target.reset();
 }
 
-// ===== Event listeners (todos con validación de existencia) =====
+// ===== Event listeners =====
 window.addEventListener("scroll", actualizarCabeceraEnScroll, { passive: true });
+menuToggle.addEventListener("click", abrirMenuMovil);
+menuCerrar.addEventListener("click", cerrarMenuMovil);
+document.getElementById("carruselAnterior").addEventListener("click", irHabitacionAnterior);
+document.getElementById("carruselSiguiente").addEventListener("click", irHabitacionSiguiente);
+document.getElementById("formularioReserva").addEventListener("submit", manejarFormularioReserva);
+document.getElementById("formularioNewsletter").addEventListener("submit", manejarFormularioNewsletter);
 
-if (menuToggle) {
-  menuToggle.addEventListener("click", abrirMenuMovil);
-}
-
-if (menuCerrar) {
-  menuCerrar.addEventListener("click", cerrarMenuMovil);
-}
-
-if (botonCarruselAnterior) {
-  botonCarruselAnterior.addEventListener("click", irHabitacionAnterior);
-}
-
-if (botonCarruselSiguiente) {
-  botonCarruselSiguiente.addEventListener("click", irHabitacionSiguiente);
-}
-
-const formularioReserva = document.getElementById("formularioReserva");
-if (formularioReserva) {
-  formularioReserva.addEventListener("submit", manejarFormularioReserva);
-}
-
-const formularioNewsletter = document.getElementById("formularioNewsletter");
-if (formularioNewsletter) {
-  formularioNewsletter.addEventListener("submit", manejarFormularioNewsletter);
-}
-
+// Cierra el menú móvil automáticamente al hacer clic en cualquiera de sus enlaces
 document.querySelectorAll(".enlace-menu-movil, .menu-movil-pie a").forEach(function (enlace) {
   enlace.addEventListener("click", cerrarMenuMovil);
 });
