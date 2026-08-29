@@ -5,17 +5,67 @@
 
 <header th:replace="~{layout :: cabecera}"></header>
 
-<main class="contenedor seccion detalle-servicio">
-  <div class="detalle-servicio-imagen">
-    <img th:src="${servicio.imagenUrl}" alt="">
-  </div>
-  <div class="detalle-servicio-info">
-    <p class="eyebrow">Service Detail</p>
-    <h1 th:text="${servicio.nombre}">Nombre</h1>
-    <p class="parrafo-cuerpo" th:text="${servicio.descripcion}">Descripción</p>
-    <p class="numero-dorado" th:text="'$' + ${servicio.precio}">Precio</p>
-    <a th:href="@{/services/cards}" class="enlace-subrayado">Back to Services</a>
-  </div>
+<main>
+
+  <!-- ===== Detalle del servicio ===== -->
+  <section class="seccion-detalle">
+    <div class="contenedor detalle-grid">
+
+      <!-- Imagen principal -->
+      <div class="detalle-imagen-col">
+        <div class="detalle-imagen-wrapper">
+          <img th:src="@{${servicio.imagenUrl}}" th:alt="${servicio.nombre}" class="detalle-imagen-principal">
+        </div>
+      </div>
+
+      <!-- Información -->
+      <div class="detalle-info-col">
+        <p class="eyebrow eyebrow-dorado-det">Service Detail</p>
+        <h1 class="detalle-titulo" th:text="${servicio.nombre}">Service Name</h1>
+        <span class="linea-dorada-det"></span>
+        <p class="detalle-descripcion" th:text="${servicio.descripcion}">Description goes here.</p>
+
+        <!-- Precio -->
+        <div class="detalle-precio-bloque">
+          <span class="detalle-precio-label">Starting from</span>
+          <span class="detalle-precio-valor" th:text="'$' + ${#numbers.formatInteger(servicio.precio,1)}">$0</span>
+          <span class="detalle-precio-nota">per stay · billed to room account</span>
+        </div>
+
+        <!-- Tabla de lo que incluye -->
+        <div class="detalle-features" th:if="${servicio.caracteristicas != null}">
+          <p class="detalle-features-titulo">What's included</p>
+          <div class="detalle-feature-row" th:each="item : ${servicio.caracteristicas}">
+            <span class="feature-icon">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <circle cx="5" cy="5" r="4" stroke="#c6a15b" stroke-width="1"/>
+                <path d="M3 5L4.5 6.5L7 4" stroke="#c6a15b" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="feature-texto" th:text="${item}">Feature detail</span>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="detalle-acciones">
+          <a th:href="@{/login}" class="btn-dorado-interior">Request This Service</a>
+          <a th:href="@{/services/cards}" class="detalle-volver">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M10 5.5H1M1 5.5L5 1.5M1 5.5L5 9.5" stroke="currentColor" stroke-width="0.9" stroke-linecap="square"/></svg>
+            Back to Services
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== Galería de fotos inferior ===== -->
+    <div class="contenedor detalle-galeria" th:if="${servicio.galeriaUrls != null}">
+      <div class="detalle-galeria-grid">
+        <img th:each="imgUrl : ${servicio.galeriaUrls}" th:src="@{${imgUrl}}" th:alt="|${servicio.nombre} Gallery|" class="detalle-galeria-img">
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer th:replace="~{layout :: pie}"></footer>

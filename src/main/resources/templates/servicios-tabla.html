@@ -1,34 +1,97 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: head('Services')}"></head>
+<head th:replace="~{layout :: head('Services — Table')}"></head>
 <body>
 
 <header th:replace="~{layout :: cabecera}"></header>
 
-<main class="contenedor seccion">
-  <p class="eyebrow">Services</p>
-  <h1>All Services</h1>
+<main>
 
-  <table class="tabla-servicios">
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Price</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="servicio : ${servicios}">
-        <td><img th:src="${servicio.imagenUrl}" alt="" class="tabla-imagen"></td>
-        <td th:text="${servicio.nombre}">Nombre</td>
-        <td th:text="${servicio.descripcion}">Descripción</td>
-        <td th:text="'$' + ${servicio.precio}">Precio</td>
-        <td><a th:href="@{/services/{nombre}(nombre=${servicio.nombre})}" class="enlace-subrayado">View Detail</a></td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- ===== Hero de página interior ===== -->
+  <section class="hero-interior">
+    <div class="hero-interior-contenido contenedor">
+      <p class="eyebrow eyebrow-claro-int">03 — Services</p>
+      <h1>All Services</h1>
+      <span class="linea-dorada-horizontal-int"></span>
+      <p class="hero-interior-subtexto">
+        From wellness and dining to private experiences, every service is
+        designed to elevate your stay at The Royale.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Barra de navegación entre vistas ===== -->
+  <section class="barra-vistas">
+    <div class="contenedor barra-vistas-contenido">
+      <span class="barra-vistas-label">View as</span>
+      <div class="barra-vistas-toggle">
+        <a th:href="@{/services/table}" class="toggle-btn toggle-activo">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0.5" y="0.5" width="13" height="2.5" rx="0.5" stroke="currentColor"/><rect x="0.5" y="5.5" width="13" height="2.5" rx="0.5" stroke="currentColor"/><rect x="0.5" y="10.5" width="13" height="2.5" rx="0.5" stroke="currentColor"/></svg>
+          Table
+        </a>
+        <a th:href="@{/services/cards}" class="toggle-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="0.5" y="0.5" width="5.5" height="5.5" rx="0.5" stroke="currentColor"/><rect x="8" y="0.5" width="5.5" height="5.5" rx="0.5" stroke="currentColor"/><rect x="0.5" y="8" width="5.5" height="5.5" rx="0.5" stroke="currentColor"/><rect x="8" y="8" width="5.5" height="5.5" rx="0.5" stroke="currentColor"/></svg>
+          Cards
+        </a>
+      </div>
+      <span class="barra-vistas-count" th:text="${#lists.size(servicios)} + ' services available'">— services</span>
+    </div>
+  </section>
+
+  <!-- ===== Tabla de servicios ===== -->
+  <section class="seccion-tabla">
+    <div class="contenedor">
+      <table class="tabla-servicios">
+        <thead>
+          <tr>
+            <th class="th-imagen"></th>
+            <th class="th-nombre">Service</th>
+            <th class="th-descripcion">Description</th>
+            <th class="th-precio">Price</th>
+            <th class="th-accion"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="servicio, iterStat : ${servicios}" class="fila-servicio">
+            <td class="td-imagen">
+              <div class="tabla-imagen-wrapper">
+                <img th:src="@{${servicio.imagenUrl}}" th:alt="${servicio.nombre}" class="tabla-imagen">
+              </div>
+            </td>
+            <td class="td-nombre">
+              <span class="tabla-num-fila" th:text="${iterStat.count < 10 ? '0' + iterStat.count : iterStat.count}">01</span>
+              <span class="tabla-nombre-texto" th:text="${servicio.nombre}">Service Name</span>
+            </td>
+            <td class="td-descripcion">
+              <p class="tabla-descripcion-texto" th:text="${servicio.descripcion}">Description here.</p>
+            </td>
+            <td class="td-precio">
+              <span class="tabla-precio" th:text="'$' + ${#numbers.formatInteger(servicio.precio,1)}">$0</span>
+              <span class="tabla-precio-label">per stay</span>
+            </td>
+            <td class="td-accion">
+              <a th:href="@{/services/{nombre}(nombre=${servicio.nombre})}" class="tabla-btn-detalle">
+                View Detail
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5H10M10 5.5L6 1.5M10 5.5L6 9.5" stroke="currentColor" stroke-width="0.9" stroke-linecap="square"/></svg>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+
+  <!-- ===== CTA inferior ===== -->
+  <section class="seccion-cta-interior">
+    <div class="contenedor cta-interior-contenido">
+      <div class="cta-int-linea"></div>
+      <p class="cta-interior-texto">Ready to personalize your stay?</p>
+      <a th:href="@{/login}" class="btn-dorado-sm">Book Your Stay</a>
+    </div>
+  </section>
+
 </main>
 
 <footer th:replace="~{layout :: pie}"></footer>

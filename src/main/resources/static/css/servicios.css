@@ -1,163 +1,822 @@
-/* ===== Paleta y tipografía de The Royale, reutilizada del frontend ===== */
+/* ================================================================
+   servicios.css — The Royale · Interior Pages
+   Paleta y sistema tipográfico idéntico al landing.css
+   ================================================================ */
+
+/* ===== Variables (mismas que landing.css) ===== */
 :root {
-  --color-oscuro: #252525;
-  --color-blanco: #ffffff;
-  --color-texto-cuerpo: #545454;
-  --color-texto-etiqueta: #7d7d7d;
-  --color-dorado: #c6a15b;
-  --color-borde-claro: #cfcfcf;
+  --oro:           #c6a15b;
+  --oro-hover:     #b28e4c;
+  --oscuro:        #252525;
+  --blanco:        #ffffff;
+  --off-blanco:    #fafaf9;
+  --cuerpo:        #545454;
+  --etiqueta:      #7d7d7d;
+  --borde:         #cfcfcf;
+  --borde-oscuro:  #3d3d3d;
+
+  --f-titulo: 'Cormorant Garamond', Georgia, serif;
+  --f-cuerpo: 'Lato', Helvetica, Arial, sans-serif;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ===== Reset ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: var(--f-cuerpo);
   font-weight: 300;
-  color: var(--color-texto-cuerpo);
+  color: var(--cuerpo);
+  line-height: 1.6;
+  background: var(--blanco);
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h3 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+h1, h2, h3 {
+  font-family: var(--f-titulo);
   font-weight: 300;
-  color: var(--color-oscuro);
+  color: var(--oscuro);
+  line-height: 1.1;
 }
 
+a { color: inherit; text-decoration: none; transition: color .3s, border-color .3s, background-color .3s; }
+img { max-width: 100%; display: block; }
+ul  { list-style: none; }
+
+/* ===== Contenedor ===== */
 .contenedor {
-  max-width: 1160px;
+  max-width: 1260px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 clamp(20px, 4vw, 64px);
 }
 
-.seccion {
-  padding: 60px 0;
-}
-
+/* ===== Eyebrow ===== */
 .eyebrow {
-  font-size: 0.7rem;
-  letter-spacing: 0.3em;
+  font-size: .67rem;
+  letter-spacing: .3em;
   text-transform: uppercase;
-  color: var(--color-texto-etiqueta);
-  margin-bottom: 12px;
+  color: var(--etiqueta);
+  margin-bottom: 14px;
 }
 
-.cabecera-simple {
+/* ================================================================
+   HEADER
+   ================================================================ */
+.cabecera-interior {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255,255,255,.97);
+  border-bottom: 1px solid var(--borde);
+  backdrop-filter: blur(10px);
+}
+
+.cabecera-interior-contenido {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 64px);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
-  border-bottom: 1px solid var(--color-borde-claro);
-}
-
-.marca-nombre {
-  font-family: 'Cormorant Garamond', serif;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--color-oscuro);
-  text-decoration: none;
-}
-
-.cabecera-simple nav {
-  display: flex;
+  justify-content: space-between;
   gap: 24px;
+  height: 70px;
 }
 
-.cabecera-simple nav a {
-  font-size: 0.8rem;
-  color: var(--color-texto-cuerpo);
-  text-decoration: none;
+.marca-interior { display: flex; align-items: center; }
+.marca-interior-logo { height: 50px; width: auto; }
+
+.nav-interior {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.5vw, 40px);
 }
 
-/* ===== Tabla de servicios ===== */
+.nav-interior a {
+  font-size: .68rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--etiqueta);
+  padding-bottom: 3px;
+  border-bottom: 1px solid transparent;
+}
+
+.nav-interior a:hover {
+  border-bottom-color: var(--oro);
+  color: var(--oscuro);
+}
+
+/* Botón dorado del header */
+.btn-dorado-interior {
+  display: inline-block;
+  font-size: .67rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--oscuro);
+  background: var(--oro);
+  border: 1px solid var(--oro);
+  padding: 11px 24px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .3s, color .3s;
+}
+
+.btn-dorado-interior:hover {
+  background: transparent;
+  color: var(--oscuro);
+}
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+.pie-interior {
+  border-top: 1px solid var(--borde);
+  padding: 26px clamp(20px, 4vw, 64px);
+  background: var(--blanco);
+}
+
+.pie-interior-contenido {
+  max-width: 1260px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.marca-nombre-pie {
+  font-family: var(--f-titulo);
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  font-size: .9rem;
+  color: var(--oscuro);
+}
+
+.pie-divider { color: var(--borde); margin: 0 4px; }
+
+.pie-texto {
+  font-size: .7rem;
+  letter-spacing: .07em;
+  color: var(--etiqueta);
+}
+
+/* ================================================================
+   HERO INTERIOR — fondo oscuro con acento dorado
+   ================================================================ */
+.hero-interior {
+  background-color: var(--oscuro);
+  padding: clamp(80px, 15vh, 150px) 0 clamp(64px, 10vh, 110px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* línea decorativa superior */
+.hero-interior::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--oro), transparent);
+}
+
+.hero-interior h1 {
+  font-size: clamp(44px, 6.5vw, 90px);
+  color: var(--blanco);
+  letter-spacing: -.01em;
+}
+
+.eyebrow-claro-int {
+  color: var(--oro);
+  font-size: .67rem;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.linea-dorada-horizontal-int {
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: var(--oro);
+  margin: 22px 0;
+}
+
+.hero-interior-subtexto {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: rgba(255,255,255,.55);
+  max-width: 500px;
+  font-weight: 300;
+}
+
+/* ================================================================
+   BARRA TOGGLE (Table / Cards)
+   ================================================================ */
+.barra-vistas {
+  border-bottom: 1px solid var(--borde);
+  background: var(--blanco);
+  position: sticky;
+  top: 70px;
+  z-index: 900;
+}
+
+.barra-vistas-contenido {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  height: 54px;
+}
+
+.barra-vistas-label {
+  font-size: .64rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--etiqueta);
+}
+
+.barra-vistas-toggle {
+  display: flex;
+  border: 1px solid var(--borde);
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--etiqueta);
+  background: transparent;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+
+.toggle-btn + .toggle-btn { border-left: 1px solid var(--borde); }
+
+.toggle-btn:hover {
+  background: var(--off-blanco);
+  color: var(--oscuro);
+}
+
+.toggle-activo {
+  background: var(--oscuro);
+  color: var(--blanco);
+}
+
+.toggle-activo:hover {
+  background: var(--oscuro);
+  color: var(--blanco);
+}
+
+.barra-vistas-count {
+  margin-left: auto;
+  font-size: .64rem;
+  letter-spacing: .14em;
+  color: var(--etiqueta);
+}
+
+/* ================================================================
+   TABLA DE SERVICIOS
+   ================================================================ */
+.seccion-tabla {
+  padding: clamp(48px, 8vh, 96px) 0 clamp(72px, 12vh, 130px);
+  background: var(--blanco);
+}
+
 .tabla-servicios {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 30px;
 }
 
-.tabla-servicios th,
-.tabla-servicios td {
+/* thead */
+.tabla-servicios thead tr {
+  border-bottom: 1px solid var(--oscuro);
+}
+
+.tabla-servicios th {
+  font-family: var(--f-cuerpo);
+  font-size: .59rem;
+  font-weight: 400;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--etiqueta);
+  padding: 0 24px 18px 0;
   text-align: left;
-  padding: 14px;
-  border-bottom: 1px solid var(--color-borde-claro);
+  white-space: nowrap;
+}
+
+.th-imagen   { width: 106px; }
+.th-nombre   { width: 200px; }
+.th-descripcion { }
+.th-precio   { width: 120px; text-align: right; padding-right: 0; }
+.th-accion   { width: 150px; text-align: right; padding-right: 0; }
+
+/* tbody */
+.fila-servicio {
+  border-bottom: 1px solid var(--borde);
+  transition: background .25s;
+}
+
+.fila-servicio:hover { background: var(--off-blanco); }
+
+.tabla-servicios td {
+  padding: 24px 24px 24px 0;
+  vertical-align: middle;
+}
+
+/* — Imagen */
+.td-imagen { width: 106px; }
+
+.tabla-imagen-wrapper {
+  width: 82px;
+  height: 62px;
+  overflow: hidden;
 }
 
 .tabla-imagen {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
-}
-
-/* ===== Tarjetas de servicios ===== */
-.tarjetas-servicios {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-  margin-top: 30px;
-}
-
-.tarjeta-servicio {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  border: 1px solid var(--color-borde-claro);
-}
-
-.tarjeta-servicio-imagen img {
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
+  transition: transform .8s ease;
 }
 
-.tarjeta-servicio-info {
-  padding: 20px;
-}
+.fila-servicio:hover .tabla-imagen { transform: scale(1.08); }
 
-.numero-dorado {
-  color: var(--color-dorado);
-  font-weight: 700;
-}
-
-/* ===== Detalle de un servicio ===== */
-.detalle-servicio {
+/* — Nombre */
+.td-nombre {
   display: flex;
-  gap: 50px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 28px;
+  padding-bottom: 28px;
 }
 
-.detalle-servicio-imagen {
-  flex: 1 1 400px;
+.tabla-num-fila {
+  font-size: .58rem;
+  letter-spacing: .24em;
+  color: var(--oro);
+  font-family: var(--f-titulo);
 }
 
-.detalle-servicio-imagen img {
+.tabla-nombre-texto {
+  font-family: var(--f-titulo);
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--oscuro);
+}
+
+/* — Descripción */
+.td-descripcion { max-width: 380px; }
+
+.tabla-descripcion-texto {
+  font-size: .85rem;
+  line-height: 1.75;
+  color: var(--cuerpo);
+  /* recortar a 3 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* — Precio */
+.td-precio {
+  text-align: right;
+  white-space: nowrap;
+  padding-right: 0;
+}
+
+.tabla-precio {
+  display: block;
+  font-family: var(--f-titulo);
+  font-size: 1.45rem;
+  font-weight: 300;
+  color: var(--oscuro);
+}
+
+.tabla-precio-label {
+  font-size: .58rem;
+  letter-spacing: .15em;
+  color: var(--etiqueta);
+  text-transform: uppercase;
+}
+
+/* — Acción */
+.td-accion {
+  text-align: right;
+  padding-right: 0;
+}
+
+.tabla-btn-detalle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--oscuro);
+  border-bottom: 1px solid var(--borde);
+  padding-bottom: 4px;
+  transition: border-color .25s, color .25s;
+  white-space: nowrap;
+}
+
+.tabla-btn-detalle:hover {
+  border-color: var(--oro);
+  color: var(--oro);
+}
+
+
+/* ================================================================
+   TARJETAS DE SERVICIOS
+   ================================================================ */
+.seccion-tarjetas {
+  padding: clamp(48px, 8vh, 96px) 0 clamp(72px, 12vh, 130px);
+  background: var(--off-blanco);
+}
+
+.tarjetas-servicios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.tarjeta-servicio-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  color: inherit;
+  transition: box-shadow .3s, border-color .3s;
+  position: relative;
+}
+
+.tarjeta-servicio-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--oro);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .35s cubic-bezier(.22,.61,.36,1);
+}
+
+.tarjeta-servicio-item:hover::after { transform: scaleX(1); }
+
+.tarjeta-servicio-item:hover {
+  box-shadow: 0 16px 48px -16px rgba(37,37,37,.15);
+  z-index: 1;
+}
+
+/* Imagen */
+.tarjeta-servicio-imagen-wrap {
+  position: relative;
   width: 100%;
-  height: 400px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.tarjeta-servicio-imagen-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 1.2s cubic-bezier(.22,.61,.36,1);
+}
+
+.tarjeta-servicio-item:hover .tarjeta-servicio-imagen-wrap img {
+  transform: scale(1.06);
+}
+
+/* Badge de número */
+.tarjeta-numero-romano {
+  position: absolute;
+  top: 14px; left: 14px;
+  font-family: var(--f-titulo);
+  font-size: .75rem;
+  color: var(--blanco);
+  background: rgba(37,37,37,.6);
+  padding: 4px 11px;
+  letter-spacing: .12em;
+  backdrop-filter: blur(4px);
+}
+
+/* Info */
+.tarjeta-servicio-info-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 24px 28px;
+  flex: 1;
+}
+
+.tarjeta-servicio-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tarjeta-servicio-encabezado h3 {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--oscuro);
+}
+
+.tarjeta-precio {
+  font-family: var(--f-titulo);
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--oro);
+  white-space: nowrap;
+}
+
+.tarjeta-descripcion {
+  font-size: .85rem;
+  line-height: 1.75;
+  color: var(--etiqueta);
+  flex: 1;
+  /* recortar a 3 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tarjeta-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--oscuro);
+  border-bottom: 1px solid var(--borde);
+  padding-bottom: 4px;
+  width: fit-content;
+  margin-top: 6px;
+  transition: border-color .25s, color .25s;
+}
+
+.tarjeta-servicio-item:hover .tarjeta-enlace {
+  border-color: var(--oro);
+  color: var(--oro);
+}
+
+
+/* ================================================================
+   DETALLE DE SERVICIO
+   ================================================================ */
+.seccion-detalle {
+  padding: clamp(140px, 16vh, 180px) 0 clamp(60px, 10vh, 120px);
+  background: var(--blanco);
+}
+
+/* ===== Features en el detalle ===== */
+.detalle-features {
+  margin-bottom: 28px;
+}
+
+.detalle-features-titulo {
+  font-size: .59rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--etiqueta);
+  margin-bottom: 10px;
+}
+
+.detalle-feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(207,207,207,.45);
+}
+
+.detalle-feature-row:last-child { border-bottom: none; }
+
+.detalle-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(40px, 7vw, 100px);
+  align-items: flex-start;
+}
+
+.detalle-imagen-col {
+  flex: 1 1 420px;
+  min-width: 300px;
+}
+
+.detalle-imagen-wrapper {
+  height: clamp(380px, 62vh, 620px);
+  overflow: hidden;
+}
+
+.detalle-imagen-principal {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
-.detalle-servicio-info {
-  flex: 1 1 300px;
+/* Info col */
+.detalle-info-col {
+  flex: 1 1 320px;
+  min-width: 280px;
+  padding-top: 10px;
 }
 
-.enlace-subrayado {
-  display: inline-block;
-  margin-top: 20px;
-  font-size: 0.8rem;
-  letter-spacing: 0.15em;
+.eyebrow-dorado-det {
+  font-size: .65rem;
+  letter-spacing: .3em;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--color-borde-claro);
-  padding-bottom: 6px;
-  color: inherit;
-  text-decoration: none;
+  color: var(--oro);
+  margin-bottom: 14px;
 }
 
-.pie-simple {
-  text-align: center;
-  padding: 24px;
-  border-top: 1px solid var(--color-borde-claro);
-  font-size: 0.75rem;
-  color: var(--color-texto-etiqueta);
+.detalle-titulo {
+  font-size: clamp(34px, 4.8vw, 62px);
+  color: var(--oscuro);
 }
+
+.linea-dorada-det {
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: var(--oro);
+  margin: 22px 0;
+}
+
+.detalle-descripcion {
+  font-size: .95rem;
+  line-height: 1.9;
+  color: var(--cuerpo);
+  font-weight: 300;
+  margin-bottom: 32px;
+}
+
+/* Bloque precio */
+.detalle-precio-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 0;
+  border-top: 1px solid var(--borde);
+  border-bottom: 1px solid var(--borde);
+  margin-bottom: 32px;
+}
+
+.detalle-precio-label {
+  font-size: .59rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--etiqueta);
+}
+
+.detalle-precio-valor {
+  font-family: var(--f-titulo);
+  font-size: clamp(30px, 3.8vw, 50px);
+  color: var(--oscuro);
+  font-weight: 300;
+}
+
+.detalle-precio-nota {
+  font-size: .72rem;
+  color: var(--etiqueta);
+  letter-spacing: .04em;
+}
+
+/* Acciones */
+.detalle-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.detalle-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--etiqueta);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 3px;
+  width: fit-content;
+}
+
+.detalle-volver:hover {
+  color: var(--oscuro);
+  border-color: var(--borde);
+}
+
+/* ===== Galería Inferior en Detalle ===== */
+.detalle-galeria {
+  margin-top: clamp(60px, 10vh, 120px);
+}
+
+.detalle-galeria-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.detalle-galeria-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform .6s ease;
+}
+
+.detalle-galeria-grid img:hover {
+  transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+  .detalle-galeria-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* ================================================================
+   CTA INFERIOR
+   ================================================================ */
+.seccion-cta-interior {
+  padding: clamp(60px, 10vh, 110px) 0;
+  background: var(--oscuro);
+  text-align: center;
+  position: relative;
+}
+
+.seccion-cta-interior::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--oro), transparent);
+}
+
+.cta-interior-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.cta-int-linea {
+  width: 1px;
+  height: 40px;
+  background: var(--oro);
+}
+
+.cta-interior-texto {
+  font-family: var(--f-titulo);
+  font-size: clamp(22px, 3vw, 38px);
+  color: var(--blanco);
+  font-style: italic;
+}
+
+.btn-dorado-sm {
+  display: inline-block;
+  font-size: .67rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--oscuro);
+  background: var(--oro);
+  border: 1px solid var(--oro);
+  padding: 14px 32px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background .3s, color .3s;
+}
+
+.btn-dorado-sm:hover {
+  background: transparent;
+  color: var(--blanco);
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 960px) {
+  .nav-interior { display: none; }
+
+  /* tabla: ocultar descripcion en tablet */
+  .th-descripcion, .td-descripcion { display: none; }
+  .th-precio, .td-precio { text-align: left; }
+  .th-accion, .td-accion { text-align: left; }
+}
+
+@media (max-width: 640px) {
+  .barra-vistas-count { display: none; }
+
+  .tarjetas-servicios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detalle-grid { flex-direction: column; }
+}
+
