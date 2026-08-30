@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Room Type Form')}"></head>
+<body>
+
+<div th:replace="~{layout :: cabecera}"></div>
+
+<main class="contenedor seccion-admin">
+  <p class="eyebrow">Admin</p>
+  <h1 th:text="${tipoHabitacion.id} != null ? 'Edit Room Type' : 'New Room Type'">Room Type Form</h1>
+
+  <form th:action="@{/admin/tipos-habitacion/guardar}" th:object="${tipoHabitacion}" method="post" class="formulario-admin">
+
+    <!-- Campo oculto: si tiene id, el guardado actualiza en vez de crear -->
+    <input type="hidden" th:field="*{id}">
+
+    <label>
+      <span>Name</span>
+      <input type="text" th:field="*{nombre}" required>
+    </label>
+
+    <label>
+      <span>Description</span>
+      <textarea th:field="*{descripcion}" rows="4" required></textarea>
+    </label>
+
+    <div class="formulario-admin-botones">
+      <button type="submit" class="btn-dorado">Save</button>
+      <a th:href="@{/admin/tipos-habitacion}" class="btn-contorno-oscuro">Cancel</a>
+    </div>
+  </form>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<div th:replace="~{layout :: script}"></div>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Room Types')}"></head>
+<body>
+
+<div th:replace="~{layout :: cabecera}"></div>
+
+<main class="contenedor seccion-admin">
+  <p class="eyebrow">Admin</p>
+  <div class="admin-encabezado">
+    <h1>Room Types</h1>
+    <a th:href="@{/admin/tipos-habitacion/nuevo}" class="btn-dorado">+ New Room Type</a>
+  </div>
+
+  <table class="tabla-admin">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="tipo : ${tipos}">
+        <td th:text="${tipo.id}">1</td>
+        <td th:text="${tipo.nombre}">Normal</td>
+        <td th:text="${tipo.descripcion}">Descripción</td>
+        <td class="tabla-admin-acciones">
+          <a th:href="@{/admin/tipos-habitacion/{id}/editar(id=${tipo.id})}" class="enlace-subrayado">Edit</a>
+          <form th:action="@{/admin/tipos-habitacion/{id}/eliminar(id=${tipo.id})}" method="post" class="form-eliminar">
+            <button type="submit" class="btn-eliminar" onclick="return confirm('Delete this room type?');">Delete</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<div th:replace="~{layout :: script}"></div>
+
+</body>
+</html>
