@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Reservations')}"></head>
+<body>
+
+<header th:replace="~{layout :: cabecera}"></header>
+
+<main>
+  <section class="hero-interior">
+    <div class="hero-interior-contenido contenedor">
+      <p class="eyebrow eyebrow-claro-int">Guest Area</p>
+      <h1>Reservations</h1>
+      <span class="linea-dorada-horizontal-int"></span>
+      <p class="hero-interior-subtexto" th:text="'Welcome, ' + ${usuario.nombreCompleto} + '. Your account is ready for reservations, services and experiences.'">
+        Welcome to The Royale.
+      </p>
+      <form th:action="@{/logout}" method="post" style="margin-top: 30px;">
+        <button type="submit" class="btn-dorado">Sign Out</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<th:block th:replace="~{layout :: script}"></th:block>
+
+</body>
+</html>

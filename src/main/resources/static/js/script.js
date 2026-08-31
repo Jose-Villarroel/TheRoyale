@@ -104,7 +104,7 @@ function irHabitacionSiguiente() {
 // ===== Función: manejar el envío del formulario de reserva (solo en la landing) =====
 function manejarFormularioReserva(evento) {
   evento.preventDefault();
-  window.location.href = "login.html";
+  window.location.href = "/login";
 }
 
 // ===== Función: manejar el envío del formulario de newsletter (en todas las páginas con footer) =====

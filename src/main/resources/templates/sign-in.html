@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | The Royale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            royale: {
+              dark: "#252525",
+              gold: "#c6a15b",
+              muted: "#7d7d7d",
+              line: "#dedbd6"
+            }
+          },
+          fontFamily: {
+            title: ["Cormorant Garamond", "Georgia", "serif"],
+            body: ["Lato", "Helvetica", "Arial", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-white font-body text-royale-muted antialiased">
+  <main class="grid min-h-screen lg:grid-cols-[1.06fr_1fr]">
+    <section class="relative hidden bg-royale-dark px-8 py-12 text-white lg:flex lg:flex-col lg:justify-center xl:px-12">
+      <a th:href="@{/}" class="absolute left-12 top-10 text-[0.62rem] uppercase tracking-[0.32em] text-white/55">Back Home</a>
+      <div>
+        <h1 class="font-title text-[6.2rem] font-light leading-none tracking-normal xl:text-[7.2rem]">The Royale</h1>
+        <p class="mt-4 text-sm uppercase tracking-[0.22em] text-white/35">New York</p>
+      </div>
+      <div class="absolute bottom-12 left-12 max-w-[19rem]">
+        <span class="mb-8 block h-9 w-px bg-royale-gold"></span>
+        <p class="font-title text-[1.35rem] italic leading-snug text-white/80">
+          Luxury is not what is added. It is what is understood.
+        </p>
+      </div>
+    </section>
+
+    <section class="flex min-h-screen items-center justify-center px-6 py-14 sm:px-10">
+      <div class="w-full max-w-[28rem]">
+        <a th:href="@{/}" class="mb-12 block font-title text-4xl text-royale-dark lg:hidden">The Royale</a>
+
+        <p class="mb-4 text-[0.62rem] uppercase tracking-[0.38em] text-royale-gold">Welcome Back</p>
+        <h2 class="font-title text-5xl font-light leading-none text-royale-dark">Sign In</h2>
+        <p class="mt-5 text-sm font-light text-royale-muted">Access your reservations, requests and stay history.</p>
+
+        <p th:if="${mensaje}" th:text="${mensaje}" class="mt-6 border border-royale-gold/30 bg-royale-gold/10 px-4 py-3 text-xs text-royale-dark"></p>
+        <p th:if="${error}" th:text="${error}" class="mt-6 border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700"></p>
+
+        <form th:action="@{/login}" method="post" class="mt-8 space-y-6">
+          <label class="block">
+            <span class="block text-[0.6rem] uppercase tracking-[0.32em] text-royale-muted">Email</span>
+            <input
+              type="email"
+              name="email"
+              th:value="${email}"
+              placeholder="you@example.com"
+              required
+              class="mt-3 w-full border-0 border-b border-royale-line bg-transparent px-0 py-2 text-sm text-royale-dark outline-none placeholder:text-royale-muted/75 focus:border-royale-gold focus:ring-0">
+          </label>
+
+          <label class="block">
+            <span class="block text-[0.6rem] uppercase tracking-[0.32em] text-royale-muted">Password</span>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+              class="mt-3 w-full border-0 border-b border-royale-line bg-transparent px-0 py-2 text-sm text-royale-dark outline-none placeholder:text-royale-muted/75 focus:border-royale-gold focus:ring-0">
+          </label>
+
+          <button type="submit" class="w-full bg-royale-gold px-6 py-4 text-[0.65rem] uppercase tracking-[0.32em] text-royale-dark transition hover:bg-royale-dark hover:text-white">
+            Sign In
+          </button>
+        </form>
+
+        <div class="mt-8 border-t border-royale-line pt-6 text-xs">
+          <a th:href="@{/login}" class="block text-royale-muted hover:text-royale-dark">Forgot password?</a>
+          <p class="mt-4">
+            Don't have an account?
+            <a th:href="@{/signup}" class="ml-1 uppercase tracking-[0.24em] text-royale-dark hover:text-royale-gold">Create an account</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
