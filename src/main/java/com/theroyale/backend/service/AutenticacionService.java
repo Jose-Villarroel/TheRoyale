@@ -38,6 +38,10 @@ public class AutenticacionService {
         return Optional.of(usuario);
     }
 
+    public boolean existeUsuario(String email) {
+        return usuarios.containsKey(normalizarEmail(email));
+    }
+
     private String normalizarEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase();
     }
