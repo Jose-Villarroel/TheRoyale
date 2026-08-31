@@ -214,9 +214,6 @@ ul  { list-style: none; }
 .barra-vistas {
   border-bottom: 1px solid var(--borde);
   background: var(--blanco);
-  position: sticky;
-  top: 70px;
-  z-index: 900;
 }
 
 .barra-vistas-contenido {
