@@ -2,24 +2,25 @@ package com.theroyale.backend.model;
 
 import java.time.LocalDate;
 
-// ===== Modelo: representa el perfil de cliente vinculado a un Usuario por email =====
 public class Cliente {
 
     private Long id;
     private String nombre;
     private String apellido;
-    private String emailUsuario;
+    private String email;
+    private String password;
     private String telefono;
     private LocalDate fechaRegistro;
 
     public Cliente() {
     }
 
-    public Cliente(Long id, String nombre, String apellido, String emailUsuario, String telefono, LocalDate fechaRegistro) {
+    public Cliente(Long id, String nombre, String apellido, String email, String password, String telefono, LocalDate fechaRegistro) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
-        this.emailUsuario = emailUsuario;
+        this.email = email;
+        this.password = password;
         this.telefono = telefono;
         this.fechaRegistro = fechaRegistro;
     }
@@ -48,12 +49,20 @@ public class Cliente {
         this.apellido = apellido;
     }
 
-    public String getEmailUsuario() {
-        return emailUsuario;
+    public String getEmail() {
+        return email;
     }
 
-    public void setEmailUsuario(String emailUsuario) {
-        this.emailUsuario = emailUsuario;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getTelefono() {

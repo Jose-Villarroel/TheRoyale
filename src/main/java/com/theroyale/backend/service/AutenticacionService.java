@@ -1,45 +1,48 @@
 package com.theroyale.backend.service;
 
-import com.theroyale.backend.model.Usuario;
+import com.theroyale.backend.model.Cliente;
+import com.theroyale.backend.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.time.LocalDate;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AutenticacionService {
 
-    private final Map<String, Usuario> usuarios = new ConcurrentHashMap<>();
+    private final ClienteRepository clienteRepository;
 
-    public AutenticacionService() {
-        registrarUsuario(new Usuario("Guest", "Royale", "you@example.com", "password"));
+    public AutenticacionService(ClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
+        registrarCliente(new Cliente(null, "Guest", "Royale", "you@example.com", "password", "", null));
     }
 
-    public boolean registrarUsuario(Usuario usuario) {
-        String emailNormalizado = normalizarEmail(usuario.getEmail());
+    public boolean registrarCliente(Cliente cliente) {
+        String emailNormalizado = normalizarEmail(cliente.getEmail());
 
-        if (emailNormalizado.isBlank() || usuarios.containsKey(emailNormalizado)) {
+        if (emailNormalizado.isBlank() || clienteRepository.obtenerPorEmail(emailNormalizado).isPresent()) {
             return false;
         }
 
-        usuario.setEmail(emailNormalizado);
-        usuarios.put(emailNormalizado, usuario);
+        cliente.setId(null);
+        cliente.setEmail(emailNormalizado);
+        cliente.setFechaRegistro(LocalDate.now());
+        clienteRepository.guardar(cliente);
         return true;
     }
 
-    public Optional<Usuario> autenticar(String email, String password) {
-        Usuario usuario = usuarios.get(normalizarEmail(email));
+    public Optional<Cliente> autenticar(String email, String password) {
+        Optional<Cliente> cliente = clienteRepository.obtenerPorEmail(normalizarEmail(email));
 
-        if (usuario == null || password == null || !usuario.getPassword().equals(password)) {
+        if (cliente.isEmpty() || password == null || !password.equals(cliente.get().getPassword())) {
             return Optional.empty();
         }
 
-        return Optional.of(usuario);
+        return cliente;
     }
 
-    public boolean existeUsuario(String email) {
-        return usuarios.containsKey(normalizarEmail(email));
+    public boolean existeCliente(String email) {
+        return clienteRepository.obtenerPorEmail(normalizarEmail(email)).isPresent();
     }
 
     private String normalizarEmail(String email) {

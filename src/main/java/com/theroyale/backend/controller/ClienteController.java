@@ -39,9 +39,9 @@ public class ClienteController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/usuario/{emailUsuario}")
-    public ResponseEntity<Cliente> buscarPorEmailUsuario(@PathVariable String emailUsuario) {
-        return clienteService.buscarPorEmailUsuario(emailUsuario)
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Cliente> buscarPorEmail(@PathVariable String email) {
+        return clienteService.buscarPorEmail(email)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

@@ -23,9 +23,9 @@ public class ClienteRepository {
                 .findFirst();
     }
 
-    public Optional<Cliente> obtenerPorEmailUsuario(String emailUsuario) {
+    public Optional<Cliente> obtenerPorEmail(String email) {
         return clientes.stream()
-                .filter(cliente -> cliente.getEmailUsuario().equalsIgnoreCase(emailUsuario))
+                .filter(cliente -> cliente.getEmail() != null && cliente.getEmail().equalsIgnoreCase(email))
                 .findFirst();
     }
 

@@ -55,7 +55,7 @@
 
         <p th:if="${error}" th:text="${error}" class="mt-6 border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700"></p>
 
-        <form th:action="@{/signup}" th:object="${usuario}" method="post" class="mt-8 space-y-6">
+        <form th:action="@{/signup}" th:object="${cliente}" method="post" class="mt-8 space-y-6">
           <div class="grid gap-6 sm:grid-cols-2">
             <label class="block">
               <span class="block text-[0.6rem] uppercase tracking-[0.32em] text-royale-muted">First Name</span>

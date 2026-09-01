@@ -13,11 +13,9 @@ import java.util.Optional;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
-    private final AutenticacionService autenticacionService;
 
-    public ClienteService(ClienteRepository clienteRepository, AutenticacionService autenticacionService) {
+    public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
-        this.autenticacionService = autenticacionService;
     }
 
     public List<Cliente> listarTodos() {
@@ -28,20 +26,20 @@ public class ClienteService {
         return clienteRepository.obtenerPorId(id);
     }
 
-    public Optional<Cliente> buscarPorEmailUsuario(String emailUsuario) {
-        return clienteRepository.obtenerPorEmailUsuario(normalizarEmail(emailUsuario));
+    public Optional<Cliente> buscarPorEmail(String email) {
+        return clienteRepository.obtenerPorEmail(normalizarEmail(email));
     }
 
     public Cliente crear(Cliente cliente) {
-        validarCliente(cliente);
+        validarCliente(cliente, true);
 
-        String emailUsuario = normalizarEmail(cliente.getEmailUsuario());
-        if (clienteRepository.obtenerPorEmailUsuario(emailUsuario).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un cliente vinculado al usuario: " + emailUsuario);
+        String email = normalizarEmail(cliente.getEmail());
+        if (clienteRepository.obtenerPorEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Ya existe un cliente con email: " + email);
         }
 
         cliente.setId(null);
-        cliente.setEmailUsuario(emailUsuario);
+        cliente.setEmail(email);
         cliente.setFechaRegistro(LocalDate.now());
         return clienteRepository.guardar(cliente);
     }
@@ -50,17 +48,20 @@ public class ClienteService {
         Cliente clienteExistente = clienteRepository.obtenerPorId(id)
                 .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado: " + id));
 
-        validarCliente(clienteActualizado);
+        validarCliente(clienteActualizado, false);
 
-        String emailUsuario = normalizarEmail(clienteActualizado.getEmailUsuario());
-        Optional<Cliente> clienteConEmail = clienteRepository.obtenerPorEmailUsuario(emailUsuario);
+        String email = normalizarEmail(clienteActualizado.getEmail());
+        Optional<Cliente> clienteConEmail = clienteRepository.obtenerPorEmail(email);
         if (clienteConEmail.isPresent() && !clienteConEmail.get().getId().equals(id)) {
-            throw new IllegalArgumentException("Ya existe un cliente vinculado al usuario: " + emailUsuario);
+            throw new IllegalArgumentException("Ya existe un cliente con email: " + email);
         }
 
         clienteExistente.setNombre(clienteActualizado.getNombre());
         clienteExistente.setApellido(clienteActualizado.getApellido());
-        clienteExistente.setEmailUsuario(emailUsuario);
+        clienteExistente.setEmail(email);
+        if (!estaVacio(clienteActualizado.getPassword())) {
+            clienteExistente.setPassword(clienteActualizado.getPassword());
+        }
         clienteExistente.setTelefono(clienteActualizado.getTelefono());
 
         return clienteRepository.guardar(clienteExistente);
@@ -74,18 +75,17 @@ public class ClienteService {
         clienteRepository.eliminarPorId(id);
     }
 
-    private void validarCliente(Cliente cliente) {
+    private void validarCliente(Cliente cliente, boolean requierePassword) {
         if (cliente == null) {
             throw new IllegalArgumentException("El cliente es obligatorio.");
         }
 
-        if (estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) || estaVacio(cliente.getEmailUsuario())) {
-            throw new IllegalArgumentException("Nombre, apellido y email de usuario son obligatorios.");
+        if (estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) || estaVacio(cliente.getEmail())) {
+            throw new IllegalArgumentException("Nombre, apellido y email son obligatorios.");
         }
 
-        String emailUsuario = normalizarEmail(cliente.getEmailUsuario());
-        if (!autenticacionService.existeUsuario(emailUsuario)) {
-            throw new IllegalArgumentException("No existe un usuario autenticable con email: " + emailUsuario);
+        if (requierePassword && estaVacio(cliente.getPassword())) {
+            throw new IllegalArgumentException("La contrasena es obligatoria.");
         }
     }
 

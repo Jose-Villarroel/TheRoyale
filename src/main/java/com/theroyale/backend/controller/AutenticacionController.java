@@ -1,6 +1,6 @@
 package com.theroyale.backend.controller;
 
-import com.theroyale.backend.model.Usuario;
+import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.service.AutenticacionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -31,60 +31,60 @@ public class AutenticacionController {
 
     @PostMapping("/login")
     public String iniciarSesion(String email, String password, HttpSession session, RedirectAttributes redirectAttributes) {
-        Optional<Usuario> usuarioAutenticado = autenticacionService.autenticar(email, password);
+        Optional<Cliente> clienteAutenticado = autenticacionService.autenticar(email, password);
 
-        if (usuarioAutenticado.isEmpty()) {
+        if (clienteAutenticado.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Email or password is incorrect.");
             redirectAttributes.addFlashAttribute("email", email);
             return "redirect:/login";
         }
 
-        session.setAttribute("usuarioAutenticado", usuarioAutenticado.get());
+        session.setAttribute("clienteAutenticado", clienteAutenticado.get());
         return "redirect:/reservations";
     }
 
     @GetMapping("/signup")
     public String mostrarRegistro(Model model) {
-        if (!model.containsAttribute("usuario")) {
-            model.addAttribute("usuario", new Usuario());
+        if (!model.containsAttribute("cliente")) {
+            model.addAttribute("cliente", new Cliente());
         }
         return "sign-up";
     }
 
     @PostMapping("/signup")
-    public String registrar(@ModelAttribute Usuario usuario, String confirmPassword, RedirectAttributes redirectAttributes) {
-        if (estaVacio(usuario.getNombre()) || estaVacio(usuario.getApellido()) || estaVacio(usuario.getEmail()) || estaVacio(usuario.getPassword())) {
+    public String registrar(@ModelAttribute Cliente cliente, String confirmPassword, RedirectAttributes redirectAttributes) {
+        if (estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) || estaVacio(cliente.getEmail()) || estaVacio(cliente.getPassword())) {
             redirectAttributes.addFlashAttribute("error", "Please complete all fields.");
-            redirectAttributes.addFlashAttribute("usuario", usuario);
+            redirectAttributes.addFlashAttribute("cliente", cliente);
             return "redirect:/signup";
         }
 
-        if (!usuario.getPassword().equals(confirmPassword)) {
+        if (!cliente.getPassword().equals(confirmPassword)) {
             redirectAttributes.addFlashAttribute("error", "Passwords do not match.");
-            redirectAttributes.addFlashAttribute("usuario", usuario);
+            redirectAttributes.addFlashAttribute("cliente", cliente);
             return "redirect:/signup";
         }
 
-        if (!autenticacionService.registrarUsuario(usuario)) {
+        if (!autenticacionService.registrarCliente(cliente)) {
             redirectAttributes.addFlashAttribute("error", "An account with this email already exists.");
-            redirectAttributes.addFlashAttribute("usuario", usuario);
+            redirectAttributes.addFlashAttribute("cliente", cliente);
             return "redirect:/signup";
         }
 
         redirectAttributes.addFlashAttribute("mensaje", "Account created. Please sign in.");
-        redirectAttributes.addFlashAttribute("email", usuario.getEmail());
+        redirectAttributes.addFlashAttribute("email", cliente.getEmail());
         return "redirect:/login";
     }
 
     @GetMapping("/reservations")
     public String mostrarReservas(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioAutenticado");
+        Cliente cliente = (Cliente) session.getAttribute("clienteAutenticado");
 
-        if (usuario == null) {
+        if (cliente == null) {
             return "redirect:/login";
         }
 
-        model.addAttribute("usuario", usuario);
+        model.addAttribute("cliente", cliente);
         return "reservations";
     }
 
