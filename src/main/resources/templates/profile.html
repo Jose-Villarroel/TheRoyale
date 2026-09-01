@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Profile')}"></head>
+<body>
+
+<header th:replace="~{layout :: cabecera}"></header>
+
+<main>
+  <section class="hero-interior">
+    <div class="hero-interior-contenido contenedor">
+      <p class="eyebrow eyebrow-claro-int">Guest Profile</p>
+      <h1>My Profile</h1>
+      <span class="linea-dorada-horizontal-int"></span>
+      <p class="hero-interior-subtexto" th:text="'Manage the client profile for ' + ${cliente.nombreCompleto} + '.'">
+        Manage your client profile.
+      </p>
+    </div>
+  </section>
+
+  <section class="perfil-seccion contenedor">
+    <div class="perfil-grid">
+      <aside class="perfil-resumen">
+        <p class="eyebrow">Client Record</p>
+        <h2 th:text="${cliente.nombreCompleto}">Guest Name</h2>
+        <dl class="perfil-datos">
+          <div>
+            <dt>ID</dt>
+            <dd th:text="${cliente.id}">1</dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd th:text="${cliente.email}">guest@example.com</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd th:text="${cliente.telefono != null and !cliente.telefono.isEmpty() ? cliente.telefono : 'Not registered'}">Not registered</dd>
+          </div>
+          <div>
+            <dt>Registered</dt>
+            <dd th:text="${cliente.fechaRegistro != null ? cliente.fechaRegistro : 'Pending'}">Pending</dd>
+          </div>
+        </dl>
+
+        <div class="perfil-acciones-secundarias">
+          <a th:href="@{/signup}" class="enlace-subrayado">Create New Client</a>
+          <a th:href="@{/reservations}" class="enlace-subrayado">Reservations</a>
+          <form th:action="@{/logout}" method="post" class="form-eliminar">
+            <button type="submit" class="btn-eliminar">Sign Out</button>
+          </form>
+        </div>
+      </aside>
+
+      <section class="perfil-panel">
+        <p th:if="${mensaje}" th:text="${mensaje}" class="perfil-alerta perfil-alerta-ok"></p>
+        <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error"></p>
+
+        <div class="admin-encabezado perfil-encabezado-form">
+          <div>
+            <p class="eyebrow">Update</p>
+            <h2>Edit Client</h2>
+          </div>
+        </div>
+
+        <form th:action="@{/profile}" th:object="${cliente}" method="post" class="formulario-admin perfil-formulario">
+          <div class="perfil-form-grid">
+            <label>
+              First Name
+              <input type="text" th:field="*{nombre}" required>
+            </label>
+            <label>
+              Last Name
+              <input type="text" th:field="*{apellido}" required>
+            </label>
+          </div>
+
+          <label>
+            Email
+            <input type="email" th:field="*{email}" required>
+          </label>
+
+          <label>
+            Phone
+            <input type="tel" th:field="*{telefono}" placeholder="+1 555 000 0000">
+          </label>
+
+          <label>
+            New Password
+            <input type="password" name="password" placeholder="Leave blank to keep current password">
+          </label>
+
+          <div class="formulario-admin-botones">
+            <button type="submit" class="btn-dorado">Save Profile</button>
+            <a th:href="@{/profile}" class="btn-contorno-oscuro">Cancel</a>
+          </div>
+        </form>
+
+        <div class="perfil-zona-peligro">
+          <div>
+            <p class="eyebrow">Delete</p>
+            <h3>Remove Client Profile</h3>
+            <p>This deletes the current client from the in-memory client repository and signs out the session.</p>
+          </div>
+          <form th:action="@{/profile/delete}" method="post">
+            <button type="submit" class="btn-eliminar" onclick="return confirm('Delete your client profile? This action cannot be undone.');">
+              Delete Profile
+            </button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<th:block th:replace="~{layout :: script}"></th:block>
+
+</body>
+</html>

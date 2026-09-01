@@ -2,6 +2,7 @@ package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.service.AutenticacionService;
+import com.theroyale.backend.service.ClienteService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +17,11 @@ import java.util.Optional;
 public class AutenticacionController {
 
     private final AutenticacionService autenticacionService;
+    private final ClienteService clienteService;
 
-    public AutenticacionController(AutenticacionService autenticacionService) {
+    public AutenticacionController(AutenticacionService autenticacionService, ClienteService clienteService) {
         this.autenticacionService = autenticacionService;
+        this.clienteService = clienteService;
     }
 
     @GetMapping("/login")
@@ -78,7 +81,7 @@ public class AutenticacionController {
 
     @GetMapping("/reservations")
     public String mostrarReservas(HttpSession session, Model model) {
-        Cliente cliente = (Cliente) session.getAttribute("clienteAutenticado");
+        Cliente cliente = obtenerClienteAutenticado(session);
 
         if (cliente == null) {
             return "redirect:/login";
@@ -88,10 +91,78 @@ public class AutenticacionController {
         return "reservations";
     }
 
+    @GetMapping("/profile")
+    public String mostrarPerfil(HttpSession session, Model model) {
+        Cliente cliente = obtenerClienteAutenticado(session);
+
+        if (cliente == null) {
+            return "redirect:/login";
+        }
+
+        if (!model.containsAttribute("cliente")) {
+            model.addAttribute("cliente", cliente);
+        }
+        return "profile";
+    }
+
+    @PostMapping("/profile")
+    public String actualizarPerfil(@ModelAttribute Cliente clienteActualizado,
+                                   HttpSession session,
+                                   RedirectAttributes redirectAttributes) {
+        Cliente cliente = obtenerClienteAutenticado(session);
+
+        if (cliente == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Cliente clienteGuardado = clienteService.actualizar(cliente.getId(), clienteActualizado);
+            session.setAttribute("clienteAutenticado", clienteGuardado);
+            redirectAttributes.addFlashAttribute("mensaje", "Profile updated successfully.");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addFlashAttribute("cliente", clienteActualizado);
+        }
+
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/delete")
+    public String eliminarPerfil(HttpSession session, RedirectAttributes redirectAttributes) {
+        Cliente cliente = obtenerClienteAutenticado(session);
+
+        if (cliente == null) {
+            return "redirect:/login";
+        }
+
+        clienteService.eliminar(cliente.getId());
+        session.invalidate();
+        redirectAttributes.addFlashAttribute("mensaje", "Your profile was deleted.");
+        return "redirect:/signup";
+    }
+
     @PostMapping("/logout")
     public String cerrarSesion(HttpSession session) {
         session.invalidate();
         return "redirect:/";
+    }
+
+    private Cliente obtenerClienteAutenticado(HttpSession session) {
+        Cliente clienteSesion = (Cliente) session.getAttribute("clienteAutenticado");
+
+        if (clienteSesion == null || clienteSesion.getId() == null) {
+            return null;
+        }
+
+        return clienteService.buscarPorId(clienteSesion.getId())
+                .map(cliente -> {
+                    session.setAttribute("clienteAutenticado", cliente);
+                    return cliente;
+                })
+                .orElseGet(() -> {
+                    session.invalidate();
+                    return null;
+                });
     }
 
     private boolean estaVacio(String valor) {

@@ -14,9 +14,12 @@
       <p class="hero-interior-subtexto" th:text="'Welcome, ' + ${cliente.nombreCompleto} + '. Your account is ready for reservations, services and experiences.'">
         Welcome to The Royale.
       </p>
-      <form th:action="@{/logout}" method="post" style="margin-top: 30px;">
-        <button type="submit" class="btn-dorado">Sign Out</button>
-      </form>
+      <div class="acciones-hero-guest">
+        <a th:href="@{/profile}" class="btn-dorado">My Profile</a>
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="btn-contorno-claro">Sign Out</button>
+        </form>
+      </div>
     </div>
   </section>
 </main>
