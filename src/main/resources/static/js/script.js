@@ -147,6 +147,12 @@ document.querySelectorAll(".enlace-menu-movil, .menu-movil-pie a").forEach(funct
   enlace.addEventListener("click", cerrarMenuMovil);
 });
 
+document.addEventListener("keydown", function (evento) {
+  if (evento.key === "Escape") {
+    cerrarMenuMovil();
+  }
+});
+
 // ===== Inicialización =====
 actualizarCabeceraEnScroll();
 activarAnimacionesAparicion();

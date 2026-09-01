@@ -17,6 +17,72 @@
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
+/* ===== Barra fija entre pantallas admin ===== */
+.admin-vistas {
+  border-bottom: 1px solid var(--admin-borde);
+  background: #fff;
+}
+
+.admin-vistas-contenido {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 54px;
+}
+
+.admin-vistas-label,
+.admin-vistas-volver,
+.admin-vistas-toggle a {
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.admin-vistas-label {
+  letter-spacing: .26em;
+  color: var(--admin-etiqueta);
+}
+
+.admin-vistas-toggle {
+  display: flex;
+  border: 1px solid var(--admin-borde);
+}
+
+.admin-vistas-toggle a {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 15px;
+  color: var(--admin-etiqueta);
+  background: transparent;
+}
+
+.admin-vistas-toggle a + a {
+  border-left: 1px solid var(--admin-borde);
+}
+
+.admin-vistas-toggle a:hover {
+  background: var(--admin-off-blanco);
+  color: var(--admin-oscuro);
+}
+
+.admin-vistas-toggle .admin-vistas-activo,
+.admin-vistas-toggle .admin-vistas-activo:hover {
+  background: var(--admin-oscuro);
+  color: #fff;
+}
+
+.admin-vistas-volver {
+  margin-left: auto;
+  color: var(--admin-dorado-hover);
+  border-bottom: 1px solid transparent;
+}
+
+.admin-vistas-volver:hover {
+  color: var(--admin-oscuro);
+  border-bottom-color: var(--admin-dorado);
+}
+
 /* ===== Tarjetas admin: grid de listado con imagen (reemplaza la tabla) ===== */
 .tarjetas-admin-grid {
   display: grid;
@@ -162,6 +228,18 @@
 @media (max-width: 960px) {
   .tarjetas-admin-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-vistas-contenido {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .admin-vistas-volver {
+    margin-left: 0;
   }
 }
 

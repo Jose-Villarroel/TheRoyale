@@ -167,6 +167,7 @@ ul  { list-style: none; }
   padding: clamp(80px, 15vh, 150px) 0 clamp(64px, 10vh, 110px);
   position: relative;
   overflow: hidden;
+
 }
 
 /* línea decorativa superior */
@@ -182,6 +183,7 @@ ul  { list-style: none; }
   font-size: clamp(44px, 6.5vw, 90px);
   color: var(--blanco);
   letter-spacing: -.01em;
+  margin-top: 90px;
 }
 
 .eyebrow-claro-int {

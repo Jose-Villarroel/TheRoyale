@@ -244,6 +244,33 @@ ul {
   gap: clamp(14px, 2vw, 28px);
 }
 
+.barra-utilitaria-izquierda {
+  display: flex;
+  align-items: center;
+}
+
+.btn-admin-acceso {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 6px 12px;
+  border: 1px solid rgba(198, 161, 91, 0.7);
+  color: #fff;
+  font-size: 0.65rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.btn-admin-acceso:hover {
+  background: var(--color-dorado);
+  border-color: var(--color-dorado);
+  color: var(--color-oscuro);
+}
+
+.envoltorio-cabecera.cabecera-solida .btn-admin-acceso {
+  color: var(--color-texto-oscuro);
+}
+
 .cabecera {
   display: flex;
   align-items: center;

@@ -1,7 +1,7 @@
 package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.Servicio;
-import com.theroyale.backend.service.ServicioService;
+import com.theroyale.backend.service.InterfaceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +12,9 @@ import java.util.Optional;
 @Controller
 public class ServicioController {
 
-    private final ServicioService servicioService;
+    private final InterfaceService servicioService;
 
-    public ServicioController(ServicioService servicioService) {
+    public ServicioController(InterfaceService servicioService) {
         this.servicioService = servicioService;
     }
 

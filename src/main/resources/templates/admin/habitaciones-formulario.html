@@ -25,6 +25,8 @@
   </div>
 </header>
 
+<div th:replace="~{layout :: admin-nav('habitaciones')}"></div>
+
 <main class="contenedor seccion-admin-contenido tema-royale" style="max-width: 640px;">
 
   <form th:action="@{/admin/habitaciones/guardar}" th:object="${habitacion}" method="post">

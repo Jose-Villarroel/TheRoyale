@@ -15,6 +15,9 @@
   <div class="envoltorio-cabecera" id="envoltorioCabecera">
 
     <div class="barra-utilitaria" id="barraUtilitaria">
+      <div class="barra-utilitaria-izquierda">
+        <a th:href="@{/admin}" class="btn-admin-acceso">Admin</a>
+      </div>
       <div class="barra-utilitaria-derecha">
         <a th:href="@{/contact}">+1 507 3165 232</a>
         <a th:href="@{/login}">Sign In</a>
@@ -49,6 +52,7 @@
       <button id="menuCerrar" aria-label="Cerrar menú">&times;</button>
     </div>
     <nav class="menu-movil-nav">
+      <a th:href="@{/admin}" class="enlace-menu-movil">Admin</a>
       <a href="#rooms" class="enlace-menu-movil">Rooms</a>
       <a href="#services" class="enlace-menu-movil">Services</a>
       <a href="#experiences" class="enlace-menu-movil">Experiences</a>

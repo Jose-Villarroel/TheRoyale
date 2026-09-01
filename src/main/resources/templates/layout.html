@@ -68,6 +68,21 @@
 
 </th:block>
 
+<th:block th:fragment="admin-nav(activo)">
+  <section class="admin-vistas" aria-label="Navegacion admin">
+    <div class="contenedor admin-vistas-contenido">
+      <span class="admin-vistas-label">Manage</span>
+      <nav class="admin-vistas-toggle">
+        <a th:href="@{/admin/habitaciones}"
+           th:classappend="${activo == 'habitaciones'} ? ' admin-vistas-activo' : ''">Habitaciones</a>
+        <a th:href="@{/admin/tipos-habitacion}"
+           th:classappend="${activo == 'tipos'} ? ' admin-vistas-activo' : ''">Tipos de habitacion</a>
+      </nav>
+      <a th:href="@{/}" class="admin-vistas-volver">Volver al sitio</a>
+    </div>
+  </section>
+</th:block>
+
 <!-- ===== Footer real de la landing, reutilizable en todas las páginas ===== -->
 <footer th:fragment="pie" class="pie-pagina">
   <div class="contenedor">

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ServicioService {
+public class ServicioService implements InterfaceService {
 
     private final ServicioRepository servicioRepository;
 
@@ -17,14 +17,17 @@ public class ServicioService {
         this.servicioRepository = servicioRepository;
     }
 
+    @Override
     public List<Servicio> listarServicios() {
         return servicioRepository.obtenerTodos();
     }
 
+    @Override
     public Optional<Servicio> buscarPorId(Long id) {
         return servicioRepository.obtenerPorId(id);
     }
 
+    @Override
     public Optional<Servicio> buscarPorNombre(String nombre) {
         return servicioRepository.obtenerPorNombre(nombre);
     }

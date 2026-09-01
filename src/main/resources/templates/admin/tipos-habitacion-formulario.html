@@ -14,6 +14,8 @@
   </div>
 </header>
 
+<div th:replace="~{layout :: admin-nav('tipos')}"></div>
+
 <main class="contenedor seccion-admin-contenido">
 
   <form th:action="@{/admin/tipos-habitacion/guardar}" th:object="${tipoHabitacion}" method="post" class="formulario-admin">

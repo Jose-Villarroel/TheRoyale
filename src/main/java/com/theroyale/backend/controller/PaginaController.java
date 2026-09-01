@@ -11,4 +11,9 @@ public class PaginaController {
     public String mostrarLanding() {
         return "landing";
     }
+
+    @GetMapping("/admin")
+    public String mostrarAdmin() {
+        return "redirect:/admin/habitaciones";
+    }
 }
