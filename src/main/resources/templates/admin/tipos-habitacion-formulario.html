@@ -5,9 +5,16 @@
 
 <div th:replace="~{layout :: cabecera}"></div>
 
-<main class="contenedor seccion-admin">
-  <p class="eyebrow">Admin</p>
-  <h1 th:text="${tipoHabitacion.id} != null ? 'Edit Room Type' : 'New Room Type'">Room Type Form</h1>
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Admin</p>
+    <h1 th:text="${tipoHabitacion.id} != null ? 'Edit Room Type' : 'New Room Type'">Room Type Form</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto">Give this tier a name, a description guests will read, and a photo that represents it.</p>
+  </div>
+</header>
+
+<main class="contenedor seccion-admin-contenido">
 
   <form th:action="@{/admin/tipos-habitacion/guardar}" th:object="${tipoHabitacion}" method="post" class="formulario-admin">
 
@@ -24,12 +31,29 @@
       <textarea th:field="*{descripcion}" rows="4" required></textarea>
     </label>
 
+    <label>
+      <span>Image URL</span>
+      <input type="text" id="imagenUrlInput" th:field="*{imagenUrl}" placeholder="/images/suite-1.webp">
+    </label>
+
+    <div class="imagen-previa-wrap">
+      <img id="imagenPrevia"
+           th:src="@{${tipoHabitacion.imagenUrl != null and !tipoHabitacion.imagenUrl.isEmpty() ? tipoHabitacion.imagenUrl : '/images/hotel.webp'}}"
+           alt="Preview">
+    </div>
+
     <div class="formulario-admin-botones">
       <button type="submit" class="btn-dorado">Save</button>
       <a th:href="@{/admin/tipos-habitacion}" class="btn-contorno-oscuro">Cancel</a>
     </div>
   </form>
 </main>
+
+<script th:inline="javascript">
+  document.getElementById('imagenUrlInput').addEventListener('input', function (e) {
+    document.getElementById('imagenPrevia').src = e.target.value || '/images/hotel.webp';
+  });
+</script>
 
 <footer th:replace="~{layout :: pie}"></footer>
 <div th:replace="~{layout :: script}"></div>

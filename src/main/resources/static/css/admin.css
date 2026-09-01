@@ -1,0 +1,287 @@
+/* ===== Admin design tokens — self-contained, no dependency on landing.css/servicios.css load order ===== */
+/* Espaciado del contenido admin cuando va precedido de un .hero-interior
+   (que ya despeja la cabecera fija) — evita el doble padding-top */
+.seccion-admin-contenido {
+  padding: clamp(48px, 8vh, 96px) 0 clamp(72px, 12vh, 130px);
+}
+
+:root {
+  --admin-dorado: #c6a15b;
+  --admin-dorado-hover: #b28e4c;
+  --admin-oscuro: #252525;
+  --admin-cuerpo: #545454;
+  --admin-etiqueta: #7d7d7d;
+  --admin-borde: #cfcfcf;
+  --admin-off-blanco: #fafaf9;
+  --admin-rojo: #b23b3b;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ===== Tarjetas admin: grid de listado con imagen (reemplaza la tabla) ===== */
+.tarjetas-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin-top: 10px;
+}
+
+.tarjeta-admin-item {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid var(--admin-borde);
+  position: relative;
+  transition: box-shadow 300ms ease, border-color 300ms ease;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: adminEntrada 250ms var(--ease-out) forwards;
+}
+
+.tarjeta-admin-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--admin-dorado);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 350ms var(--ease-out);
+}
+
+.tarjeta-admin-item:hover::after {
+  transform: scaleX(1);
+}
+
+.tarjeta-admin-item:hover {
+  box-shadow: 0 16px 48px -16px rgba(37, 37, 37, .15);
+  z-index: 1;
+}
+
+.tarjeta-admin-item:nth-child(1) { animation-delay: 0ms; }
+.tarjeta-admin-item:nth-child(2) { animation-delay: 40ms; }
+.tarjeta-admin-item:nth-child(3) { animation-delay: 80ms; }
+.tarjeta-admin-item:nth-child(4) { animation-delay: 120ms; }
+.tarjeta-admin-item:nth-child(n+5) { animation-delay: 160ms; }
+
+@keyframes adminEntrada {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta-admin-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Imagen */
+.tarjeta-admin-imagen-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--admin-off-blanco);
+}
+
+.tarjeta-admin-imagen-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 1.2s var(--ease-out);
+}
+
+.tarjeta-admin-item:hover .tarjeta-admin-imagen-wrap img {
+  transform: scale(1.06);
+}
+
+/* Info */
+.tarjeta-admin-info-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 24px 28px;
+  flex: 1;
+}
+
+.tarjeta-admin-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tarjeta-admin-encabezado h3 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.tarjeta-admin-precio {
+  font-family: 'Lato', sans-serif;
+  font-size: .85rem;
+  color: var(--admin-dorado-hover);
+  white-space: nowrap;
+}
+
+.tarjeta-admin-descripcion {
+  font-size: .875rem;
+  line-height: 1.65;
+  color: var(--admin-cuerpo);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tarjeta-admin-acciones {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+/* Chip de estado (Habitación) */
+.chip-estado {
+  display: inline-block;
+  width: fit-content;
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+}
+
+.chip-estado[data-estado="Disponible"] { color: var(--admin-dorado-hover); }
+.chip-estado[data-estado="Ocupada"] { color: var(--admin-etiqueta); }
+.chip-estado[data-estado="Mantenimiento"] { color: var(--admin-rojo); }
+
+@media (max-width: 960px) {
+  .tarjetas-admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Miniatura de previsualización en formularios */
+.imagen-previa-wrap {
+  width: 160px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--admin-borde);
+  background: var(--admin-off-blanco);
+  margin-top: 8px;
+}
+
+.imagen-previa-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 200ms var(--ease-out);
+}
+
+/* ===== Formulario admin: foco dorado, sin ring ===== */
+.formulario-admin input,
+.formulario-admin textarea,
+.formulario-admin select {
+  transition: border-color 200ms var(--ease-out);
+  outline: none;
+}
+
+.formulario-admin input:focus,
+.formulario-admin textarea:focus,
+.formulario-admin select:focus {
+  border-color: var(--admin-dorado);
+}
+
+/* ===== Botones: feedback de presión ===== */
+.btn-dorado,
+.btn-contorno-oscuro,
+.enlace-subrayado,
+.btn-eliminar {
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.btn-dorado:active,
+.btn-contorno-oscuro:active,
+.enlace-subrayado:active,
+.btn-eliminar:active {
+  transform: scale(0.97);
+}
+
+/* ================================================================
+   Tema Royale — re-tema Bootstrap para las páginas de Habitación
+   (mantiene Bootstrap cargado, pero visualmente en línea con la marca)
+   ================================================================ */
+.tema-royale {
+  color: var(--admin-cuerpo);
+}
+
+.tema-royale .btn-primary {
+  --bs-btn-color: var(--admin-oscuro);
+  --bs-btn-bg: var(--admin-dorado);
+  --bs-btn-border-color: var(--admin-dorado);
+  --bs-btn-hover-color: var(--admin-oscuro);
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-hover-border-color: var(--admin-dorado);
+  --bs-btn-active-color: var(--admin-oscuro);
+  --bs-btn-active-bg: transparent;
+  --bs-btn-active-border-color: var(--admin-dorado);
+  --bs-btn-focus-shadow-rgb: 198, 161, 91;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-radius: 0;
+  padding: 0.85rem 1.75rem;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.tema-royale .btn-outline-secondary,
+.tema-royale .btn-outline-danger {
+  border-radius: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease;
+}
+
+.tema-royale .btn-outline-secondary {
+  --bs-btn-color: var(--admin-oscuro);
+  --bs-btn-border-color: var(--admin-borde);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--admin-oscuro);
+  --bs-btn-hover-border-color: var(--admin-oscuro);
+}
+
+.tema-royale .btn-outline-danger {
+  --bs-btn-color: var(--admin-rojo);
+  --bs-btn-border-color: var(--admin-rojo);
+  --bs-btn-hover-bg: var(--admin-rojo);
+  --bs-btn-hover-border-color: var(--admin-rojo);
+}
+
+.tema-royale .btn-primary:active,
+.tema-royale .btn-outline-secondary:active,
+.tema-royale .btn-outline-danger:active {
+  transform: scale(0.97);
+}
+
+.tema-royale .form-control,
+.tema-royale .form-select {
+  border-radius: 4px;
+  border-color: var(--admin-borde);
+  transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+}
+
+.tema-royale .form-control:focus,
+.tema-royale .form-select:focus {
+  border-color: var(--admin-dorado);
+  box-shadow: none;
+}
+
+.tema-royale .form-label {
+  font-size: 0.85rem;
+  color: var(--admin-etiqueta);
+}

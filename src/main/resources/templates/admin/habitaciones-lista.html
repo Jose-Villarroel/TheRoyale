@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rooms | The Royale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/landing.css}">
+  <link rel="stylesheet" th:href="@{/css/servicios.css}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+<div th:replace="~{layout :: cabecera}"></div>
+
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Admin</p>
+    <h1>Rooms</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto">Every physical room at The Royale, linked to its tier — manage numbers, pricing and availability.</p>
+  </div>
+</header>
+
+<main class="contenedor seccion-admin-contenido tema-royale">
+  <div class="admin-encabezado">
+    <p class="eyebrow">02 — Rooms</p>
+    <a th:href="@{/admin/habitaciones/nuevo}" class="btn btn-primary">+ New Room</a>
+  </div>
+
+  <div class="tarjetas-admin-grid">
+    <article class="tarjeta-admin-item" th:each="habitacion : ${habitaciones}">
+      <div class="tarjeta-admin-imagen-wrap">
+        <img th:src="@{${habitacion.tipoHabitacion.imagenUrl != null and !habitacion.tipoHabitacion.imagenUrl.isEmpty() ? habitacion.tipoHabitacion.imagenUrl : '/images/hotel.webp'}}"
+             th:alt="${habitacion.tipoHabitacion.nombre}">
+      </div>
+      <div class="tarjeta-admin-info-wrap">
+        <div class="tarjeta-admin-encabezado">
+          <h3 th:text="'Room ' + ${habitacion.numero}">Room 101</h3>
+          <span class="tarjeta-admin-precio" th:text="'$' + ${habitacion.precio} + ' / night'">$120.0 / night</span>
+        </div>
+        <p class="tarjeta-admin-descripcion" th:text="${habitacion.tipoHabitacion.nombre}">Normal</p>
+        <span class="chip-estado" th:attr="data-estado=${habitacion.estado}" th:text="${habitacion.estado}">Disponible</span>
+        <div class="tarjeta-admin-acciones">
+          <a th:href="@{/admin/habitaciones/{id}/editar(id=${habitacion.id})}" class="enlace-subrayado">Edit</a>
+          <form th:action="@{/admin/habitaciones/{id}/eliminar(id=${habitacion.id})}" method="post" class="form-eliminar">
+            <button type="submit" class="btn-eliminar" onclick="return confirm('Delete this room?');">Delete</button>
+          </form>
+        </div>
+      </div>
+    </article>
+  </div>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<div th:replace="~{layout :: script}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

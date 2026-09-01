@@ -5,36 +5,40 @@
 
 <div th:replace="~{layout :: cabecera}"></div>
 
-<main class="contenedor seccion-admin">
-  <p class="eyebrow">Admin</p>
-  <div class="admin-encabezado">
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Admin</p>
     <h1>Room Types</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto">The four tiers that define every stay at The Royale — manage their names, descriptions and imagery.</p>
+  </div>
+</header>
+
+<main class="contenedor seccion-admin-contenido">
+  <div class="admin-encabezado">
+    <p class="eyebrow">01 — Room Types</p>
     <a th:href="@{/admin/tipos-habitacion/nuevo}" class="btn-dorado">+ New Room Type</a>
   </div>
 
-  <table class="tabla-admin">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="tipo : ${tipos}">
-        <td th:text="${tipo.id}">1</td>
-        <td th:text="${tipo.nombre}">Normal</td>
-        <td th:text="${tipo.descripcion}">Descripción</td>
-        <td class="tabla-admin-acciones">
+  <div class="tarjetas-admin-grid">
+    <article class="tarjeta-admin-item" th:each="tipo : ${tipos}">
+      <div class="tarjeta-admin-imagen-wrap">
+        <img th:src="@{${tipo.imagenUrl != null and !tipo.imagenUrl.isEmpty() ? tipo.imagenUrl : '/images/hotel.webp'}}" th:alt="${tipo.nombre}">
+      </div>
+      <div class="tarjeta-admin-info-wrap">
+        <div class="tarjeta-admin-encabezado">
+          <h3 th:text="${tipo.nombre}">Normal</h3>
+        </div>
+        <p class="tarjeta-admin-descripcion" th:text="${tipo.descripcion}">Descripción</p>
+        <div class="tarjeta-admin-acciones">
           <a th:href="@{/admin/tipos-habitacion/{id}/editar(id=${tipo.id})}" class="enlace-subrayado">Edit</a>
           <form th:action="@{/admin/tipos-habitacion/{id}/eliminar(id=${tipo.id})}" method="post" class="form-eliminar">
             <button type="submit" class="btn-eliminar" onclick="return confirm('Delete this room type?');">Delete</button>
           </form>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        </div>
+      </div>
+    </article>
+  </div>
 </main>
 
 <footer th:replace="~{layout :: pie}"></footer>

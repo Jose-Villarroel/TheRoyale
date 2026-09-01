@@ -6,14 +6,16 @@ public class TipoHabitacion {
     private Long id;
     private String nombre;
     private String descripcion;
+    private String imagenUrl;
 
     public TipoHabitacion() {
     }
 
-    public TipoHabitacion(Long id, String nombre, String descripcion) {
+    public TipoHabitacion(Long id, String nombre, String descripcion, String imagenUrl) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.imagenUrl = imagenUrl;
     }
 
     public Long getId() {
@@ -38,5 +40,13 @@ public class TipoHabitacion {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 }
