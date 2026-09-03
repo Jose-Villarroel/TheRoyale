@@ -21,8 +21,7 @@
     <div class="barra-utilitaria" id="barraUtilitaria">
       <div class="barra-utilitaria-derecha">
         <a th:href="@{/contact}">+1 507 3165 232</a>
-        <a th:if="${session.clienteAutenticado == null}" th:href="@{/login}">Sign In</a>
-        <a th:if="${session.clienteAutenticado != null}" th:href="@{/profile}">Profile</a>
+        <a th:href="@{/login}">Sign In</a>
       </div>
     </div>
 
@@ -39,7 +38,7 @@
         <a th:href="@{/contact}">Contact</a>
       </nav>
 
-      <a th:href="${session.clienteAutenticado != null} ? @{/reservations} : @{/login}" class="btn-dorado btn-nav-reserva">Book Now</a>
+      <a th:href="@{/login}" class="btn-dorado btn-nav-reserva">Book Now</a>
 
       <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
         <span></span><span></span>
@@ -60,9 +59,8 @@
       <a th:href="@{/contact}" class="enlace-menu-movil">Contact</a>
     </nav>
     <div class="menu-movil-pie">
-      <a th:if="${session.clienteAutenticado == null}" th:href="@{/login}">Sign In</a>
-      <a th:if="${session.clienteAutenticado != null}" th:href="@{/profile}">Profile</a>
-      <a th:href="${session.clienteAutenticado != null} ? @{/reservations} : @{/login}" class="btn-dorado">Book Now</a>
+      <a th:href="@{/login}">Sign In</a>
+      <a th:href="@{/login}" class="btn-dorado">Book Now</a>
     </div>
   </div>
 
@@ -118,10 +116,9 @@
       </div>
       <div class="footer-columna">
         <span class="footer-columna-titulo">Guest</span>
-        <a th:if="${session.clienteAutenticado == null}" th:href="@{/login}">Sign In</a>
-        <a th:if="${session.clienteAutenticado != null}" th:href="@{/profile}">My Profile</a>
-        <a th:href="${session.clienteAutenticado != null} ? @{/reservations} : @{/login}">My Reservations</a>
-        <a th:href="${session.clienteAutenticado != null} ? @{/reservations} : @{/login}">Book a Room</a>
+        <a th:href="@{/login}">Sign In</a>
+        <a th:href="@{/login}">My Reservations</a>
+        <a th:href="@{/login}">Book a Room</a>
       </div>
       <div class="footer-columna">
         <span class="footer-columna-titulo">Contact</span>

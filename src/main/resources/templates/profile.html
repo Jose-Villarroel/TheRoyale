@@ -43,10 +43,8 @@
 
         <div class="perfil-acciones-secundarias">
           <a th:href="@{/signup}" class="enlace-subrayado">Create New Client</a>
-          <a th:href="@{/reservations}" class="enlace-subrayado">Reservations</a>
-          <form th:action="@{/logout}" method="post" class="form-eliminar">
-            <button type="submit" class="btn-eliminar">Sign Out</button>
-          </form>
+          <a th:href="@{/reservations(clienteId=${cliente.id})}" class="enlace-subrayado">Reservations</a>
+          <a th:href="@{/login}" class="btn-eliminar">Sign Out</a>
         </div>
       </aside>
 
@@ -61,7 +59,7 @@
           </div>
         </div>
 
-        <form th:action="@{/profile}" th:object="${cliente}" method="post" class="formulario-admin perfil-formulario">
+        <form th:action="@{/profile(clienteId=${cliente.id})}" th:object="${cliente}" method="post" class="formulario-admin perfil-formulario">
           <div class="perfil-form-grid">
             <label>
               First Name
@@ -90,7 +88,7 @@
 
           <div class="formulario-admin-botones">
             <button type="submit" class="btn-dorado">Save Profile</button>
-            <a th:href="@{/profile}" class="btn-contorno-oscuro">Cancel</a>
+            <a th:href="@{/profile(clienteId=${cliente.id})}" class="btn-contorno-oscuro">Cancel</a>
           </div>
         </form>
 
@@ -98,9 +96,9 @@
           <div>
             <p class="eyebrow">Delete</p>
             <h3>Remove Client Profile</h3>
-            <p>This deletes the current client from the in-memory client repository and signs out the session.</p>
+            <p>This deletes the current client from the in-memory client repository.</p>
           </div>
-          <form th:action="@{/profile/delete}" method="post">
+          <form th:action="@{/profile/delete(clienteId=${cliente.id})}" method="post">
             <button type="submit" class="btn-eliminar" onclick="return confirm('Delete your client profile? This action cannot be undone.');">
               Delete Profile
             </button>

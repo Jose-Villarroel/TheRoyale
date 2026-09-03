@@ -15,10 +15,8 @@
         Welcome to The Royale.
       </p>
       <div class="acciones-hero-guest">
-        <a th:href="@{/profile}" class="btn-dorado">My Profile</a>
-        <form th:action="@{/logout}" method="post">
-          <button type="submit" class="btn-dorado">Sign Out</button>
-        </form>
+        <a th:href="@{/profile(clienteId=${cliente.id})}" class="btn-dorado">My Profile</a>
+        <a th:href="@{/login}" class="btn-dorado">Sign Out</a>
       </div>
     </div>
   </section>

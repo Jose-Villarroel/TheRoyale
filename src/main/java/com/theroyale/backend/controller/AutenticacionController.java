@@ -3,12 +3,12 @@ package com.theroyale.backend.controller;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.service.AutenticacionService;
 import com.theroyale.backend.service.ClienteService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
@@ -25,144 +25,154 @@ public class AutenticacionController {
     }
 
     @GetMapping("/login")
-    public String mostrarLogin(Model model) {
-        if (!model.containsAttribute("email")) {
-            model.addAttribute("email", "");
+    public String mostrarLogin(@RequestParam(required = false) String email,
+                               @RequestParam(required = false) String error,
+                               @RequestParam(required = false) String mensaje,
+                               Model model) {
+        model.addAttribute("email", email == null ? "" : email);
+
+        if ("invalid".equals(error)) {
+            model.addAttribute("error", "Email or password is incorrect.");
         }
+
+        if ("accountCreated".equals(mensaje)) {
+            model.addAttribute("mensaje", "Account created. Please sign in.");
+        }
+
         return "sign-in";
     }
 
     @PostMapping("/login")
-    public String iniciarSesion(String email, String password, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String iniciarSesion(String email, String password, RedirectAttributes redirectAttributes) {
         Optional<Cliente> clienteAutenticado = autenticacionService.autenticar(email, password);
 
         if (clienteAutenticado.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Email or password is incorrect.");
-            redirectAttributes.addFlashAttribute("email", email);
+            redirectAttributes.addAttribute("error", "invalid");
+            redirectAttributes.addAttribute("email", email);
             return "redirect:/login";
         }
 
-        session.setAttribute("clienteAutenticado", clienteAutenticado.get());
-        return "redirect:/reservations";
+        return "redirect:/reservations?clienteId=" + clienteAutenticado.get().getId();
     }
 
     @GetMapping("/signup")
-    public String mostrarRegistro(Model model) {
-        if (!model.containsAttribute("cliente")) {
-            model.addAttribute("cliente", new Cliente());
+    public String mostrarRegistro(@RequestParam(required = false) String error,
+                                  @RequestParam(required = false) String mensaje,
+                                  Model model) {
+        model.addAttribute("cliente", new Cliente());
+
+        if ("incomplete".equals(error)) {
+            model.addAttribute("error", "Please complete all fields.");
+        } else if ("passwordMismatch".equals(error)) {
+            model.addAttribute("error", "Passwords do not match.");
+        } else if ("duplicate".equals(error)) {
+            model.addAttribute("error", "An account with this email already exists.");
         }
+
+        if ("profileDeleted".equals(mensaje)) {
+            model.addAttribute("mensaje", "Your profile was deleted.");
+        }
+
         return "sign-up";
     }
 
     @PostMapping("/signup")
     public String registrar(@ModelAttribute Cliente cliente, String confirmPassword, RedirectAttributes redirectAttributes) {
         if (estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) || estaVacio(cliente.getEmail()) || estaVacio(cliente.getPassword())) {
-            redirectAttributes.addFlashAttribute("error", "Please complete all fields.");
-            redirectAttributes.addFlashAttribute("cliente", cliente);
+            redirectAttributes.addAttribute("error", "incomplete");
             return "redirect:/signup";
         }
 
         if (!cliente.getPassword().equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("error", "Passwords do not match.");
-            redirectAttributes.addFlashAttribute("cliente", cliente);
+            redirectAttributes.addAttribute("error", "passwordMismatch");
             return "redirect:/signup";
         }
 
         if (!autenticacionService.registrarCliente(cliente)) {
-            redirectAttributes.addFlashAttribute("error", "An account with this email already exists.");
-            redirectAttributes.addFlashAttribute("cliente", cliente);
+            redirectAttributes.addAttribute("error", "duplicate");
             return "redirect:/signup";
         }
 
-        redirectAttributes.addFlashAttribute("mensaje", "Account created. Please sign in.");
-        redirectAttributes.addFlashAttribute("email", cliente.getEmail());
+        redirectAttributes.addAttribute("mensaje", "accountCreated");
+        redirectAttributes.addAttribute("email", cliente.getEmail());
         return "redirect:/login";
     }
 
     @GetMapping("/reservations")
-    public String mostrarReservas(HttpSession session, Model model) {
-        Cliente cliente = obtenerClienteAutenticado(session);
+    public String mostrarReservas(@RequestParam(required = false) Long clienteId, Model model) {
+        Optional<Cliente> cliente = obtenerClientePorId(clienteId);
 
-        if (cliente == null) {
+        if (cliente.isEmpty()) {
             return "redirect:/login";
         }
 
-        model.addAttribute("cliente", cliente);
+        model.addAttribute("cliente", cliente.get());
         return "reservations";
     }
 
     @GetMapping("/profile")
-    public String mostrarPerfil(HttpSession session, Model model) {
-        Cliente cliente = obtenerClienteAutenticado(session);
+    public String mostrarPerfil(@RequestParam(required = false) Long clienteId,
+                                @RequestParam(required = false) String mensaje,
+                                Model model) {
+        Optional<Cliente> cliente = obtenerClientePorId(clienteId);
 
-        if (cliente == null) {
+        if (cliente.isEmpty()) {
             return "redirect:/login";
         }
 
         if (!model.containsAttribute("cliente")) {
-            model.addAttribute("cliente", cliente);
+            model.addAttribute("cliente", cliente.get());
         }
+
+        if ("profileUpdated".equals(mensaje)) {
+            model.addAttribute("mensaje", "Profile updated successfully.");
+        }
+
         return "profile";
     }
 
     @PostMapping("/profile")
     public String actualizarPerfil(@ModelAttribute Cliente clienteActualizado,
-                                   HttpSession session,
+                                   @RequestParam(required = false) Long clienteId,
+                                   Model model,
                                    RedirectAttributes redirectAttributes) {
-        Cliente cliente = obtenerClienteAutenticado(session);
+        Optional<Cliente> clienteExistente = obtenerClientePorId(clienteId);
 
-        if (cliente == null) {
+        if (clienteExistente.isEmpty()) {
             return "redirect:/login";
         }
 
         try {
-            Cliente clienteGuardado = clienteService.actualizar(cliente.getId(), clienteActualizado);
-            session.setAttribute("clienteAutenticado", clienteGuardado);
-            redirectAttributes.addFlashAttribute("mensaje", "Profile updated successfully.");
+            Cliente clienteGuardado = clienteService.actualizar(clienteId, clienteActualizado);
+            redirectAttributes.addAttribute("clienteId", clienteGuardado.getId());
+            redirectAttributes.addAttribute("mensaje", "profileUpdated");
+            return "redirect:/profile";
         } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-            redirectAttributes.addFlashAttribute("cliente", clienteActualizado);
+            clienteActualizado.setId(clienteId);
+            clienteActualizado.setFechaRegistro(clienteExistente.get().getFechaRegistro());
+            model.addAttribute("cliente", clienteActualizado);
+            model.addAttribute("error", ex.getMessage());
+            return "profile";
         }
-
-        return "redirect:/profile";
     }
 
     @PostMapping("/profile/delete")
-    public String eliminarPerfil(HttpSession session, RedirectAttributes redirectAttributes) {
-        Cliente cliente = obtenerClienteAutenticado(session);
-
-        if (cliente == null) {
+    public String eliminarPerfil(@RequestParam(required = false) Long clienteId, RedirectAttributes redirectAttributes) {
+        if (obtenerClientePorId(clienteId).isEmpty()) {
             return "redirect:/login";
         }
 
-        clienteService.eliminar(cliente.getId());
-        session.invalidate();
-        redirectAttributes.addFlashAttribute("mensaje", "Your profile was deleted.");
+        clienteService.eliminar(clienteId);
+        redirectAttributes.addAttribute("mensaje", "profileDeleted");
         return "redirect:/signup";
     }
 
-    @PostMapping("/logout")
-    public String cerrarSesion(HttpSession session) {
-        session.invalidate();
-        return "redirect:/";
-    }
-
-    private Cliente obtenerClienteAutenticado(HttpSession session) {
-        Cliente clienteSesion = (Cliente) session.getAttribute("clienteAutenticado");
-
-        if (clienteSesion == null || clienteSesion.getId() == null) {
-            return null;
+    private Optional<Cliente> obtenerClientePorId(Long clienteId) {
+        if (clienteId == null) {
+            return Optional.empty();
         }
 
-        return clienteService.buscarPorId(clienteSesion.getId())
-                .map(cliente -> {
-                    session.setAttribute("clienteAutenticado", cliente);
-                    return cliente;
-                })
-                .orElseGet(() -> {
-                    session.invalidate();
-                    return null;
-                });
+        return clienteService.buscarPorId(clienteId);
     }
 
     private boolean estaVacio(String valor) {
