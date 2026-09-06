@@ -1,41 +1,60 @@
-@startuml DiagramaClasesHotelAlcaravan
-
+@startuml DiagramaClasesTheRoyale
 skinparam classAttributeIconSize 0
 
-class Cliente {
+enum EstadoReserva {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+  FINALIZADA
+}
+
+enum EstadoHabitacion {
+  DISPONIBLE
+  OCUPADA
+  DESHABILITADA
+  MANTENIMIENTO
+}
+
+enum EstadoCuenta {
+  ABIERTA
+  CERRADA
+}
+
+enum TipoUsuario {
+  CLIENTE
+  OPERADOR
+  ADMINISTRADOR
+}
+
+abstract class Usuario {
   -id: int
   -nombre: string
-  -email: string
+  -email: string {unique}
   -password: string
+  -tipo: TipoUsuario
+  +login(email, password): boolean
+}
+
+class Cliente extends Usuario {
+  -apellido: string
   -telefono: string
   -fechaRegistro: date
   +registrarse(datos): boolean
-  +login(email, password): boolean
   +actualizarInfo(datos): void
   +verReservasActivas(): List<Reserva>
   +verHistorialReservas(): List<Reserva>
 }
 
-class Operador {
-  -id: int
-  -nombre: string
-  -email: string
-  -password: string
-  +login(email, password): boolean
+class Operador extends Usuario {
   +verReservas(filtro): List<Reserva>
   +cancelarReserva(idReserva): void
   +agregarServicioACuenta(idReserva, idServicio, cantidad): ItemConsumo
   +eliminarItemCuenta(idItem): void
-  +registrarPago(idReserva): void
+  +registrarPago(idCuenta, monto, metodoPago): Pago
   +realizarCheckOut(idReserva): boolean
 }
 
-class Administrador {
-  -id: int
-  -nombre: string
-  -email: string
-  -password: string
-  +login(email, password): boolean
+class Administrador extends Usuario {
   +crearOperador(datos): Operador
   +eliminarOperador(id): void
   +crearServicio(datos): Servicio
@@ -44,7 +63,12 @@ class Administrador {
   +crearHabitacion(datos): Habitacion
   +eliminarHabitacion(id): void
   +deshabilitarHabitacion(id): void
+  +crearTipoHabitacion(datos): TipoHabitacion
+  +agregarImagen(idTipoHabitacion, url): Imagen
+  +eliminarImagen(idImagen): void
 }
+
+Usuario "1" -- "1" TipoUsuario
 
 class TipoHabitacion {
   -id: int
@@ -54,10 +78,16 @@ class TipoHabitacion {
   -precioPorNoche: decimal
 }
 
+class Imagen {
+  -id: int
+  -url: string
+  -orden: int
+}
+
 class Habitacion {
   -id: int
   -numero: string
-  -estado: string
+  -estado: EstadoHabitacion
   +estaDisponible(fechaInicio, fechaFin): boolean
   +habilitar(): void
   +deshabilitar(): void
@@ -67,23 +97,37 @@ class Reserva {
   -id: int
   -fechaInicio: date
   -fechaFin: date
-  -cantidadPersonas: int
-  -estado: string
+  -estado: EstadoReserva
   -fechaCreacion: date
   +cancelar(): void
-  +modificar(nuevaFechaInicio, nuevaFechaFin, nuevoTipoHabitacion, nuevaCantidad): boolean
-  +calcularCostoHabitacion(): decimal
+  +modificar(nuevaFechaInicio, nuevaFechaFin): boolean
+  +agregarHabitacion(idHabitacion, cantidadPersonas): ReservaHabitacion
+  +quitarHabitacion(idReservaHabitacion): void
+  +calcularCostoHabitaciones(): decimal
   +calcularSaldoPendiente(): decimal
+}
+
+class ReservaHabitacion {
+  -id: int
+  -cantidadPersonas: int
+  -precioNocheAcordado: decimal
+  +calcularSubtotal(): decimal
 }
 
 class Cuenta {
   -id: int
-  -estado: string
+  -estado: EstadoCuenta
   -fechaCreacion: datetime
   +calcularTotal(): decimal
   +calcularSaldoPendiente(): decimal
-  +registrarPago(): void
   +cerrar(): void
+}
+
+class Pago {
+  -id: int
+  -monto: decimal
+  -fecha: datetime
+  -metodoPago: string
 }
 
 class Servicio {
@@ -108,22 +152,30 @@ class ItemConsumo {
 Cliente "1" -- "0..*" Reserva : realiza >
 
 TipoHabitacion "1" -- "0..*" Habitacion : clasifica >
+TipoHabitacion "1" *-- "0..*" Imagen : tiene >
 
-Habitacion "1" -- "0..*" Reserva : es reservada en >
+Reserva "1" *-- "1..*" ReservaHabitacion : incluye >
+Habitacion "1" -- "0..*" ReservaHabitacion : es reservada en >
 
 Reserva "1" *-- "1" Cuenta : tiene >
 
 Cuenta "1" *-- "0..*" ItemConsumo : contiene >
+Cuenta "1" -- "0..*" Pago : recibe >
 
 Servicio "1" -- "0..*" ItemConsumo : corresponde a >
 
 Operador "1" -- "0..*" ItemConsumo : registra >
-
+Operador "1" -- "0..*" Pago : registra >
 Operador "1" -- "0..*" Reserva : cancela / gestiona >
 
 Administrador ..> Operador : administra (CRUD)
 Administrador ..> Servicio : administra (CRUD)
 Administrador ..> Habitacion : administra (CRUD)
 Administrador ..> TipoHabitacion : administra
+Administrador ..> Imagen : administra
+
+Habitacion -- EstadoHabitacion
+Reserva -- EstadoReserva
+Cuenta -- EstadoCuenta
 
 @enduml

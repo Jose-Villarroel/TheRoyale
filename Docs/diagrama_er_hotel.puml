@@ -1,0 +1,139 @@
+@startuml DiagramaER_TheRoyale
+
+skinparam linetype ortho
+hide circle
+hide empty methods
+hide empty members
+
+' ==========================================================
+' Entidades
+' ==========================================================
+
+entity Usuario {
+  * id : int <<PK>>
+  --
+  nombre : VARCHAR(100)
+  email : VARCHAR(150) <<unique, not null>>
+  password : VARCHAR(255)
+  tipo : VARCHAR(20) <<check: CLIENTE|OPERADOR|ADMINISTRADOR>>
+}
+
+entity Cliente {
+  * usuario_id : int <<PK, FK>>
+  --
+  apellido : VARCHAR(100)
+  telefono : VARCHAR(20)
+  fecha_registro : DATE
+}
+
+entity TipoHabitacion {
+  * id : int <<PK>>
+  --
+  nombre : VARCHAR(100)
+  descripcion : TEXT
+  capacidad_maxima : int
+  precio_por_noche : DECIMAL(10,2)
+}
+
+entity Imagen {
+  * id : int <<PK>>
+  --
+  # tipo_habitacion_id : int <<FK>>
+  url : VARCHAR(255)
+  orden : int
+}
+
+entity Habitacion {
+  * id : int <<PK>>
+  --
+  # tipo_habitacion_id : int <<FK>>
+  numero : VARCHAR(10) <<unique>>
+  estado : VARCHAR(20) <<check: DISPONIBLE|OCUPADA|DESHABILITADA|MANTENIMIENTO>>
+}
+
+entity Reserva {
+  * id : int <<PK>>
+  --
+  # cliente_id : int <<FK -> Cliente.usuario_id>>
+  # operador_id : int <<FK -> Usuario.id, nullable>>
+  fecha_inicio : DATE
+  fecha_fin : DATE
+  estado : VARCHAR(20) <<check: PENDIENTE|CONFIRMADA|CANCELADA|FINALIZADA>>
+  fecha_creacion : TIMESTAMP
+}
+
+entity ReservaHabitacion {
+  * id : int <<PK>>
+  --
+  # reserva_id : int <<FK>>
+  # habitacion_id : int <<FK>>
+  cantidad_personas : int
+  precio_noche_acordado : DECIMAL(10,2)
+  --
+  <<unique(reserva_id, habitacion_id)>>
+}
+
+entity Cuenta {
+  * id : int <<PK>>
+  --
+  # reserva_id : int <<FK, unique, not null>>
+  estado : VARCHAR(20) <<check: ABIERTA|CERRADA>>
+  fecha_creacion : TIMESTAMP
+}
+
+entity Servicio {
+  * id : int <<PK>>
+  --
+  nombre : VARCHAR(100)
+  descripcion : TEXT
+  precio : DECIMAL(10,2)
+  categoria : VARCHAR(50)
+  activo : BOOLEAN
+}
+
+entity ItemConsumo {
+  * id : int <<PK>>
+  --
+  # cuenta_id : int <<FK>>
+  # servicio_id : int <<FK>>
+  # operador_id : int <<FK -> Usuario.id>>
+  cantidad : int
+  fecha_hora : TIMESTAMP
+  precio_unitario : DECIMAL(10,2)
+  pagado : BOOLEAN
+}
+
+entity Pago {
+  * id : int <<PK>>
+  --
+  # cuenta_id : int <<FK>>
+  # operador_id : int <<FK -> Usuario.id, nullable>>
+  monto : DECIMAL(10,2)
+  fecha : TIMESTAMP
+  metodo_pago : VARCHAR(30)
+}
+
+' ==========================================================
+' Relaciones (notación pata de gallo)
+' ==========================================================
+
+Usuario          ||--o|  Cliente           : extiende
+
+Cliente          ||--o{ Reserva            : realiza
+Usuario          |o--o{ Reserva            : gestiona/cancela (rol OPERADOR)
+TipoHabitacion   ||--o{ Habitacion         : clasifica
+TipoHabitacion   ||--o{ Imagen             : tiene
+
+Reserva          ||--|{ ReservaHabitacion  : incluye
+Habitacion       ||--o{ ReservaHabitacion  : es_reservada_en
+
+Reserva          ||--||  Cuenta            : tiene
+
+Cuenta           ||--o{ ItemConsumo        : contiene
+Servicio         ||--o{ ItemConsumo        : corresponde_a
+Usuario          ||--o{ ItemConsumo        : registra (rol OPERADOR)
+
+Cuenta           ||--o{ Pago               : recibe
+Usuario          |o--o{ Pago               : registra (rol OPERADOR)
+
+@enduml
