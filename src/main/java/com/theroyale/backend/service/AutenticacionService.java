@@ -3,11 +3,13 @@ package com.theroyale.backend.service;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 public class AutenticacionService {
 
     private final ClienteRepository clienteRepository;
@@ -16,6 +18,7 @@ public class AutenticacionService {
         this.clienteRepository = clienteRepository;
     }
 
+    @Transactional
     public boolean registrarCliente(Cliente cliente) {
         String emailNormalizado = normalizarEmail(cliente.getEmail());
 

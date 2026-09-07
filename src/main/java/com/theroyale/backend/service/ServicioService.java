@@ -12,7 +12,7 @@ public class ServicioService implements InterfaceService {
 
     private final ServicioRepository servicioRepository;
 
-    
+
     public ServicioService(ServicioRepository servicioRepository) {
         this.servicioRepository = servicioRepository;
     }

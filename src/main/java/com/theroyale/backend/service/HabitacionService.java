@@ -2,31 +2,41 @@ package com.theroyale.backend.service;
 
 import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.repository.HabitacionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 @Service
+@Transactional(readOnly = true)
 public class HabitacionService {
 
-    @Autowired
-    private HabitacionRepository habitacionRepository;
+    private final HabitacionRepository habitacionRepository;
+
+    public HabitacionService(HabitacionRepository habitacionRepository) {
+        this.habitacionRepository = habitacionRepository;
+    }
 
     public List<Habitacion> listarTodos() {
         return habitacionRepository.findAll();
     }
 
-    public Optional<Habitacion> buscarPorId(Long id) {
-        return habitacionRepository.findById(id);
+    public Habitacion buscarPorId(Long id) {
+        return habitacionRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Habitación no encontrada: " + id));
     }
 
+    @Transactional
     public Habitacion guardar(Habitacion habitacion) {
         return habitacionRepository.save(habitacion);
     }
 
+    @Transactional
     public void eliminar(Long id) {
+        if (!habitacionRepository.existsById(id)) {
+            throw new NoSuchElementException("Habitación no encontrada: " + id);
+        }
         habitacionRepository.deleteById(id);
     }
 }

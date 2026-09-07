@@ -4,7 +4,6 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.service.HabitacionService;
 import com.theroyale.backend.service.TipoHabitacionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +12,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/habitaciones")
 public class HabitacionController {
 
-    @Autowired
-    private HabitacionService habitacionService;
+    private final HabitacionService habitacionService;
 
-    @Autowired
-    private TipoHabitacionService tipoHabitacionService;
+    private final TipoHabitacionService tipoHabitacionService;
+
+    public HabitacionController(HabitacionService habitacionService, TipoHabitacionService tipoHabitacionService) {
+        this.habitacionService = habitacionService;
+        this.tipoHabitacionService = tipoHabitacionService;
+    }
 
     // ===== Listar todas las habitaciones =====
     @GetMapping
@@ -37,8 +39,7 @@ public class HabitacionController {
     // ===== Mostrar el formulario para editar una existente =====
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model) {
-        Habitacion habitacion = habitacionService.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + id));
+        Habitacion habitacion = habitacionService.buscarPorId(id);
         model.addAttribute("habitacion", habitacion);
         model.addAttribute("tiposHabitacion", tipoHabitacionService.listarTodos());
         return "admin/habitaciones-formulario";
@@ -47,8 +48,7 @@ public class HabitacionController {
     // ===== Procesar el guardado (sirve tanto para crear como para editar) =====
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Habitacion habitacion, @RequestParam Long tipoHabitacionId) {
-        TipoHabitacion tipoHabitacion = tipoHabitacionService.buscarPorId(tipoHabitacionId)
-                .orElseThrow(() -> new IllegalArgumentException("Tipo de habitación no encontrado: " + tipoHabitacionId));
+        TipoHabitacion tipoHabitacion = tipoHabitacionService.buscarPorId(tipoHabitacionId);
         habitacion.setTipoHabitacion(tipoHabitacion);
         habitacionService.guardar(habitacion);
         return "redirect:/admin/habitaciones";

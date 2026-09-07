@@ -2,7 +2,6 @@ package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.service.TipoHabitacionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/tipos-habitacion")
 public class TipoHabitacionController {
 
-    @Autowired
-    private TipoHabitacionService tipoHabitacionService;
+    private final TipoHabitacionService tipoHabitacionService;
+
+    public TipoHabitacionController(TipoHabitacionService tipoHabitacionService) {
+        this.tipoHabitacionService = tipoHabitacionService;
+    }
 
     // ===== Listar todos los tipos de habitación =====
     @GetMapping
@@ -31,8 +33,7 @@ public class TipoHabitacionController {
     // ===== Mostrar el formulario para editar uno existente =====
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model) {
-        TipoHabitacion tipoHabitacion = tipoHabitacionService.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Tipo de habitación no encontrado: " + id));
+        TipoHabitacion tipoHabitacion = tipoHabitacionService.buscarPorId(id);
         model.addAttribute("tipoHabitacion", tipoHabitacion);
         return "admin/tipos-habitacion-formulario";
     }

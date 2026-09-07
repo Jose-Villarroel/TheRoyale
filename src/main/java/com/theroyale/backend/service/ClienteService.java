@@ -3,6 +3,7 @@ package com.theroyale.backend.service;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
@@ -30,6 +32,7 @@ public class ClienteService {
         return clienteRepository.findByEmailIgnoreCase(normalizarEmail(email));
     }
 
+    @Transactional
     public Cliente crear(Cliente cliente) {
         validarCliente(cliente, true);
 
@@ -44,6 +47,7 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    @Transactional
     public Cliente actualizar(Long id, Cliente clienteActualizado) {
         Cliente clienteExistente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado: " + id));
@@ -67,6 +71,7 @@ public class ClienteService {
         return clienteRepository.save(clienteExistente);
     }
 
+    @Transactional
     public void eliminar(Long id) {
         if (clienteRepository.findById(id).isEmpty()) {
             throw new NoSuchElementException("Cliente no encontrado: " + id);

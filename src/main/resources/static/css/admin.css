@@ -221,9 +221,9 @@
   border: 1px solid currentColor;
 }
 
-.chip-estado[data-estado="Disponible"] { color: var(--admin-dorado-hover); }
-.chip-estado[data-estado="Ocupada"] { color: var(--admin-etiqueta); }
-.chip-estado[data-estado="Mantenimiento"] { color: var(--admin-rojo); }
+.chip-estado[data-estado="DISPONIBLE"] { color: var(--admin-dorado-hover); }
+.chip-estado[data-estado="OCUPADA"] { color: var(--admin-etiqueta); }
+.chip-estado[data-estado="MANTENIMIENTO"] { color: var(--admin-rojo); }
 
 @media (max-width: 960px) {
   .tarjetas-admin-grid {

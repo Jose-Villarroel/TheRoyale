@@ -29,65 +29,65 @@ INSERT INTO cliente (nombre, apellido, email, password, telefono, fecha_registro
 
 -- Normal (piso 1-2, $120-$140)
 INSERT INTO habitacion (numero, tipo_habitacion_id, precio, estado) VALUES
-  ('101', 1, 120.00, 'Disponible'),
-  ('102', 1, 120.00, 'Ocupada'),
-  ('103', 1, 125.00, 'Disponible'),
-  ('104', 1, 125.00, 'Disponible'),
-  ('105', 1, 130.00, 'Mantenimiento'),
-  ('106', 1, 130.00, 'Disponible'),
-  ('107', 1, 135.00, 'Ocupada'),
-  ('108', 1, 135.00, 'Disponible'),
-  ('109', 1, 140.00, 'Disponible'),
-  ('110', 1, 140.00, 'Disponible');
+  ('101', 1, 120.00, 'DISPONIBLE'),
+  ('102', 1, 120.00, 'OCUPADA'),
+  ('103', 1, 125.00, 'DISPONIBLE'),
+  ('104', 1, 125.00, 'DISPONIBLE'),
+  ('105', 1, 130.00, 'MANTENIMIENTO'),
+  ('106', 1, 130.00, 'DISPONIBLE'),
+  ('107', 1, 135.00, 'OCUPADA'),
+  ('108', 1, 135.00, 'DISPONIBLE'),
+  ('109', 1, 140.00, 'DISPONIBLE'),
+  ('110', 1, 140.00, 'DISPONIBLE');
 
 -- Executive (piso 3-4, $190-$220)
 INSERT INTO habitacion (numero, tipo_habitacion_id, precio, estado) VALUES
-  ('301', 2, 190.00, 'Disponible'),
-  ('302', 2, 190.00, 'Ocupada'),
-  ('303', 2, 195.00, 'Disponible'),
-  ('304', 2, 195.00, 'Disponible'),
-  ('305', 2, 200.00, 'Mantenimiento'),
-  ('306', 2, 200.00, 'Disponible'),
-  ('307', 2, 205.00, 'Ocupada'),
-  ('308', 2, 210.00, 'Disponible'),
-  ('309', 2, 215.00, 'Disponible'),
-  ('310', 2, 220.00, 'Disponible');
+  ('301', 2, 190.00, 'DISPONIBLE'),
+  ('302', 2, 190.00, 'OCUPADA'),
+  ('303', 2, 195.00, 'DISPONIBLE'),
+  ('304', 2, 195.00, 'DISPONIBLE'),
+  ('305', 2, 200.00, 'MANTENIMIENTO'),
+  ('306', 2, 200.00, 'DISPONIBLE'),
+  ('307', 2, 205.00, 'OCUPADA'),
+  ('308', 2, 210.00, 'DISPONIBLE'),
+  ('309', 2, 215.00, 'DISPONIBLE'),
+  ('310', 2, 220.00, 'DISPONIBLE');
 
 -- VIP (piso 5-6, $280-$320)
 INSERT INTO habitacion (numero, tipo_habitacion_id, precio, estado) VALUES
-  ('501', 3, 280.00, 'Disponible'),
-  ('502', 3, 280.00, 'Ocupada'),
-  ('503', 3, 285.00, 'Disponible'),
-  ('504', 3, 290.00, 'Disponible'),
-  ('505', 3, 295.00, 'Disponible'),
-  ('506', 3, 295.00, 'Mantenimiento'),
-  ('507', 3, 300.00, 'Disponible'),
-  ('508', 3, 305.00, 'Ocupada'),
-  ('509', 3, 310.00, 'Disponible'),
-  ('510', 3, 320.00, 'Disponible');
+  ('501', 3, 280.00, 'DISPONIBLE'),
+  ('502', 3, 280.00, 'OCUPADA'),
+  ('503', 3, 285.00, 'DISPONIBLE'),
+  ('504', 3, 290.00, 'DISPONIBLE'),
+  ('505', 3, 295.00, 'DISPONIBLE'),
+  ('506', 3, 295.00, 'MANTENIMIENTO'),
+  ('507', 3, 300.00, 'DISPONIBLE'),
+  ('508', 3, 305.00, 'OCUPADA'),
+  ('509', 3, 310.00, 'DISPONIBLE'),
+  ('510', 3, 320.00, 'DISPONIBLE');
 
 -- Luxury (piso 7-8, $350-$420)
 INSERT INTO habitacion (numero, tipo_habitacion_id, precio, estado) VALUES
-  ('701', 4, 350.00, 'Disponible'),
-  ('702', 4, 355.00, 'Ocupada'),
-  ('703', 4, 360.00, 'Disponible'),
-  ('704', 4, 370.00, 'Disponible'),
-  ('705', 4, 380.00, 'Disponible'),
-  ('706', 4, 380.00, 'Mantenimiento'),
-  ('707', 4, 390.00, 'Disponible'),
-  ('708', 4, 400.00, 'Ocupada'),
-  ('709', 4, 410.00, 'Disponible'),
-  ('710', 4, 420.00, 'Disponible');
+  ('701', 4, 350.00, 'DISPONIBLE'),
+  ('702', 4, 355.00, 'OCUPADA'),
+  ('703', 4, 360.00, 'DISPONIBLE'),
+  ('704', 4, 370.00, 'DISPONIBLE'),
+  ('705', 4, 380.00, 'DISPONIBLE'),
+  ('706', 4, 380.00, 'MANTENIMIENTO'),
+  ('707', 4, 390.00, 'DISPONIBLE'),
+  ('708', 4, 400.00, 'OCUPADA'),
+  ('709', 4, 410.00, 'DISPONIBLE'),
+  ('710', 4, 420.00, 'DISPONIBLE');
 
 -- Presidential Suite (piso 9-10, $800-$1200)
 INSERT INTO habitacion (numero, tipo_habitacion_id, precio, estado) VALUES
-  ('901', 5,  800.00, 'Disponible'),
-  ('902', 5,  850.00, 'Disponible'),
-  ('903', 5,  900.00, 'Ocupada'),
-  ('904', 5,  950.00, 'Disponible'),
-  ('905', 5, 1000.00, 'Disponible'),
-  ('906', 5, 1000.00, 'Mantenimiento'),
-  ('907', 5, 1050.00, 'Disponible'),
-  ('908', 5, 1100.00, 'Disponible'),
-  ('909', 5, 1150.00, 'Ocupada'),
-  ('910', 5, 1200.00, 'Disponible');
+  ('901', 5,  800.00, 'DISPONIBLE'),
+  ('902', 5,  850.00, 'DISPONIBLE'),
+  ('903', 5,  900.00, 'OCUPADA'),
+  ('904', 5,  950.00, 'DISPONIBLE'),
+  ('905', 5, 1000.00, 'DISPONIBLE'),
+  ('906', 5, 1000.00, 'MANTENIMIENTO'),
+  ('907', 5, 1050.00, 'DISPONIBLE'),
+  ('908', 5, 1100.00, 'DISPONIBLE'),
+  ('909', 5, 1150.00, 'OCUPADA'),
+  ('910', 5, 1200.00, 'DISPONIBLE');
