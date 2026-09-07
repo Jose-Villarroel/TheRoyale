@@ -41,16 +41,4 @@ public class Habitacion {
         return "Habitacion{id=" + id + ", numero='" + numero + "', precio=" + precio +
                 ", estado=" + estado + "}";
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Habitacion h)) return false;
-        return id != null && id.equals(h.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

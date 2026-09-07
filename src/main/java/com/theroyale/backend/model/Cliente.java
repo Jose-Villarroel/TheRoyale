@@ -49,16 +49,4 @@ public class Cliente {
                 "', email='" + email + "', telefono='" + telefono +
                 "', fechaRegistro=" + fechaRegistro + "}";
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Cliente cliente)) return false;
-        return id != null && id.equals(cliente.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

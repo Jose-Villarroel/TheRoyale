@@ -35,16 +35,4 @@ public class TipoHabitacion {
         return "TipoHabitacion{id=" + id + ", nombre='" + nombre + "', descripcion='" + descripcion +
                 "', imagenUrl='" + imagenUrl + "'}";
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TipoHabitacion t)) return false;
-        return id != null && id.equals(t.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }
