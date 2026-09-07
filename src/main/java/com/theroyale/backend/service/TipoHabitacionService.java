@@ -15,18 +15,18 @@ public class TipoHabitacionService {
     private TipoHabitacionRepository tipoHabitacionRepository;
 
     public List<TipoHabitacion> listarTodos() {
-        return tipoHabitacionRepository.obtenerTodos();
+        return tipoHabitacionRepository.findAll();
     }
 
     public Optional<TipoHabitacion> buscarPorId(Long id) {
-        return tipoHabitacionRepository.obtenerPorId(id);
+        return tipoHabitacionRepository.findById(id);
     }
 
     public TipoHabitacion guardar(TipoHabitacion tipoHabitacion) {
-        return tipoHabitacionRepository.guardar(tipoHabitacion);
+        return tipoHabitacionRepository.save(tipoHabitacion);
     }
 
     public void eliminar(Long id) {
-        tipoHabitacionRepository.eliminarPorId(id);
+        tipoHabitacionRepository.deleteById(id);
     }
 }

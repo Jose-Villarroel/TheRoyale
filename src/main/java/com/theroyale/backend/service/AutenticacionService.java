@@ -14,25 +14,24 @@ public class AutenticacionService {
 
     public AutenticacionService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
-        registrarCliente(new Cliente(null, "Guest", "Royale", "you@example.com", "password", "", null));
     }
 
     public boolean registrarCliente(Cliente cliente) {
         String emailNormalizado = normalizarEmail(cliente.getEmail());
 
-        if (emailNormalizado.isBlank() || clienteRepository.obtenerPorEmail(emailNormalizado).isPresent()) {
+        if (emailNormalizado.isBlank() || clienteRepository.findByEmailIgnoreCase(emailNormalizado).isPresent()) {
             return false;
         }
 
         cliente.setId(null);
         cliente.setEmail(emailNormalizado);
         cliente.setFechaRegistro(LocalDate.now());
-        clienteRepository.guardar(cliente);
+        clienteRepository.save(cliente);
         return true;
     }
 
     public Optional<Cliente> autenticar(String email, String password) {
-        Optional<Cliente> cliente = clienteRepository.obtenerPorEmail(normalizarEmail(email));
+        Optional<Cliente> cliente = clienteRepository.findByEmailIgnoreCase(normalizarEmail(email));
 
         if (cliente.isEmpty() || password == null || !password.equals(cliente.get().getPassword())) {
             return Optional.empty();
@@ -42,7 +41,7 @@ public class AutenticacionService {
     }
 
     public boolean existeCliente(String email) {
-        return clienteRepository.obtenerPorEmail(normalizarEmail(email)).isPresent();
+        return clienteRepository.findByEmailIgnoreCase(normalizarEmail(email)).isPresent();
     }
 
     private String normalizarEmail(String email) {

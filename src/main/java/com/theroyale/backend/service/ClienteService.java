@@ -19,39 +19,39 @@ public class ClienteService {
     }
 
     public List<Cliente> listarTodos() {
-        return clienteRepository.obtenerTodos();
+        return clienteRepository.findAll();
     }
 
     public Optional<Cliente> buscarPorId(Long id) {
-        return clienteRepository.obtenerPorId(id);
+        return clienteRepository.findById(id);
     }
 
     public Optional<Cliente> buscarPorEmail(String email) {
-        return clienteRepository.obtenerPorEmail(normalizarEmail(email));
+        return clienteRepository.findByEmailIgnoreCase(normalizarEmail(email));
     }
 
     public Cliente crear(Cliente cliente) {
         validarCliente(cliente, true);
 
         String email = normalizarEmail(cliente.getEmail());
-        if (clienteRepository.obtenerPorEmail(email).isPresent()) {
+        if (clienteRepository.findByEmailIgnoreCase(email).isPresent()) {
             throw new IllegalArgumentException("Ya existe un cliente con email: " + email);
         }
 
         cliente.setId(null);
         cliente.setEmail(email);
         cliente.setFechaRegistro(LocalDate.now());
-        return clienteRepository.guardar(cliente);
+        return clienteRepository.save(cliente);
     }
 
     public Cliente actualizar(Long id, Cliente clienteActualizado) {
-        Cliente clienteExistente = clienteRepository.obtenerPorId(id)
+        Cliente clienteExistente = clienteRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado: " + id));
 
         validarCliente(clienteActualizado, false);
 
         String email = normalizarEmail(clienteActualizado.getEmail());
-        Optional<Cliente> clienteConEmail = clienteRepository.obtenerPorEmail(email);
+        Optional<Cliente> clienteConEmail = clienteRepository.findByEmailIgnoreCase(email);
         if (clienteConEmail.isPresent() && !clienteConEmail.get().getId().equals(id)) {
             throw new IllegalArgumentException("Ya existe un cliente con email: " + email);
         }
@@ -64,15 +64,14 @@ public class ClienteService {
         }
         clienteExistente.setTelefono(clienteActualizado.getTelefono());
 
-        return clienteRepository.guardar(clienteExistente);
+        return clienteRepository.save(clienteExistente);
     }
 
     public void eliminar(Long id) {
-        if (clienteRepository.obtenerPorId(id).isEmpty()) {
+        if (clienteRepository.findById(id).isEmpty()) {
             throw new NoSuchElementException("Cliente no encontrado: " + id);
         }
-
-        clienteRepository.eliminarPorId(id);
+        clienteRepository.deleteById(id);
     }
 
     private void validarCliente(Cliente cliente, boolean requierePassword) {

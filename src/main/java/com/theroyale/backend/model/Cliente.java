@@ -1,15 +1,29 @@
 package com.theroyale.backend.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "cliente")
 public class Cliente {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String nombre;
+
+    @Column(nullable = false)
     private String apellido;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
     private String password;
+
     private String telefono;
+
     private LocalDate fechaRegistro;
 
     public Cliente() {

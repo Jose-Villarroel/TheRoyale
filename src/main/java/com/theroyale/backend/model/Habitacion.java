@@ -1,12 +1,27 @@
 package com.theroyale.backend.model;
 
+import jakarta.persistence.*;
+
 // ===== Modelo: representa una habitación física, ligada a un tipo de habitación =====
+@Entity
+@Table(name = "habitacion")
 public class Habitacion {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
     private String numero;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tipo_habitacion_id", nullable = false)
     private TipoHabitacion tipoHabitacion;
+
+    @Column(nullable = false)
     private double precio;
+
+    @Column(nullable = false)
     private String estado;
 
     public Habitacion() {

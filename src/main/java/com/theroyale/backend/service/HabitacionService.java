@@ -15,18 +15,18 @@ public class HabitacionService {
     private HabitacionRepository habitacionRepository;
 
     public List<Habitacion> listarTodos() {
-        return habitacionRepository.obtenerTodos();
+        return habitacionRepository.findAll();
     }
 
     public Optional<Habitacion> buscarPorId(Long id) {
-        return habitacionRepository.obtenerPorId(id);
+        return habitacionRepository.findById(id);
     }
 
     public Habitacion guardar(Habitacion habitacion) {
-        return habitacionRepository.guardar(habitacion);
+        return habitacionRepository.save(habitacion);
     }
 
     public void eliminar(Long id) {
-        habitacionRepository.eliminarPorId(id);
+        habitacionRepository.deleteById(id);
     }
 }

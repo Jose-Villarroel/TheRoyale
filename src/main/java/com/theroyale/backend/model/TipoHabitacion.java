@@ -1,11 +1,22 @@
 package com.theroyale.backend.model;
 
-// ===== Modelo: representa un tipo de habitación (Normal, Executive, VIP, Luxury) =====
+import jakarta.persistence.*;
+
+// ===== Modelo: representa un tipo de habitación (Normal, Executive, VIP, Luxury, Presidential Suite) =====
+@Entity
+@Table(name = "tipo_habitacion")
 public class TipoHabitacion {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
     private String nombre;
+
+    @Column(length = 500)
     private String descripcion;
+
     private String imagenUrl;
 
     public TipoHabitacion() {
