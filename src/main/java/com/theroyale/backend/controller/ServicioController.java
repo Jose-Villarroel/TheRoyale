@@ -7,8 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.Optional;
-
 @Controller
 public class ServicioController {
 
@@ -32,8 +30,8 @@ public class ServicioController {
 
     @GetMapping("/services/{nombre}")
     public String mostrarDetalle(@PathVariable String nombre, Model model) {
-        Optional<Servicio> servicioEncontrado = servicioService.buscarPorNombre(nombre);
-        model.addAttribute("servicio", servicioEncontrado.get());
+        Servicio servicio = servicioService.buscarPorNombre(nombre);
+        model.addAttribute("servicio", servicio);
         return "servicio-detalle";
     }
 }
