@@ -1,70 +1,60 @@
 package com.theroyale.backend.model;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "servicio")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Servicio {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true, length = 100)
     private String nombre;
+
+    @Column(nullable = false, length = 1000)
     private String descripcion;
+
+    @Column(nullable = false)
     private double precio;
+
+    @Column(nullable = false, length = 255)
     private String imagenUrl;
-    private List<String> caracteristicas;
-    private List<String> galeriaUrls;
 
-    public Servicio() {}
+    @ElementCollection
+    @CollectionTable(name = "servicio_caracteristica", joinColumns = @JoinColumn(name = "servicio_id"))
+    @OrderColumn(name = "orden")
+    @Column(name = "caracteristica", nullable = false, length = 500)
+    @Builder.Default
+    private List<String> caracteristicas = new ArrayList<>();
 
-    public Servicio(Long id, String nombre, String descripcion, double precio, String imagenUrl) {
-        this.id = id; this.nombre = nombre; this.descripcion = descripcion;
-        this.precio = precio; this.imagenUrl = imagenUrl;
-    }
-
-    public Servicio(Long id, String nombre, String descripcion, double precio, String imagenUrl, List<String> caracteristicas, List<String> galeriaUrls) {
-        this(id, nombre, descripcion, precio, imagenUrl);
-        this.caracteristicas = caracteristicas;
-        this.galeriaUrls = galeriaUrls;
-    }
-
-    public Long getId() { 
-        return id; 
-    }
-    public void setId(Long id) { 
-        this.id = id; 
-    }
-    public String getNombre() { 
-        return nombre; 
-    }
-    public void setNombre(String nombre) { 
-        this.nombre = nombre; 
-    }
-    public String getDescripcion() { 
-        return descripcion; 
-    }
-    public void setDescripcion(String descripcion) { 
-        this.descripcion = descripcion; 
-    }
-    public double getPrecio() { 
-        return precio; 
-    }
-    public void setPrecio(double precio) { 
-        this.precio = precio; 
-    }
-    public String getImagenUrl() { 
-        return imagenUrl; 
-    }
-    public void setImagenUrl(String imagenUrl) { 
-        this.imagenUrl = imagenUrl; 
-    }
-    public List<String> getCaracteristicas() { 
-        return caracteristicas; 
-    }
-    public void setCaracteristicas(List<String> caracteristicas) { 
-        this.caracteristicas = caracteristicas; 
-    }
-    public List<String> getGaleriaUrls() { 
-        return galeriaUrls; 
-    }
-    public void setGaleriaUrls(List<String> galeriaUrls) { 
-        this.galeriaUrls = galeriaUrls; 
-    }
+    @ElementCollection
+    @CollectionTable(name = "servicio_galeria_url", joinColumns = @JoinColumn(name = "servicio_id"))
+    @OrderColumn(name = "orden")
+    @Column(name = "galeria_url", nullable = false, length = 255)
+    @Builder.Default
+    private List<String> galeriaUrls = new ArrayList<>();
 }
