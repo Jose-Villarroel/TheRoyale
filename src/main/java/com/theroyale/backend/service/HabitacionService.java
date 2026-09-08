@@ -23,8 +23,12 @@ public class HabitacionService {
     }
 
     public Habitacion buscarPorId(Long id) {
+        return obtenerPorId(id);
+    }
+
+    public Habitacion obtenerPorId(Long id) {
         return habitacionRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Habitación no encontrada: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Habitacion no encontrada: " + id));
     }
 
     @Transactional
@@ -34,9 +38,7 @@ public class HabitacionService {
 
     @Transactional
     public void eliminar(Long id) {
-        if (!habitacionRepository.existsById(id)) {
-            throw new NoSuchElementException("Habitación no encontrada: " + id);
-        }
+        obtenerPorId(id);
         habitacionRepository.deleteById(id);
     }
 }

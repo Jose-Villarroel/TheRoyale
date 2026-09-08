@@ -28,6 +28,8 @@
 <div th:replace="~{layout :: admin-nav('habitaciones')}"></div>
 
 <main class="contenedor seccion-admin-contenido tema-royale">
+  <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error"></p>
+
   <div class="admin-encabezado">
     <p class="eyebrow">02 — Rooms</p>
     <a th:href="@{/admin/habitaciones/nuevo}" class="btn btn-primary">+ New Room</a>

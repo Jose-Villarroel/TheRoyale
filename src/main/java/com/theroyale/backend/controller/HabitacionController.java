@@ -1,7 +1,6 @@
 package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.Habitacion;
-import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.service.HabitacionService;
 import com.theroyale.backend.service.TipoHabitacionService;
 import org.springframework.stereotype.Controller;
@@ -21,14 +20,12 @@ public class HabitacionController {
         this.tipoHabitacionService = tipoHabitacionService;
     }
 
-    // ===== Listar todas las habitaciones =====
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("habitaciones", habitacionService.listarTodos());
         return "admin/habitaciones-lista";
     }
 
-    // ===== Mostrar el formulario para crear una nueva =====
     @GetMapping("/nuevo")
     public String mostrarFormularioCreacion(Model model) {
         model.addAttribute("habitacion", new Habitacion());
@@ -36,28 +33,42 @@ public class HabitacionController {
         return "admin/habitaciones-formulario";
     }
 
-    // ===== Mostrar el formulario para editar una existente =====
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model) {
-        Habitacion habitacion = habitacionService.buscarPorId(id);
-        model.addAttribute("habitacion", habitacion);
-        model.addAttribute("tiposHabitacion", tipoHabitacionService.listarTodos());
-        return "admin/habitaciones-formulario";
+        try {
+            model.addAttribute("habitacion", habitacionService.obtenerPorId(id));
+            model.addAttribute("tiposHabitacion", tipoHabitacionService.listarTodos());
+            return "admin/habitaciones-formulario";
+        } catch (RuntimeException ex) {
+            model.addAttribute("habitaciones", habitacionService.listarTodos());
+            model.addAttribute("error", ex.getMessage());
+            return "admin/habitaciones-lista";
+        }
     }
 
-    // ===== Procesar el guardado (sirve tanto para crear como para editar) =====
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Habitacion habitacion, @RequestParam Long tipoHabitacionId) {
-        TipoHabitacion tipoHabitacion = tipoHabitacionService.buscarPorId(tipoHabitacionId);
-        habitacion.setTipoHabitacion(tipoHabitacion);
-        habitacionService.guardar(habitacion);
-        return "redirect:/admin/habitaciones";
+    public String guardar(@ModelAttribute Habitacion habitacion, @RequestParam Long tipoHabitacionId, Model model) {
+        try {
+            habitacion.setTipoHabitacion(tipoHabitacionService.obtenerPorId(tipoHabitacionId));
+            habitacionService.guardar(habitacion);
+            return "redirect:/admin/habitaciones";
+        } catch (RuntimeException ex) {
+            model.addAttribute("habitacion", habitacion);
+            model.addAttribute("tiposHabitacion", tipoHabitacionService.listarTodos());
+            model.addAttribute("error", ex.getMessage());
+            return "admin/habitaciones-formulario";
+        }
     }
 
-    // ===== Eliminar una habitación =====
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id) {
-        habitacionService.eliminar(id);
-        return "redirect:/admin/habitaciones";
+    public String eliminar(@PathVariable Long id, Model model) {
+        try {
+            habitacionService.eliminar(id);
+            return "redirect:/admin/habitaciones";
+        } catch (RuntimeException ex) {
+            model.addAttribute("habitaciones", habitacionService.listarTodos());
+            model.addAttribute("error", ex.getMessage());
+            return "admin/habitaciones-lista";
+        }
     }
 }

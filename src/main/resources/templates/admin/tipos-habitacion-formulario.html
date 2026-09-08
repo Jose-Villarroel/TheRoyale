@@ -17,6 +17,7 @@
 <div th:replace="~{layout :: admin-nav('tipos')}"></div>
 
 <main class="contenedor seccion-admin-contenido">
+  <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error"></p>
 
   <form th:action="@{/admin/tipos-habitacion/guardar}" th:object="${tipoHabitacion}" method="post" class="formulario-admin">
 

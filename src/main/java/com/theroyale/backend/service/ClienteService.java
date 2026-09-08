@@ -28,6 +28,11 @@ public class ClienteService {
         return clienteRepository.findById(id);
     }
 
+    public Cliente obtenerPorId(Long id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado: " + id));
+    }
+
     public Optional<Cliente> buscarPorEmail(String email) {
         return clienteRepository.findByEmailIgnoreCase(normalizarEmail(email));
     }
@@ -49,8 +54,7 @@ public class ClienteService {
 
     @Transactional
     public Cliente actualizar(Long id, Cliente clienteActualizado) {
-        Cliente clienteExistente = clienteRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado: " + id));
+        Cliente clienteExistente = obtenerPorId(id);
 
         validarCliente(clienteActualizado, false);
 
@@ -73,9 +77,7 @@ public class ClienteService {
 
     @Transactional
     public void eliminar(Long id) {
-        if (clienteRepository.findById(id).isEmpty()) {
-            throw new NoSuchElementException("Cliente no encontrado: " + id);
-        }
+        obtenerPorId(id);
         clienteRepository.deleteById(id);
     }
 

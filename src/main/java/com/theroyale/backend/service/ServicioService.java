@@ -5,13 +5,13 @@ import com.theroyale.backend.repository.ServicioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
 public class ServicioService implements InterfaceService {
 
     private final ServicioRepository servicioRepository;
-
 
     public ServicioService(ServicioRepository servicioRepository) {
         this.servicioRepository = servicioRepository;
@@ -29,6 +29,12 @@ public class ServicioService implements InterfaceService {
 
     @Override
     public Optional<Servicio> buscarPorNombre(String nombre) {
-        return servicioRepository.obtenerPorNombre(nombre);
+        Optional<Servicio> servicio = servicioRepository.obtenerPorNombre(nombre);
+
+        if (servicio.isEmpty()) {
+            throw new NoSuchElementException("Servicio no encontrado: " + nombre);
+        }
+
+        return servicio;
     }
 }

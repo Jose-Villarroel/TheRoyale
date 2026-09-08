@@ -23,8 +23,12 @@ public class TipoHabitacionService {
     }
 
     public TipoHabitacion buscarPorId(Long id) {
+        return obtenerPorId(id);
+    }
+
+    public TipoHabitacion obtenerPorId(Long id) {
         return tipoHabitacionRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Tipo de habitación no encontrado: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Tipo de habitacion no encontrado: " + id));
     }
 
     @Transactional
@@ -34,9 +38,7 @@ public class TipoHabitacionService {
 
     @Transactional
     public void eliminar(Long id) {
-        if (!tipoHabitacionRepository.existsById(id)) {
-            throw new NoSuchElementException("Tipo de habitación no encontrado: " + id);
-        }
+        obtenerPorId(id);
         tipoHabitacionRepository.deleteById(id);
     }
 }

@@ -75,6 +75,8 @@
            th:classappend="${activo == 'habitaciones'} ? ' admin-vistas-activo' : ''">Habitaciones</a>
         <a th:href="@{/admin/tipos-habitacion}"
            th:classappend="${activo == 'tipos'} ? ' admin-vistas-activo' : ''">Tipos de habitacion</a>
+        <a th:href="@{/admin/clientes}"
+           th:classappend="${activo == 'clientes'} ? ' admin-vistas-activo' : ''">Clientes</a>
       </nav>
       <a th:href="@{/}" class="admin-vistas-volver">Volver al sitio</a>
     </div>

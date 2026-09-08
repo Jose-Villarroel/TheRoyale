@@ -32,13 +32,13 @@ public class ServicioController {
 
     @GetMapping("/services/{nombre}")
     public String mostrarDetalle(@PathVariable String nombre, Model model) {
-        Optional<Servicio> servicioEncontrado = servicioService.buscarPorNombre(nombre);
-
-        if (servicioEncontrado.isEmpty()) {
+        try {
+            Optional<Servicio> servicioEncontrado = servicioService.buscarPorNombre(nombre);
+            model.addAttribute("servicio", servicioEncontrado.get());
+            return "servicio-detalle";
+        } catch (RuntimeException ex) {
+            model.addAttribute("error", ex.getMessage());
             return "servicio-no-encontrado";
         }
-
-        model.addAttribute("servicio", servicioEncontrado.get());
-        return "servicio-detalle";
     }
 }

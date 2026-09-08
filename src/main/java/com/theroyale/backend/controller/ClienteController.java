@@ -2,79 +2,67 @@ package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.service.ClienteService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
-@RestController
+@Controller
 @RequestMapping("/admin/clientes")
 public class ClienteController {
 
-    private final ClienteService clienteService;
-
-    public ClienteController(ClienteService clienteService) {
-        this.clienteService = clienteService;
-    }
+    @Autowired
+    private ClienteService clienteService;
 
     @GetMapping
-    public List<Cliente> listar() {
-        return clienteService.listarTodos();
+    public String listar(Model model) {
+        model.addAttribute("clientes", clienteService.listarTodos());
+        return "admin/clientes-lista";
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarPorId(@PathVariable Long id) {
-        return clienteService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/nuevo")
+    public String mostrarFormularioCreacion(Model model) {
+        model.addAttribute("cliente", new Cliente());
+        return "admin/clientes-formulario";
     }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<Cliente> buscarPorEmail(@PathVariable String email) {
-        return clienteService.buscarPorEmail(email)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<?> crear(@RequestBody Cliente cliente) {
+    @GetMapping("/{id}/editar")
+    public String mostrarFormularioEdicion(@PathVariable Long id, Model model) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.crear(cliente));
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            model.addAttribute("cliente", clienteService.obtenerPorId(id));
+            return "admin/clientes-formulario";
+        } catch (RuntimeException ex) {
+            model.addAttribute("clientes", clienteService.listarTodos());
+            model.addAttribute("error", ex.getMessage());
+            return "admin/clientes-lista";
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
+    @PostMapping("/guardar")
+    public String guardar(@ModelAttribute Cliente cliente, Model model) {
         try {
-            return ResponseEntity.ok(clienteService.actualizar(id, cliente));
-        } catch (NoSuchElementException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            if (cliente.getId() == null) {
+                clienteService.crear(cliente);
+            } else {
+                clienteService.actualizar(cliente.getId(), cliente);
+            }
+            return "redirect:/admin/clientes";
+        } catch (RuntimeException ex) {
+            model.addAttribute("cliente", cliente);
+            model.addAttribute("error", ex.getMessage());
+            return "admin/clientes-formulario";
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+    @PostMapping("/{id}/eliminar")
+    public String eliminar(@PathVariable Long id, Model model) {
         try {
             clienteService.eliminar(id);
-            return ResponseEntity.noContent().build();
-        } catch (NoSuchElementException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+            return "redirect:/admin/clientes";
+        } catch (RuntimeException ex) {
+            model.addAttribute("clientes", clienteService.listarTodos());
+            model.addAttribute("error", ex.getMessage());
+            return "admin/clientes-lista";
         }
     }
 }

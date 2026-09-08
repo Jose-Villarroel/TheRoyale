@@ -17,6 +17,8 @@
 <div th:replace="~{layout :: admin-nav('tipos')}"></div>
 
 <main class="contenedor seccion-admin-contenido">
+  <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error"></p>
+
   <div class="admin-encabezado">
     <p class="eyebrow">01 — Room Types</p>
     <a th:href="@{/admin/tipos-habitacion/nuevo}" class="btn-dorado">+ New Room Type</a>
