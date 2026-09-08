@@ -1,5 +1,6 @@
 package com.theroyale.backend.service;
 
+import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -30,7 +30,7 @@ public class ClienteService {
 
     public Cliente obtenerPorId(Long id) {
         return clienteRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado: " + id));
     }
 
     public Optional<Cliente> buscarPorEmail(String email) {

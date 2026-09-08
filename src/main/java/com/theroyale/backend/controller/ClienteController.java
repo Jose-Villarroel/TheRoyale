@@ -28,14 +28,8 @@ public class ClienteController {
 
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model) {
-        try {
-            model.addAttribute("cliente", clienteService.obtenerPorId(id));
-            return "admin/clientes-formulario";
-        } catch (RuntimeException ex) {
-            model.addAttribute("clientes", clienteService.listarTodos());
-            model.addAttribute("error", ex.getMessage());
-            return "admin/clientes-lista";
-        }
+        model.addAttribute("cliente", clienteService.obtenerPorId(id));
+        return "admin/clientes-formulario";
     }
 
     @PostMapping("/guardar")
@@ -47,7 +41,7 @@ public class ClienteController {
                 clienteService.actualizar(cliente.getId(), cliente);
             }
             return "redirect:/admin/clientes";
-        } catch (RuntimeException ex) {
+        } catch (IllegalArgumentException ex) {
             model.addAttribute("cliente", cliente);
             model.addAttribute("error", ex.getMessage());
             return "admin/clientes-formulario";
@@ -55,14 +49,8 @@ public class ClienteController {
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id, Model model) {
-        try {
-            clienteService.eliminar(id);
-            return "redirect:/admin/clientes";
-        } catch (RuntimeException ex) {
-            model.addAttribute("clientes", clienteService.listarTodos());
-            model.addAttribute("error", ex.getMessage());
-            return "admin/clientes-lista";
-        }
+    public String eliminar(@PathVariable Long id) {
+        clienteService.eliminar(id);
+        return "redirect:/admin/clientes";
     }
 }

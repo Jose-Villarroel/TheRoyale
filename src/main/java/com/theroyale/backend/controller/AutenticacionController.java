@@ -147,7 +147,7 @@ public class AutenticacionController {
             redirectAttributes.addAttribute("clienteId", clienteGuardado.getId());
             redirectAttributes.addAttribute("mensaje", "profileUpdated");
             return "redirect:/profile";
-        } catch (RuntimeException ex) {
+        } catch (IllegalArgumentException ex) {
             clienteActualizado.setId(clienteId);
             clienteActualizado.setFechaRegistro(clienteExistente.get().getFechaRegistro());
             model.addAttribute("cliente", clienteActualizado);

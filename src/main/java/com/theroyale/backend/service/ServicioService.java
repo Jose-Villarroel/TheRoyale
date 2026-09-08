@@ -1,11 +1,11 @@
 package com.theroyale.backend.service;
 
+import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.repository.ServicioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -32,7 +32,7 @@ public class ServicioService implements InterfaceService {
         Optional<Servicio> servicio = servicioRepository.obtenerPorNombre(nombre);
 
         if (servicio.isEmpty()) {
-            throw new NoSuchElementException("Servicio no encontrado: " + nombre);
+            throw new RecursoNoEncontradoException("Servicio no encontrado: " + nombre);
         }
 
         return servicio;

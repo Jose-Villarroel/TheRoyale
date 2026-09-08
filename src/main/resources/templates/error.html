@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Error')}"></head>
+<body>
+
+<div th:replace="~{layout :: cabecera}"></div>
+
+<main class="contenedor"
+      style="min-height: 68vh; padding-top: clamp(180px, 18vh, 190px); padding-bottom: clamp(80px, 12vh, 130px);">
+  <section style="max-width: 620px;">
+    <h1 style="font-size: clamp(44px, 7vw, 78px); margin-bottom: 24px;">Something went wrong</h1>
+    <p class="parrafo-cuerpo" th:text="${mensaje}">The requested resource could not be found.</p>
+    <a th:href="@{/}" class="enlace-subrayado" style="display: inline-block; margin-top: 30px;">Back to Home</a>
+  </section>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<th:block th:replace="~{layout :: script}"></th:block>
+
+</body>
+</html>

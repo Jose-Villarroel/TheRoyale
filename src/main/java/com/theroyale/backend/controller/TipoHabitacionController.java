@@ -30,37 +30,19 @@ public class TipoHabitacionController {
 
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model) {
-        try {
-            model.addAttribute("tipoHabitacion", tipoHabitacionService.obtenerPorId(id));
-            return "admin/tipos-habitacion-formulario";
-        } catch (RuntimeException ex) {
-            model.addAttribute("tipos", tipoHabitacionService.listarTodos());
-            model.addAttribute("error", ex.getMessage());
-            return "admin/tipos-habitacion-lista";
-        }
+        model.addAttribute("tipoHabitacion", tipoHabitacionService.obtenerPorId(id));
+        return "admin/tipos-habitacion-formulario";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute TipoHabitacion tipoHabitacion, Model model) {
-        try {
-            tipoHabitacionService.guardar(tipoHabitacion);
-            return "redirect:/admin/tipos-habitacion";
-        } catch (RuntimeException ex) {
-            model.addAttribute("tipoHabitacion", tipoHabitacion);
-            model.addAttribute("error", ex.getMessage());
-            return "admin/tipos-habitacion-formulario";
-        }
+    public String guardar(@ModelAttribute TipoHabitacion tipoHabitacion) {
+        tipoHabitacionService.guardar(tipoHabitacion);
+        return "redirect:/admin/tipos-habitacion";
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id, Model model) {
-        try {
-            tipoHabitacionService.eliminar(id);
-            return "redirect:/admin/tipos-habitacion";
-        } catch (RuntimeException ex) {
-            model.addAttribute("tipos", tipoHabitacionService.listarTodos());
-            model.addAttribute("error", ex.getMessage());
-            return "admin/tipos-habitacion-lista";
-        }
+    public String eliminar(@PathVariable Long id) {
+        tipoHabitacionService.eliminar(id);
+        return "redirect:/admin/tipos-habitacion";
     }
 }

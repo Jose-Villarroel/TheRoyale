@@ -1,12 +1,12 @@
 package com.theroyale.backend.service;
 
+import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.repository.HabitacionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,7 +28,7 @@ public class HabitacionService {
 
     public Habitacion obtenerPorId(Long id) {
         return habitacionRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Habitacion no encontrada: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Habitacion no encontrada: " + id));
     }
 
     @Transactional

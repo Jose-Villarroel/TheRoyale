@@ -35,40 +35,21 @@ public class HabitacionController {
 
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model) {
-        try {
-            model.addAttribute("habitacion", habitacionService.obtenerPorId(id));
-            model.addAttribute("tiposHabitacion", tipoHabitacionService.listarTodos());
-            return "admin/habitaciones-formulario";
-        } catch (RuntimeException ex) {
-            model.addAttribute("habitaciones", habitacionService.listarTodos());
-            model.addAttribute("error", ex.getMessage());
-            return "admin/habitaciones-lista";
-        }
+        model.addAttribute("habitacion", habitacionService.obtenerPorId(id));
+        model.addAttribute("tiposHabitacion", tipoHabitacionService.listarTodos());
+        return "admin/habitaciones-formulario";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Habitacion habitacion, @RequestParam Long tipoHabitacionId, Model model) {
-        try {
-            habitacion.setTipoHabitacion(tipoHabitacionService.obtenerPorId(tipoHabitacionId));
-            habitacionService.guardar(habitacion);
-            return "redirect:/admin/habitaciones";
-        } catch (RuntimeException ex) {
-            model.addAttribute("habitacion", habitacion);
-            model.addAttribute("tiposHabitacion", tipoHabitacionService.listarTodos());
-            model.addAttribute("error", ex.getMessage());
-            return "admin/habitaciones-formulario";
-        }
+    public String guardar(@ModelAttribute Habitacion habitacion, @RequestParam Long tipoHabitacionId) {
+        habitacion.setTipoHabitacion(tipoHabitacionService.obtenerPorId(tipoHabitacionId));
+        habitacionService.guardar(habitacion);
+        return "redirect:/admin/habitaciones";
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id, Model model) {
-        try {
-            habitacionService.eliminar(id);
-            return "redirect:/admin/habitaciones";
-        } catch (RuntimeException ex) {
-            model.addAttribute("habitaciones", habitacionService.listarTodos());
-            model.addAttribute("error", ex.getMessage());
-            return "admin/habitaciones-lista";
-        }
+    public String eliminar(@PathVariable Long id) {
+        habitacionService.eliminar(id);
+        return "redirect:/admin/habitaciones";
     }
 }
