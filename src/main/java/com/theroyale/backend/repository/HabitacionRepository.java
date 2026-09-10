@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
     // JpaRepository provee: findAll(), findById(), save(), deleteById(), etc.
+    boolean existsByTipoHabitacionId(Long tipoHabitacionId);
 }

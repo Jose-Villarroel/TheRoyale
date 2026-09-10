@@ -2,6 +2,7 @@ package com.theroyale.backend.service;
 
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.TipoHabitacion;
+import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +14,12 @@ import java.util.List;
 public class TipoHabitacionService {
 
     private final TipoHabitacionRepository tipoHabitacionRepository;
+    private final HabitacionRepository habitacionRepository;
 
-    public TipoHabitacionService(TipoHabitacionRepository tipoHabitacionRepository) {
+    public TipoHabitacionService(TipoHabitacionRepository tipoHabitacionRepository,
+                                 HabitacionRepository habitacionRepository) {
         this.tipoHabitacionRepository = tipoHabitacionRepository;
+        this.habitacionRepository = habitacionRepository;
     }
 
     public List<TipoHabitacion> listarTodos() {
@@ -39,6 +43,9 @@ public class TipoHabitacionService {
     @Transactional
     public void eliminar(Long id) {
         obtenerPorId(id);
+        if (habitacionRepository.existsByTipoHabitacionId(id)) {
+            throw new IllegalStateException("Ese tipo de habitacion aun tiene habitaciones asociadas.");
+        }
         tipoHabitacionRepository.deleteById(id);
     }
 }

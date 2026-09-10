@@ -5,6 +5,7 @@ import com.theroyale.backend.service.TipoHabitacionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/tipos-habitacion")
@@ -41,8 +42,12 @@ public class TipoHabitacionController {
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id) {
-        tipoHabitacionService.eliminar(id);
+    public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            tipoHabitacionService.eliminar(id);
+        } catch (IllegalStateException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/admin/tipos-habitacion";
     }
 }

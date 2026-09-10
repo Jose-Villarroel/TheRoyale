@@ -37,7 +37,7 @@ public class TipoHabitacion {
     // ===== Lado inverso de la relación: un tipo tiene muchas habitaciones =====
     // mappedBy = "tipoHabitacion" apunta al nombre EXACTO del campo en la clase Habitacion,
     // no al nombre de la columna. Este lado no es "dueño" de la relación, por eso no lleva @JoinColumn.
-    @OneToMany(mappedBy = "tipoHabitacion", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "tipoHabitacion", orphanRemoval = false)
     @Builder.Default
     @ToString.Exclude
     private List<Habitacion> habitaciones = new ArrayList<>();
