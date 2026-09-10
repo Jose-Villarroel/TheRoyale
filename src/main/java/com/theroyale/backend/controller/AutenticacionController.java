@@ -2,7 +2,9 @@ package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.service.AutenticacionService;
+import com.theroyale.backend.service.AutenticacionService.ResultadoRegistro;
 import com.theroyale.backend.service.ClienteService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,13 +18,11 @@ import java.util.Optional;
 @Controller
 public class AutenticacionController {
 
-    private final AutenticacionService autenticacionService;
-    private final ClienteService clienteService;
+    @Autowired
+    private AutenticacionService autenticacionService;
 
-    public AutenticacionController(AutenticacionService autenticacionService, ClienteService clienteService) {
-        this.autenticacionService = autenticacionService;
-        this.clienteService = clienteService;
-    }
+    @Autowired
+    private ClienteService clienteService;
 
     @GetMapping("/login")
     public String mostrarLogin(@RequestParam(required = false) String email,
@@ -78,17 +78,19 @@ public class AutenticacionController {
 
     @PostMapping("/signup")
     public String registrar(@ModelAttribute Cliente cliente, String confirmPassword, RedirectAttributes redirectAttributes) {
-        if (estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) || estaVacio(cliente.getEmail()) || estaVacio(cliente.getPassword())) {
+        ResultadoRegistro resultado = autenticacionService.registrarCliente(cliente, confirmPassword);
+
+        if (resultado == ResultadoRegistro.INCOMPLETO) {
             redirectAttributes.addAttribute("error", "incomplete");
             return "redirect:/signup";
         }
 
-        if (!cliente.getPassword().equals(confirmPassword)) {
+        if (resultado == ResultadoRegistro.PASSWORD_NO_COINCIDE) {
             redirectAttributes.addAttribute("error", "passwordMismatch");
             return "redirect:/signup";
         }
 
-        if (!autenticacionService.registrarCliente(cliente)) {
+        if (resultado == ResultadoRegistro.DUPLICADO) {
             redirectAttributes.addAttribute("error", "duplicate");
             return "redirect:/signup";
         }
@@ -100,7 +102,7 @@ public class AutenticacionController {
 
     @GetMapping("/reservations")
     public String mostrarReservas(@RequestParam(required = false) Long clienteId, Model model) {
-        Optional<Cliente> cliente = obtenerClientePorId(clienteId);
+        Optional<Cliente> cliente = autenticacionService.obtenerClienteAutenticado(clienteId);
 
         if (cliente.isEmpty()) {
             return "redirect:/login";
@@ -114,7 +116,7 @@ public class AutenticacionController {
     public String mostrarPerfil(@RequestParam(required = false) Long clienteId,
                                 @RequestParam(required = false) String mensaje,
                                 Model model) {
-        Optional<Cliente> cliente = obtenerClientePorId(clienteId);
+        Optional<Cliente> cliente = autenticacionService.obtenerClienteAutenticado(clienteId);
 
         if (cliente.isEmpty()) {
             return "redirect:/login";
@@ -136,7 +138,7 @@ public class AutenticacionController {
                                    @RequestParam(required = false) Long clienteId,
                                    Model model,
                                    RedirectAttributes redirectAttributes) {
-        Optional<Cliente> clienteExistente = obtenerClientePorId(clienteId);
+        Optional<Cliente> clienteExistente = autenticacionService.obtenerClienteAutenticado(clienteId);
 
         if (clienteExistente.isEmpty()) {
             return "redirect:/login";
@@ -158,24 +160,12 @@ public class AutenticacionController {
 
     @PostMapping("/profile/delete")
     public String eliminarPerfil(@RequestParam(required = false) Long clienteId, RedirectAttributes redirectAttributes) {
-        if (obtenerClientePorId(clienteId).isEmpty()) {
+        if (autenticacionService.obtenerClienteAutenticado(clienteId).isEmpty()) {
             return "redirect:/login";
         }
 
         clienteService.eliminar(clienteId);
         redirectAttributes.addAttribute("mensaje", "profileDeleted");
         return "redirect:/signup";
-    }
-
-    private Optional<Cliente> obtenerClientePorId(Long clienteId) {
-        if (clienteId == null) {
-            return Optional.empty();
-        }
-
-        return clienteService.buscarPorId(clienteId);
-    }
-
-    private boolean estaVacio(String valor) {
-        return valor == null || valor.trim().isEmpty();
     }
 }
