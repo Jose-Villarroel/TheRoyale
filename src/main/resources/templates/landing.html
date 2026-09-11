@@ -185,6 +185,21 @@
         <div class="carrusel-ventana aparecer">
           <div class="carrusel-track" id="carruselTrack">
 
+            <article class="habitacion-slide" th:each="tipo, iter : ${tiposHabitacion}">
+              <div class="habitacion-imagen">
+                <img th:src="@{${tipo.imagenUrl != null and !tipo.imagenUrl.isEmpty() ? tipo.imagenUrl : '/images/hotel.webp'}}"
+                     th:alt="${tipo.nombre}">
+              </div>
+              <div class="habitacion-info">
+                <span class="numero-dorado" th:text="${#numbers.formatInteger(iter.count, 2)} + ' / ' + ${tipo.nombre}">01 / Room Type</span>
+                <h3 th:text="${tipo.descripcion}">Room type description</h3>
+                <a th:href="@{/rooms/{id}(id=${tipo.id})}" class="enlace-subrayado">View Room</a>
+              </div>
+            </article>
+
+            <p class="parrafo-cuerpo" th:if="${#lists.isEmpty(tiposHabitacion)}">No room types are available yet.</p>
+
+            <th:block th:remove="all">
             <article class="habitacion-slide">
               <div class="habitacion-imagen">
                 <img th:src="@{/images/suite-3.webp}" alt="Habitación Normal">
@@ -252,13 +267,15 @@
                 <a th:href="@{/rooms}" class="enlace-subrayado">View Room</a>
               </div>
             </article>
+            </th:block>
 
           </div>
         </div>
 
         <div class="carrusel-pie aparecer">
           <div class="carrusel-progreso-contenedor">
-            <span id="carruselContador">01 / 04</span>
+            <span id="carruselContador"
+                  th:text="${#lists.isEmpty(tiposHabitacion) ? '00 / 00' : '01 / ' + #numbers.formatInteger(#lists.size(tiposHabitacion), 2)}">01 / 04</span>
             <span class="carrusel-barra">
               <span class="carrusel-barra-relleno" id="carruselProgreso"></span>
             </span>

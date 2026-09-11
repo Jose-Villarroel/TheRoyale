@@ -9,30 +9,40 @@ hide empty members
 ' Entidades
 ' ==========================================================
 
-entity Usuario {
+entity Operador {
   * id : int <<PK>>
   --
   nombre : VARCHAR(100)
   email : VARCHAR(150) <<unique, not null>>
   password : VARCHAR(255)
-  tipo : VARCHAR(20) <<check: CLIENTE|OPERADOR|ADMINISTRADOR>>
+  tipo : VARCHAR(20) <<check: OPERADOR>>
 }
 
 entity Cliente {
-  * usuario_id : int <<PK, FK>>
+  * id : int <<PK>>
   --
+  nombre : VARCHAR(100)
   apellido : VARCHAR(100)
+  email : VARCHAR(150) <<unique, not null>>
+  password : VARCHAR(255)
   telefono : VARCHAR(20)
   fecha_registro : DATE
+}
+
+entity Admin {
+  * id : int <<PK>>
+  --
+  nombre : VARCHAR(100)
+  email : VARCHAR(150) <<unique, not null>>
+  password : VARCHAR(255)
 }
 
 entity TipoHabitacion {
   * id : int <<PK>>
   --
-  nombre : VARCHAR(100)
-  descripcion : TEXT
-  capacidad_maxima : int
-  precio_por_noche : DECIMAL(10,2)
+  nombre : VARCHAR(100) <<unique, not null>>
+  descripcion : VARCHAR(500)
+  imagen_url : VARCHAR(255)
 }
 
 entity Imagen {
@@ -47,30 +57,23 @@ entity Habitacion {
   * id : int <<PK>>
   --
   # tipo_habitacion_id : int <<FK>>
-  numero : VARCHAR(10) <<unique>>
+  numero : VARCHAR(10) <<unique, not null>>
+  precio : DECIMAL(10,2)
   estado : VARCHAR(20) <<check: DISPONIBLE|OCUPADA|DESHABILITADA|MANTENIMIENTO>>
 }
 
 entity Reserva {
   * id : int <<PK>>
   --
-  # cliente_id : int <<FK -> Cliente.usuario_id>>
-  # operador_id : int <<FK -> Usuario.id, nullable>>
+  # cliente_id : int <<FK -> Cliente.id>>
+  # habitacion_id : int <<FK -> Habitacion.id>>
+  # operador_id : int <<FK -> Operador.id, nullable>>
   fecha_inicio : DATE
   fecha_fin : DATE
   estado : VARCHAR(20) <<check: PENDIENTE|CONFIRMADA|CANCELADA|FINALIZADA>>
-  fecha_creacion : TIMESTAMP
-}
-
-entity ReservaHabitacion {
-  * id : int <<PK>>
-  --
-  # reserva_id : int <<FK>>
-  # habitacion_id : int <<FK>>
   cantidad_personas : int
   precio_noche_acordado : DECIMAL(10,2)
-  --
-  <<unique(reserva_id, habitacion_id)>>
+  fecha_creacion : TIMESTAMP
 }
 
 entity Cuenta {
@@ -96,7 +99,7 @@ entity ItemConsumo {
   --
   # cuenta_id : int <<FK>>
   # servicio_id : int <<FK>>
-  # operador_id : int <<FK -> Usuario.id>>
+  # operador_id : int <<FK -> Operador.id>>
   cantidad : int
   fecha_hora : TIMESTAMP
   precio_unitario : DECIMAL(10,2)
@@ -107,33 +110,35 @@ entity Pago {
   * id : int <<PK>>
   --
   # cuenta_id : int <<FK>>
-  # operador_id : int <<FK -> Usuario.id, nullable>>
+  # operador_id : int <<FK -> Operador.id, nullable>>
   monto : DECIMAL(10,2)
   fecha : TIMESTAMP
   metodo_pago : VARCHAR(30)
 }
 
 ' ==========================================================
-' Relaciones (notación pata de gallo)
+' Relaciones (notacion pata de gallo)
 ' ==========================================================
 
-Usuario          ||--o|  Cliente           : extiende
-
 Cliente          ||--o{ Reserva            : realiza
-Usuario          |o--o{ Reserva            : gestiona/cancela (rol OPERADOR)
+Operador          |o--o{ Reserva            : gestiona/cancela
+
 TipoHabitacion   ||--o{ Habitacion         : clasifica
 TipoHabitacion   ||--o{ Imagen             : tiene
 
-Reserva          ||--|{ ReservaHabitacion  : incluye
-Habitacion       ||--o{ ReservaHabitacion  : es_reservada_en
-
+Habitacion       ||--o{ Reserva            : es_reservada_en
 Reserva          ||--||  Cuenta            : tiene
 
 Cuenta           ||--o{ ItemConsumo        : contiene
 Servicio         ||--o{ ItemConsumo        : corresponde_a
-Usuario          ||--o{ ItemConsumo        : registra (rol OPERADOR)
+Operador          ||--o{ ItemConsumo        : registra
 
 Cuenta           ||--o{ Pago               : recibe
-Usuario          |o--o{ Pago               : registra (rol OPERADOR)
+Operador          |o--o{ Pago               : registra
+
+Admin            }o..o{ TipoHabitacion     : administra
+Admin            }o..o{ Habitacion         : administra
+Admin            }o..o{ Servicio           : administra
+Admin            }o..o{ Operador            : administra
 
 @enduml

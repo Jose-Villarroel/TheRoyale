@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Rooms & Suites')}"></head>
+<body>
+
+<header th:replace="~{layout :: cabecera}"></header>
+
+<main>
+
+  <section class="hero-interior">
+    <div class="hero-interior-contenido contenedor">
+      <p class="eyebrow eyebrow-claro-int">02 - Accommodation</p>
+      <h1>Rooms &amp; Suites</h1>
+      <span class="linea-dorada-horizontal-int"></span>
+      <p class="hero-interior-subtexto">
+        Refined spaces for every kind of stay, from essential comfort to private-suite luxury.
+      </p>
+    </div>
+  </section>
+
+  <section class="barra-vistas">
+    <div class="contenedor barra-vistas-contenido">
+      <span class="barra-vistas-label">Browse</span>
+      <span class="barra-vistas-count" th:text="${#lists.size(tiposHabitacion)} + ' room types available'">0 room types available</span>
+    </div>
+  </section>
+
+  <section class="seccion-rooms-lista">
+    <div class="contenedor">
+      <div class="rooms-lista">
+        <article class="room-lista-item" th:each="tipo, iterStat : ${tiposHabitacion}">
+          <a th:href="@{/rooms/{id}(id=${tipo.id})}" class="room-lista-imagen">
+            <img th:src="@{${tipo.imagenUrl != null and !tipo.imagenUrl.isEmpty() ? tipo.imagenUrl : '/images/hotel.webp'}}"
+                 th:alt="${tipo.nombre}">
+            <span class="room-lista-numero" th:text="${iterStat.count < 10 ? '0' + iterStat.count : iterStat.count}">01</span>
+          </a>
+
+          <div class="room-lista-info">
+            <p class="eyebrow">Room Type</p>
+            <h2 th:text="${tipo.nombre}">Room Name</h2>
+            <span class="linea-dorada-det"></span>
+            <p class="room-lista-descripcion" th:text="${tipo.descripcion}">Room description.</p>
+
+            <div class="room-lista-meta">
+              <div>
+                <span>Starting from</span>
+                <strong th:if="${preciosDesdePorTipo[tipo.id] != null}"
+                        th:text="'$' + ${#numbers.formatInteger(preciosDesdePorTipo[tipo.id], 1)}">$0</strong>
+                <strong th:unless="${preciosDesdePorTipo[tipo.id] != null}">Upon request</strong>
+              </div>
+              <div>
+                <span>Available rooms</span>
+                <strong th:text="${habitacionesDisponiblesPorTipo[tipo.id] != null ? habitacionesDisponiblesPorTipo[tipo.id] : 0}">0</strong>
+              </div>
+            </div>
+
+            <a th:href="@{/rooms/{id}(id=${tipo.id})}" class="tabla-btn-detalle">
+              View Room
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5H10M10 5.5L6 1.5M10 5.5L6 9.5" stroke="currentColor" stroke-width="0.9" stroke-linecap="square"/></svg>
+            </a>
+          </div>
+        </article>
+      </div>
+
+      <p class="rooms-vacio" th:if="${#lists.isEmpty(tiposHabitacion)}">No room types are available yet.</p>
+    </div>
+  </section>
+
+  <section class="seccion-cta-interior">
+    <div class="contenedor cta-interior-contenido">
+      <div class="cta-int-linea"></div>
+      <p class="cta-interior-texto">Ready to find your place above the city?</p>
+      <a th:href="@{/login}" class="btn-dorado-sm">Book Your Stay</a>
+    </div>
+  </section>
+
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+
+</body>
+</html>

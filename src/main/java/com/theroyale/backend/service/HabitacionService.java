@@ -22,6 +22,10 @@ public class HabitacionService {
         return habitacionRepository.findAll();
     }
 
+    public List<Habitacion> listarPorTipoHabitacion(Long tipoHabitacionId) {
+        return habitacionRepository.findByTipoHabitacionIdOrderByNumeroAsc(tipoHabitacionId);
+    }
+
     public Habitacion buscarPorId(Long id) {
         return obtenerPorId(id);
     }

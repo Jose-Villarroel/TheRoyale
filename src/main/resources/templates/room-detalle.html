@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(${tipoHabitacion.nombre})}"></head>
+<body>
+
+<header th:replace="~{layout :: cabecera}"></header>
+
+<main>
+
+  <section class="seccion-detalle room-detalle">
+    <div class="contenedor detalle-grid">
+
+      <div class="detalle-imagen-col">
+        <div class="detalle-imagen-wrapper">
+          <img th:src="@{${tipoHabitacion.imagenUrl != null and !tipoHabitacion.imagenUrl.isEmpty() ? tipoHabitacion.imagenUrl : '/images/hotel.webp'}}"
+               th:alt="${tipoHabitacion.nombre}"
+               class="detalle-imagen-principal">
+        </div>
+      </div>
+
+      <div class="detalle-info-col">
+        <p class="eyebrow eyebrow-dorado-det">Room Detail</p>
+        <h1 class="detalle-titulo" th:text="${tipoHabitacion.nombre}">Room Name</h1>
+        <span class="linea-dorada-det"></span>
+        <p class="detalle-descripcion" th:text="${tipoHabitacion.descripcion}">Description goes here.</p>
+
+        <div class="detalle-precio-bloque">
+          <span class="detalle-precio-label">Starting from</span>
+          <span class="detalle-precio-valor"
+                th:if="${precioDesde.isPresent()}"
+                th:text="'$' + ${#numbers.formatInteger(precioDesde.get(), 1)}">$0</span>
+          <span class="detalle-precio-valor detalle-precio-consulta"
+                th:unless="${precioDesde.isPresent()}">Upon request</span>
+          <span class="detalle-precio-nota">per night &middot; availability may vary</span>
+        </div>
+
+        <div class="room-resumen">
+          <div>
+            <span>Available now</span>
+            <strong th:text="${habitacionesDisponibles}">0</strong>
+          </div>
+          <div>
+            <span>Total rooms</span>
+            <strong th:text="${#lists.size(habitaciones)}">0</strong>
+          </div>
+        </div>
+
+        <div class="detalle-acciones">
+          <a th:href="@{/login}" class="btn-dorado-interior">Book This Room</a>
+          <a th:href="@{/rooms}" class="detalle-volver">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M10 5.5H1M1 5.5L5 1.5M1 5.5L5 9.5" stroke="currentColor" stroke-width="0.9" stroke-linecap="square"/></svg>
+            Back to Rooms
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="contenedor room-disponibilidad" th:if="${!#lists.isEmpty(habitaciones)}">
+      <div class="room-disponibilidad-encabezado">
+        <p class="eyebrow">Availability</p>
+        <h2>Rooms in this category</h2>
+      </div>
+
+      <div class="room-disponibilidad-lista">
+        <article class="room-disponibilidad-item" th:each="habitacion : ${habitaciones}">
+          <span class="room-numero" th:text="'Room ' + ${habitacion.numero}">Room 101</span>
+          <span class="room-estado" th:attr="data-estado=${habitacion.estado}" th:text="${habitacion.estado}">DISPONIBLE</span>
+          <span class="room-precio" th:text="'$' + ${#numbers.formatInteger(habitacion.precio, 1)} + ' / night'">$0 / night</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion-cta-interior">
+    <div class="contenedor cta-interior-contenido">
+      <div class="cta-int-linea"></div>
+      <p class="cta-interior-texto">Make New York feel entirely yours.</p>
+      <a th:href="@{/login}" class="btn-dorado-sm">Book Your Stay</a>
+    </div>
+  </section>
+
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+
+</body>
+</html>

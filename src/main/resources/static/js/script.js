@@ -83,7 +83,15 @@ function actualizarCarrusel() {
     return;
   }
 
+  if (totalHabitaciones === 0) {
+    carruselContador.textContent = "00 / 00";
+    carruselProgreso.style.width = "0";
+    carruselProgreso.style.transform = "translateX(0)";
+    return;
+  }
+
   carruselTrack.style.transform = "translateX(-" + (habitacionActual * 100) + "%)";
+  carruselProgreso.style.width = (100 / totalHabitaciones) + "%";
   carruselProgreso.style.transform = "translateX(" + (habitacionActual * 100) + "%)";
 
   const numeroActual = String(habitacionActual + 1).padStart(2, "0");
@@ -92,11 +100,19 @@ function actualizarCarrusel() {
 }
 
 function irHabitacionAnterior() {
+  if (totalHabitaciones === 0) {
+    return;
+  }
+
   habitacionActual = (habitacionActual - 1 + totalHabitaciones) % totalHabitaciones;
   actualizarCarrusel();
 }
 
 function irHabitacionSiguiente() {
+  if (totalHabitaciones === 0) {
+    return;
+  }
+
   habitacionActual = (habitacionActual + 1) % totalHabitaciones;
   actualizarCarrusel();
 }
