@@ -1,11 +1,14 @@
 package com.theroyale.backend.model;
 
+import java.util.ArrayList;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import java.util.List;
 
 // ===== Modelo: representa una habitación física, ligada a un tipo de habitación =====
 @Entity
@@ -34,6 +37,11 @@ public class Habitacion {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoHabitacion estado;
+
+    @OneToMany(mappedBy = "habitacion")
+    @Builder.Default
+    @ToString.Exclude
+    private List<Reserva> reservas = new ArrayList<>();
 
     @Override
     public String toString() {

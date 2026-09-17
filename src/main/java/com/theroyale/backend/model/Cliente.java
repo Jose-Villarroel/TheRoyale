@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import lombok.ToString;
+import java.util.List;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "cliente")
@@ -38,6 +40,11 @@ public class Cliente {
     private String telefono;
 
     private LocalDate fechaRegistro;
+
+    @OneToMany(mappedBy = "cliente")
+    @Builder.Default
+    @ToString.Exclude
+    private List<Reserva> reservas = new ArrayList<>();
 
     public String getNombreCompleto() {
         return (nombre + " " + apellido).trim();

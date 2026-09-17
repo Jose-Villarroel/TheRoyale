@@ -42,6 +42,12 @@ public class TipoHabitacion {
     @ToString.Exclude
     private List<Habitacion> habitaciones = new ArrayList<>();
 
+    // ===== Lado inverso de la relación: un tipo tiene muchas imágenes en su galería =====
+    @OneToMany(mappedBy = "tipoHabitacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    private List<Imagen> imagenes = new ArrayList<>();
+
     @Override
     public String toString() {
         return "TipoHabitacion{id=" + id + ", nombre='" + nombre + "', descripcion='" + descripcion +

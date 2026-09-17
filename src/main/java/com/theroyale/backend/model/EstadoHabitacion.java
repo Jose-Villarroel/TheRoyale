@@ -1,5 +1,5 @@
 package com.theroyale.backend.model;
 
 public enum EstadoHabitacion {
-    DISPONIBLE, OCUPADA, MANTENIMIENTO
+    DISPONIBLE, OCUPADA, MANTENIMIENTO, DESHABILITADA
 }

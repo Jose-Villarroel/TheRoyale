@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,4 +59,9 @@ public class Servicio {
     @Column(name = "galeria_url", nullable = false, length = 255)
     @Builder.Default
     private List<String> galeriaUrls = new ArrayList<>();
+
+    @OneToMany(mappedBy = "servicio")
+    @Builder.Default
+    @ToString.Exclude
+    private List<ItemConsumo> itemsConsumo = new ArrayList<>();
 }
