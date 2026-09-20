@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/clientes")
@@ -49,8 +50,12 @@ public class ClienteController {
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id) {
-        clienteService.eliminar(id);
+    public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            clienteService.eliminar(id);
+        } catch (IllegalStateException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/admin/clientes";
     }
 }

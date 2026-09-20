@@ -1,9 +1,12 @@
 package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.Cliente;
+import com.theroyale.backend.model.Operador;
 import com.theroyale.backend.service.AutenticacionService;
 import com.theroyale.backend.service.AutenticacionService.ResultadoRegistro;
 import com.theroyale.backend.service.ClienteService;
+import com.theroyale.backend.service.OperadorService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +27,9 @@ public class AutenticacionController {
     @Autowired
     private ClienteService clienteService;
 
+    @Autowired
+    private OperadorService operadorService;
+
     @GetMapping("/login")
     public String mostrarLogin(@RequestParam(required = false) String email,
                                @RequestParam(required = false) String error,
@@ -43,16 +49,24 @@ public class AutenticacionController {
     }
 
     @PostMapping("/login")
-    public String iniciarSesion(String email, String password, RedirectAttributes redirectAttributes) {
+    public String iniciarSesion(String email, String password, HttpSession session, RedirectAttributes redirectAttributes) {
         Optional<Cliente> clienteAutenticado = autenticacionService.autenticar(email, password);
 
-        if (clienteAutenticado.isEmpty()) {
-            redirectAttributes.addAttribute("error", "invalid");
-            redirectAttributes.addAttribute("email", email);
-            return "redirect:/login";
+        if (clienteAutenticado.isPresent()) {
+            return "redirect:/reservations?clienteId=" + clienteAutenticado.get().getId();
         }
 
-        return "redirect:/reservations?clienteId=" + clienteAutenticado.get().getId();
+        // Si no es un huesped, se prueba con el personal del hotel (operadores)
+        Optional<Operador> operadorAutenticado = operadorService.autenticar(email, password);
+
+        if (operadorAutenticado.isPresent()) {
+            session.setAttribute(OperatorController.ATRIBUTO_SESION, operadorAutenticado.get().getId());
+            return "redirect:/operator";
+        }
+
+        redirectAttributes.addAttribute("error", "invalid");
+        redirectAttributes.addAttribute("email", email);
+        return "redirect:/login";
     }
 
     @GetMapping("/signup")
@@ -164,7 +178,14 @@ public class AutenticacionController {
             return "redirect:/login";
         }
 
-        clienteService.eliminar(clienteId);
+        try {
+            clienteService.eliminar(clienteId);
+        } catch (IllegalStateException ex) {
+            redirectAttributes.addAttribute("clienteId", clienteId);
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/profile";
+        }
+
         redirectAttributes.addAttribute("mensaje", "profileDeleted");
         return "redirect:/signup";
     }

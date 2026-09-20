@@ -1,5 +1,5 @@
 package com.theroyale.backend.model;
 
 public enum EstadoReserva {
-    PENDIENTE, CONFIRMADA, CANCELADA, FINALIZADA
+    PENDIENTE, CONFIRMADA, EN_CURSO, CANCELADA, FINALIZADA
 }

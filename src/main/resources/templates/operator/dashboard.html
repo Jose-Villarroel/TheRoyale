@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Operator Panel')}"></head>
+<body>
+
+<div th:replace="~{layout :: cabecera}"></div>
+
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Operator</p>
+    <h1>Front Desk</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto" th:text="'Welcome, ' + ${operador.nombre} + '. Here is what needs attention today.'">Welcome.</p>
+  </div>
+</header>
+
+<div th:replace="~{layout :: operator-nav('dashboard')}"></div>
+
+<main class="contenedor seccion-admin-contenido panel-operador">
+  <p th:if="${mensaje}" th:text="${mensaje}" class="perfil-alerta perfil-alerta-ok" role="status"></p>
+  <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error" role="alert"></p>
+
+  <div class="operador-resumen">
+    <a th:href="@{/operator/habitaciones}" class="operador-stat">
+      <span class="operador-stat-numero" th:text="${habitacionesDisponibles}">0</span>
+      <span class="operador-stat-etiqueta">Rooms available</span>
+    </a>
+    <a th:href="@{/operator/habitaciones}" class="operador-stat">
+      <span class="operador-stat-numero" th:text="${habitacionesOcupadas}">0</span>
+      <span class="operador-stat-etiqueta">Rooms occupied</span>
+    </a>
+    <a th:href="@{/operator/habitaciones}" class="operador-stat">
+      <span class="operador-stat-numero" th:text="${habitacionesMantenimiento}">0</span>
+      <span class="operador-stat-etiqueta">In maintenance</span>
+    </a>
+    <a th:href="@{/operator/reservas(estado=PENDIENTE)}" class="operador-stat" th:classappend="${reservasPendientes > 0} ? ' requiere-atencion' : ''">
+      <span class="operador-stat-numero" th:text="${reservasPendientes}">0</span>
+      <span class="operador-stat-etiqueta">Pending reservations</span>
+    </a>
+    <a th:href="@{/operator/reservas(estado=EN_CURSO)}" class="operador-stat">
+      <span class="operador-stat-numero" th:text="${reservasEnCurso}">0</span>
+      <span class="operador-stat-etiqueta">Guests in house</span>
+    </a>
+    <a th:href="@{/operator/reservas(estado=EN_CURSO)}" class="operador-stat">
+      <span class="operador-stat-numero" th:text="${cuentasAbiertas}">0</span>
+      <span class="operador-stat-etiqueta">Open accounts</span>
+    </a>
+  </div>
+
+  <div class="operador-columnas">
+    <section>
+      <div class="operador-seccion-titulo">
+        <p class="eyebrow">Arrivals today</p>
+        <span class="operador-filtro-conteo" th:text="${#lists.size(llegadas)}">0</span>
+      </div>
+      <div th:if="${#lists.isEmpty(llegadas)}" class="operador-vacio-caja">
+        <strong>All clear</strong>
+        <span>No arrivals pending for today.</span>
+      </div>
+      <div class="operador-tabla-wrap" th:unless="${#lists.isEmpty(llegadas)}">
+        <table class="tabla-operador">
+          <thead><tr><th>Guest</th><th>Room</th><th>Status</th><th class="col-acciones">Next step</th></tr></thead>
+          <tbody>
+            <tr th:each="r : ${llegadas}">
+              <td>
+                <a th:href="@{/operator/reservas/{id}(id=${r.id})}" class="operador-celda-principal">
+                  <strong th:text="${r.cliente.nombreCompleto}">Guest</strong>
+                  <span th:text="${r.noches} + (${r.noches == 1} ? ' night' : ' nights')">2 nights</span>
+                </a>
+              </td>
+              <td th:text="${r.habitacion.numero}">101</td>
+              <td><span class="chip-estado" th:attr="data-estado=${r.estado}" th:text="${r.estado}">PENDIENTE</span></td>
+              <td class="col-acciones">
+                <form th:if="${r.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${r.id})}" method="post">
+                  <input type="hidden" name="volver" value="dashboard">
+                  <button type="submit" class="btn-contorno-oscuro btn-mini">Confirm</button>
+                </form>
+                <form th:if="${r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${r.id})}" method="post">
+                  <input type="hidden" name="volver" value="dashboard">
+                  <button type="submit" class="btn-dorado btn-mini">Check-in</button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="operador-seccion-titulo">
+        <p class="eyebrow">Departures today</p>
+        <span class="operador-filtro-conteo" th:text="${#lists.size(salidas)}">0</span>
+      </div>
+      <div th:if="${#lists.isEmpty(salidas)}" class="operador-vacio-caja">
+        <strong>All clear</strong>
+        <span>No departures scheduled for today.</span>
+      </div>
+      <div class="operador-tabla-wrap" th:unless="${#lists.isEmpty(salidas)}">
+        <table class="tabla-operador">
+          <thead><tr><th>Guest</th><th>Room</th><th>Balance</th><th class="col-acciones">Next step</th></tr></thead>
+          <tbody>
+            <tr th:each="r : ${salidas}">
+              <td>
+                <a th:href="@{/operator/reservas/{id}(id=${r.id})}" class="operador-celda-principal">
+                  <strong th:text="${r.cliente.nombreCompleto}">Guest</strong>
+                  <span th:text="${r.cuenta != null ? #lists.size(r.cuenta.itemsConsumo) + ' services charged' : 'No account'}">2 services charged</span>
+                </a>
+              </td>
+              <td th:text="${r.habitacion.numero}">101</td>
+              <td>
+                <span th:if="${r.cuenta != null}" th:classappend="${r.cuenta.saldo.signum() > 0} ? 'texto-pendiente' : 'texto-saldada'"
+                      th:text="${r.cuenta.saldo.signum() > 0} ? ('$' + ${#numbers.formatDecimal(r.cuenta.saldo, 1, 2)} + ' due') : 'Settled'">Settled</span>
+              </td>
+              <td class="col-acciones">
+                <form th:action="@{/operator/reservas/{id}/check-out(id=${r.id})}" method="post">
+                  <input type="hidden" name="volver" value="dashboard">
+                  <button type="submit" class="btn-dorado btn-mini">Check-out</button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<div th:replace="~{layout :: script}"></div>
+
+</body>
+</html>

@@ -142,8 +142,7 @@ ul {
   color: var(--color-texto-claro);
 }
 
-.seccion:not(.seccion-oscura) .btn-dorado:hover,
-.pie-pagina .btn-dorado:hover {
+.seccion:not(.seccion-oscura) .btn-dorado:hover {
   color: var(--color-dorado);
 }
 
@@ -911,6 +910,14 @@ ul {
   color: var(--color-texto-etiqueta);
 }
 
+.tarjeta-servicio-precio {
+  margin-top: 4px;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-dorado);
+}
+
 /* ===== Experiences ===== */
 .seccion-experiencias {
   position: relative;
@@ -1107,79 +1114,135 @@ ul {
 
 /* ===== Footer ===== */
 .pie-pagina {
-  background-color: var(--color-blanco);
-  padding: clamp(56px, 9vh, 100px) 0 36px;
+  background-color: var(--color-oscuro);
+  color: var(--color-texto-claro-secundario);
+  border-top: 3px solid var(--color-dorado);
+  padding: clamp(48px, 8vh, 84px) 0 28px;
 }
 
-.newsletter-fila {
+.pie-superior {
   display: flex;
   flex-wrap: wrap;
-  gap: 28px;
+  gap: 32px 60px;
   align-items: flex-end;
   justify-content: space-between;
-  border-bottom: 1px solid var(--color-borde-claro);
-  padding-bottom: 40px;
-  margin-bottom: 54px;
+  padding-bottom: 44px;
+  margin-bottom: 44px;
+  border-bottom: 1px solid var(--color-borde-oscuro);
 }
 
-.newsletter-titulo {
+.pie-presentacion {
+  max-width: 380px;
+}
+
+.pie-marca {
+  display: inline-block;
   font-family: var(--fuente-titulos);
-  font-size: clamp(24px, 2.6vw, 34px);
-  margin-top: 6px;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-texto-claro);
+}
+
+.pie-presentacion p {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--color-texto-claro-secundario);
 }
 
 .formulario-newsletter {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(100%, 420px);
+}
+
+.formulario-newsletter label {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-dorado);
+}
+
+.formulario-newsletter-campos {
+  display: flex;
   gap: 14px;
-  flex-wrap: wrap;
   align-items: flex-end;
 }
 
 .formulario-newsletter input {
+  flex: 1;
+  min-width: 0;
   border: none;
-  border-bottom: 1px solid var(--color-borde-claro);
+  border-bottom: 1px solid var(--color-borde-oscuro);
   padding: 10px 0;
-  min-width: 220px;
   font-family: var(--fuente-cuerpo);
   font-size: 0.9rem;
   background: transparent;
   outline: none;
-  color: var(--color-texto-oscuro);
+  color: var(--color-texto-claro);
+  transition: border-color 0.2s ease;
+}
+
+.formulario-newsletter input::placeholder {
+  color: var(--color-texto-etiqueta);
+}
+
+.formulario-newsletter input:focus {
+  border-bottom-color: var(--color-dorado);
+}
+
+.pie-boton {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-dorado);
+  background: transparent;
+  border: 1px solid var(--color-dorado);
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pie-boton:hover {
+  background-color: var(--color-dorado);
+  color: var(--color-oscuro);
 }
 
 .footer-columnas {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: clamp(32px, 5vw, 70px);
-  margin-bottom: 40px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(28px, 5vw, 70px);
+  margin-bottom: 44px;
 }
 
 .footer-columna {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  align-items: flex-start;
+  gap: 12px;
 }
 
-.footer-marca {
-  font-size: 20px;
-}
-
-.footer-columna p {
+.footer-columna a,
+.footer-inferior a {
   font-size: 0.85rem;
-  color: var(--color-texto-etiqueta);
-  line-height: 1.85;
+  color: var(--color-texto-claro-secundario);
+  transition: color 0.2s ease;
 }
 
-.footer-columna a {
-  font-size: 0.85rem;
-  color: var(--color-texto-etiqueta);
+.footer-columna a:hover,
+.footer-inferior a:hover {
+  color: var(--color-dorado);
 }
 
 .footer-columna-titulo {
   font-size: 0.6rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--color-texto-oscuro);
+  color: var(--color-dorado);
+  margin-bottom: 4px;
 }
 
 .footer-redes {
@@ -1191,12 +1254,12 @@ ul {
 .footer-redes a {
   width: 34px;
   height: 34px;
-  border: 1px solid var(--color-borde-claro);
+  border: 1px solid var(--color-borde-oscuro);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.6rem;
-  color: var(--color-texto-etiqueta);
+  letter-spacing: 0.08em;
 }
 
 .footer-redes a:hover {
@@ -1204,15 +1267,50 @@ ul {
 }
 
 .footer-inferior {
-  border-top: 1px solid var(--color-borde-claro);
-  padding-top: 24px;
+  border-top: 1px solid var(--color-borde-oscuro);
+  padding-top: 22px;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 12px 28px;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.68rem;
   letter-spacing: 0.14em;
   color: var(--color-texto-etiqueta);
+}
+
+.footer-inferior-enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  align-items: center;
+}
+
+.footer-inferior a {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 700px) {
+  .pie-superior {
+    align-items: flex-start;
+  }
+
+  .footer-columnas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-columnas .footer-columna:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 420px) {
+  .formulario-newsletter-campos {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 /* ===== Responsive ===== */

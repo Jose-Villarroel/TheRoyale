@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Operator Rooms')}"></head>
+<body>
+
+<div th:replace="~{layout :: cabecera}"></div>
+
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Operator</p>
+    <h1>Rooms</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto">Update a room's status as it is cleaned, occupied or sent to maintenance.</p>
+  </div>
+</header>
+
+<div th:replace="~{layout :: operator-nav('habitaciones')}"></div>
+
+<main class="contenedor seccion-admin-contenido panel-operador">
+  <p th:if="${mensaje}" th:text="${mensaje}" class="perfil-alerta perfil-alerta-ok" role="status"></p>
+  <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error" role="alert"></p>
+
+  <div class="operador-tabla-wrap">
+    <table class="tabla-operador">
+      <thead>
+        <tr><th>Room</th><th>Type</th><th class="col-num">Rate</th><th>Status</th><th>Change status</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="h : ${habitaciones}">
+          <td><strong th:text="${h.numero}">101</strong></td>
+          <td th:text="${h.tipoHabitacion.nombre}">Normal</td>
+          <td class="col-num" th:text="'$' + ${#numbers.formatDecimal(h.precio, 1, 2)}">$120.00</td>
+          <td><span class="chip-estado" th:attr="data-estado=${h.estado}" th:text="${h.estado}">DISPONIBLE</span></td>
+          <td>
+            <form th:action="@{/operator/habitaciones/{id}/estado(id=${h.id})}" method="post" class="operador-form-linea">
+              <select name="estado" class="operador-select" aria-label="New status">
+                <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == h.estado}">DISPONIBLE</option>
+              </select>
+              <button type="submit" class="btn-contorno-oscuro btn-mini">Update</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<div th:replace="~{layout :: script}"></div>
+
+</body>
+</html>

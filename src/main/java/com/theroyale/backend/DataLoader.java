@@ -1,12 +1,23 @@
 package com.theroyale.backend;
 
 import com.theroyale.backend.model.Cliente;
+import com.theroyale.backend.model.Cuenta;
+import com.theroyale.backend.model.EstadoCuenta;
 import com.theroyale.backend.model.EstadoHabitacion;
+import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.Habitacion;
+import com.theroyale.backend.model.ItemConsumo;
+import com.theroyale.backend.model.Operador;
+import com.theroyale.backend.model.Pago;
+import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.model.TipoHabitacion;
+import com.theroyale.backend.model.TipoOperador;
 import com.theroyale.backend.repository.ClienteRepository;
+import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
+import com.theroyale.backend.repository.OperadorRepository;
+import com.theroyale.backend.repository.ReservaRepository;
 import com.theroyale.backend.repository.ServicioRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +25,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 // ===== Carga datos iniciales de prueba cada vez que la aplicación arranca =====
@@ -37,12 +51,23 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private ServicioRepository servicioRepository;
 
+    @Autowired
+    private OperadorRepository operadorRepository;
+
+    @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
+    private CuentaRepository cuentaRepository;
+
     @Override
     public void run(String... args) throws Exception {
         cargarTiposHabitacion();
         cargarClientes();
         cargarHabitaciones();
         cargarServicios();
+        cargarOperadores();
+        cargarReservas();
     }
 
     // ===== 5 tipos de habitación =====
@@ -292,5 +317,118 @@ public class DataLoader implements CommandLineRunner {
                 .caracteristicas(caracteristicas)
                 .galeriaUrls(galeriaUrls)
                 .build());
+    }
+
+    // ===== 2 operadores (personal del hotel; entran por /login y son redirigidos a /operator) =====
+    private void cargarOperadores() {
+        operadorRepository.save(Operador.builder()
+                .nombre("Laura Gomez").email("laura.gomez@theroyale.com")
+                .password("operator123").tipo(TipoOperador.OPERADOR)
+                .build());
+
+        operadorRepository.save(Operador.builder()
+                .nombre("Pedro Ruiz").email("pedro.ruiz@theroyale.com")
+                .password("operator123").tipo(TipoOperador.OPERADOR)
+                .build());
+    }
+
+    // ===== Reservas de ejemplo en todos los estados, con fechas relativas al dia de arranque =====
+    // Las habitaciones OCUPADA 102, 302 y 502 tienen una reserva EN_CURSO con su cuenta abierta.
+    private void cargarReservas() {
+        LocalDate hoy = LocalDate.now();
+        Operador laura = operadorRepository.findByEmail("laura.gomez@theroyale.com").orElseThrow();
+        List<Cliente> clientes = clienteRepository.findAll();
+        Servicio wellness = servicioRepository.findByNombreIgnoreCase("Wellness").orElseThrow();
+        Servicio dining = servicioRepository.findByNombreIgnoreCase("Dining").orElseThrow();
+        Servicio concierge = servicioRepository.findByNombreIgnoreCase("Concierge").orElseThrow();
+        Servicio business = servicioRepository.findByNombreIgnoreCase("Business").orElseThrow();
+
+        // Llegan hoy. Las CONFIRMADAS ya tienen cuenta abierta (con servicios reservados de antemano);
+        // las PENDIENTES todavia no: la cuenta se abre al confirmar.
+        Reserva confirmada101 = guardarReserva(clientes.get(0), "101", laura, hoy, hoy.plusDays(3), EstadoReserva.CONFIRMADA, 2);
+        Cuenta cuenta101 = abrirCuenta(confirmada101, hoy.minusDays(1));
+        agregarConsumo(cuenta101, concierge, laura, 1, false);
+        guardarReserva(clientes.get(1), "301", null, hoy, hoy.plusDays(2), EstadoReserva.PENDIENTE, 1);
+
+        // Futuras
+        guardarReserva(clientes.get(2), "103", null, hoy.plusDays(4), hoy.plusDays(7), EstadoReserva.PENDIENTE, 2);
+        Reserva confirmada703 = guardarReserva(clientes.get(3), "703", laura, hoy.plusDays(10), hoy.plusDays(14), EstadoReserva.CONFIRMADA, 3);
+        Cuenta cuenta703 = abrirCuenta(confirmada703, hoy.minusDays(2));
+        agregarConsumo(cuenta703, business, laura, 2, false);
+
+        // En curso: la 102 sale hoy y esta pagada (lista para check-out); la 302 tiene saldo pendiente
+        Reserva enCurso102 = guardarReserva(clientes.get(4), "102", laura, hoy.minusDays(2), hoy, EstadoReserva.EN_CURSO, 2);
+        Cuenta cuenta102 = abrirCuenta(enCurso102, hoy.minusDays(2));
+        agregarConsumo(cuenta102, wellness, laura, 2, true);
+        agregarPago(cuenta102, laura, BigDecimal.valueOf(90), "CARD");
+
+        Reserva enCurso302 = guardarReserva(clientes.get(5), "302", laura, hoy.minusDays(1), hoy.plusDays(2), EstadoReserva.EN_CURSO, 2);
+        Cuenta cuenta302 = abrirCuenta(enCurso302, hoy.minusDays(1));
+        agregarConsumo(cuenta302, dining, laura, 2, false);
+        agregarConsumo(cuenta302, concierge, laura, 1, false);
+        agregarPago(cuenta302, laura, BigDecimal.valueOf(50), "CASH");
+
+        Reserva enCurso502 = guardarReserva(clientes.get(6), "502", laura, hoy.minusDays(3), hoy.plusDays(1), EstadoReserva.EN_CURSO, 3);
+        abrirCuenta(enCurso502, hoy.minusDays(3));
+
+        // Historial
+        Reserva finalizada = guardarReserva(clientes.get(7), "104", laura, hoy.minusDays(9), hoy.minusDays(6), EstadoReserva.FINALIZADA, 2);
+        Cuenta cuentaFinalizada = abrirCuenta(finalizada, hoy.minusDays(9));
+        agregarConsumo(cuentaFinalizada, dining, laura, 1, true);
+        agregarPago(cuentaFinalizada, laura, BigDecimal.valueOf(60), "CARD");
+        cuentaFinalizada.setEstado(EstadoCuenta.CERRADA);
+        cuentaRepository.save(cuentaFinalizada);
+
+        guardarReserva(clientes.get(8), "303", laura, hoy.plusDays(1), hoy.plusDays(3), EstadoReserva.CANCELADA, 1);
+    }
+
+    private Reserva guardarReserva(Cliente cliente, String numeroHabitacion, Operador operador,
+                                   LocalDate inicio, LocalDate fin, EstadoReserva estado, int personas) {
+        Habitacion habitacion = habitacionRepository.findByNumero(numeroHabitacion).orElseThrow();
+        return reservaRepository.save(Reserva.builder()
+                .cliente(cliente)
+                .habitacion(habitacion)
+                .operador(operador)
+                .fechaInicio(inicio)
+                .fechaFin(fin)
+                .estado(estado)
+                .cantidadPersonas(personas)
+                .precioNocheAcordado(BigDecimal.valueOf(habitacion.getPrecio()))
+                .fechaCreacion(LocalDateTime.now().minusDays(15))
+                .build());
+    }
+
+    private Cuenta abrirCuenta(Reserva reserva, LocalDate desde) {
+        return cuentaRepository.save(Cuenta.builder()
+                .reserva(reserva)
+                .estado(EstadoCuenta.ABIERTA)
+                .fechaCreacion(desde.atTime(15, 0))
+                .itemsConsumo(new ArrayList<>())
+                .pagos(new ArrayList<>())
+                .build());
+    }
+
+    private void agregarConsumo(Cuenta cuenta, Servicio servicio, Operador operador, int cantidad, boolean pagado) {
+        cuenta.getItemsConsumo().add(ItemConsumo.builder()
+                .cuenta(cuenta)
+                .servicio(servicio)
+                .operador(operador)
+                .cantidad(cantidad)
+                .fechaHora(LocalDateTime.now().minusHours(5))
+                .precioUnitario(BigDecimal.valueOf(servicio.getPrecio()))
+                .pagado(pagado)
+                .build());
+        cuentaRepository.save(cuenta);
+    }
+
+    private void agregarPago(Cuenta cuenta, Operador operador, BigDecimal monto, String metodo) {
+        cuenta.getPagos().add(Pago.builder()
+                .cuenta(cuenta)
+                .operador(operador)
+                .monto(monto)
+                .fecha(LocalDateTime.now().minusHours(2))
+                .metodoPago(metodo)
+                .build());
+        cuentaRepository.save(cuenta);
     }
 }

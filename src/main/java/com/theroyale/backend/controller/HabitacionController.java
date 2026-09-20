@@ -6,6 +6,7 @@ import com.theroyale.backend.service.TipoHabitacionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/habitaciones")
@@ -41,15 +42,30 @@ public class HabitacionController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Habitacion habitacion, @RequestParam Long tipoHabitacionId) {
-        habitacion.setTipoHabitacion(tipoHabitacionService.obtenerPorId(tipoHabitacionId));
-        habitacionService.guardar(habitacion);
-        return "redirect:/admin/habitaciones";
+    public String guardar(@ModelAttribute Habitacion habitacion,
+                          @RequestParam(required = false) Long tipoHabitacionId,
+                          Model model) {
+        try {
+            if (tipoHabitacionId != null) {
+                habitacion.setTipoHabitacion(tipoHabitacionService.obtenerPorId(tipoHabitacionId));
+            }
+            habitacionService.guardar(habitacion);
+            return "redirect:/admin/habitaciones";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("habitacion", habitacion);
+            model.addAttribute("tiposHabitacion", tipoHabitacionService.listarTodos());
+            model.addAttribute("error", ex.getMessage());
+            return "admin/habitaciones-formulario";
+        }
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id) {
-        habitacionService.eliminar(id);
+    public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            habitacionService.eliminar(id);
+        } catch (IllegalStateException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/admin/habitaciones";
     }
 }

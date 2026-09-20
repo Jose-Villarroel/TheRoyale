@@ -45,6 +45,11 @@ public class ItemConsumo {
     @Column(nullable = false)
     private Boolean pagado;
 
+    // Calculado (no se persiste: la entidad usa acceso por campo)
+    public BigDecimal getTotal() {
+        return precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+    }
+
     @Override
     public String toString() {
         return "ItemConsumo{id=" + id + ", cantidad=" + cantidad + ", precioUnitario=" + precioUnitario +

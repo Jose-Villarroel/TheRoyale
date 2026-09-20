@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Reservation Detail')}"></head>
+<body>
+
+<div th:replace="~{layout :: cabecera}"></div>
+
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Operator</p>
+    <h1 th:text="'Reservation #' + ${reserva.id}">Reservation</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto"
+       th:text="${reserva.cliente.nombreCompleto} + ' · Room ' + ${reserva.habitacion.numero} + ' · ' + ${reserva.fechaInicio} + ' → ' + ${reserva.fechaFin}">Guest · Room · Dates</p>
+  </div>
+</header>
+
+<div th:replace="~{layout :: operator-nav('reservas')}"></div>
+
+<main class="contenedor seccion-admin-contenido panel-operador">
+  <p th:if="${mensaje}" th:text="${mensaje}" class="perfil-alerta perfil-alerta-ok" role="status"></p>
+  <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error" role="alert"></p>
+
+  <div class="operador-detalle">
+
+    <!-- ===== Columna izquierda: huesped, habitacion asignada y acciones ===== -->
+    <aside class="operador-lateral">
+
+      <section class="operador-tarjeta">
+        <div class="operador-tarjeta-cabecera">
+          <p class="eyebrow">Reservation</p>
+          <span class="chip-estado" th:attr="data-estado=${reserva.estado}" th:text="${reserva.estado}">PENDIENTE</span>
+        </div>
+        <dl class="operador-datos">
+          <div><dt>Check-in</dt><dd th:text="${reserva.fechaInicio}">2026-01-01</dd></div>
+          <div><dt>Check-out</dt><dd th:text="${reserva.fechaFin}">2026-01-03</dd></div>
+          <div><dt>Nights</dt><dd th:text="${reserva.noches}">2</dd></div>
+          <div><dt>Guests</dt><dd th:text="${reserva.cantidadPersonas}">2</dd></div>
+          <div><dt>Handled by</dt><dd th:text="${reserva.operador != null ? reserva.operador.nombre : 'Not assigned yet'}">Not assigned yet</dd></div>
+        </dl>
+
+        <div class="operador-acciones operador-acciones-columna">
+          <form th:if="${reserva.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${reserva.id})}" method="post">
+            <button type="submit" class="btn-dorado btn-bloque">Confirm reservation</button>
+          </form>
+          <form th:if="${reserva.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${reserva.id})}" method="post">
+            <button type="submit" class="btn-dorado btn-bloque">Check-in</button>
+          </form>
+          <form th:if="${reserva.estado.name() == 'EN_CURSO'}" th:action="@{/operator/reservas/{id}/check-out(id=${reserva.id})}" method="post">
+            <button type="submit" class="btn-dorado btn-bloque">Check-out</button>
+          </form>
+          <form th:if="${reserva.estado.name() == 'PENDIENTE' or reserva.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/cancelar(id=${reserva.id})}" method="post">
+            <button type="submit" class="btn-eliminar" onclick="return confirm('Cancel this reservation?');">Cancel reservation</button>
+          </form>
+          <a th:href="@{/operator/reservas}" class="enlace-subrayado">← Back to reservations</a>
+        </div>
+      </section>
+
+      <section class="operador-tarjeta">
+        <p class="eyebrow">Guest</p>
+        <h2 class="operador-tarjeta-titulo" th:text="${reserva.cliente.nombreCompleto}">Guest Name</h2>
+        <dl class="operador-datos">
+          <div><dt>Email</dt><dd><a th:href="'mailto:' + ${reserva.cliente.email}" th:text="${reserva.cliente.email}" class="operador-enlace">guest@example.com</a></dd></div>
+          <div><dt>Phone</dt><dd th:text="${reserva.cliente.telefono != null and !reserva.cliente.telefono.isEmpty() ? reserva.cliente.telefono : 'Not registered'}">Not registered</dd></div>
+          <div><dt>Guest since</dt><dd th:text="${reserva.cliente.fechaRegistro != null ? reserva.cliente.fechaRegistro : '—'}">2025-01-01</dd></div>
+          <div><dt>Reservations</dt><dd th:text="${#lists.size(reserva.cliente.reservas)}">1</dd></div>
+        </dl>
+      </section>
+
+      <section class="operador-tarjeta operador-habitacion">
+        <div class="operador-habitacion-imagen">
+          <img th:src="@{${reserva.habitacion.tipoHabitacion.imagenUrl != null and !reserva.habitacion.tipoHabitacion.imagenUrl.isEmpty() ? reserva.habitacion.tipoHabitacion.imagenUrl : '/images/hotel.webp'}}"
+               th:alt="${reserva.habitacion.tipoHabitacion.nombre}" loading="lazy">
+        </div>
+        <div class="operador-habitacion-cuerpo">
+          <p class="eyebrow">Assigned room</p>
+          <h2 class="operador-tarjeta-titulo" th:text="'Room ' + ${reserva.habitacion.numero}">Room 101</h2>
+          <p class="operador-habitacion-tipo" th:text="${reserva.habitacion.tipoHabitacion.nombre}">Normal</p>
+          <div class="operador-habitacion-pie">
+            <span class="chip-estado" th:attr="data-estado=${reserva.habitacion.estado}" th:text="${reserva.habitacion.estado}">DISPONIBLE</span>
+            <span class="operador-numero" th:text="'$' + ${#numbers.formatDecimal(reserva.precioNocheAcordado, 1, 2)} + ' / night'">$120.00 / night</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- ===== Columna derecha: cuenta de la habitacion ===== -->
+    <section class="operador-cuenta">
+      <div class="operador-cuenta-cabecera">
+        <div>
+          <p class="eyebrow" th:text="'Room ' + ${reserva.habitacion.numero} + ' account'">Room account</p>
+          <h2>Services &amp; Payments</h2>
+        </div>
+        <span class="chip-estado" th:if="${cuenta != null}" th:attr="data-estado=${cuenta.estado}" th:text="${cuenta.estado}">ABIERTA</span>
+      </div>
+
+      <div th:if="${cuenta == null}" class="operador-vacio-caja">
+        <strong>No account yet</strong>
+        <span>The account opens when the reservation is confirmed. Services can be charged to it from then on.</span>
+      </div>
+
+      <th:block th:if="${cuenta != null}">
+
+        <div class="operador-totales">
+          <div><span>Services</span><strong th:text="'$' + ${#numbers.formatDecimal(cuenta.totalConsumos, 1, 2)}">$0.00</strong></div>
+          <div><span>Paid</span><strong th:text="'$' + ${#numbers.formatDecimal(cuenta.totalPagado, 1, 2)}">$0.00</strong></div>
+          <div class="operador-saldo" th:attr="data-saldo=${cuenta.saldo.signum() > 0 ? 'pendiente' : 'saldada'}">
+            <span th:text="${cuenta.saldo.signum() > 0 ? 'Balance due' : 'Settled'}">Balance due</span>
+            <strong th:text="'$' + ${#numbers.formatDecimal(cuenta.saldo, 1, 2)}">$0.00</strong>
+          </div>
+        </div>
+
+        <h3 class="operador-subtitulo">Services contracted</h3>
+        <div th:if="${#lists.isEmpty(cuenta.itemsConsumo)}" class="operador-vacio-caja">
+          <strong>Nothing charged yet</strong>
+          <span>Add a service below and it will be billed to this room.</span>
+        </div>
+        <ul class="operador-servicios" th:unless="${#lists.isEmpty(cuenta.itemsConsumo)}">
+          <li th:each="i : ${cuenta.itemsConsumo}">
+            <img th:src="@{${i.servicio.imagenUrl}}" th:alt="${i.servicio.nombre}" loading="lazy">
+            <div class="operador-servicio-info">
+              <strong th:text="${i.servicio.nombre}">Wellness</strong>
+              <span th:text="${i.cantidad} + ' × $' + ${#numbers.formatDecimal(i.precioUnitario, 1, 2)} + ' · ' + ${#temporals.format(i.fechaHora, 'yyyy-MM-dd HH:mm')} + ' · ' + ${i.operador.nombre}">1 × $45.00</span>
+            </div>
+            <span class="operador-servicio-total">
+              <strong class="operador-numero" th:text="'$' + ${#numbers.formatDecimal(i.total, 1, 2)}">$45.00</strong>
+              <span class="operador-pagado" th:if="${i.pagado}">Paid</span>
+            </span>
+            <form th:if="${cuenta.estado.name() == 'ABIERTA' and !i.pagado}"
+                  th:action="@{/operator/reservas/{id}/consumos/{itemId}/eliminar(id=${reserva.id},itemId=${i.id})}" method="post">
+              <button type="submit" class="operador-quitar" aria-label="Remove charge"
+                      onclick="return confirm('Remove this charge from the account?');">Remove</button>
+            </form>
+          </li>
+        </ul>
+
+        <h3 class="operador-subtitulo">Payments</h3>
+        <div th:if="${#lists.isEmpty(cuenta.pagos)}" class="operador-vacio-caja">
+          <strong>No payments yet</strong>
+          <span>Payments are registered against the balance due.</span>
+        </div>
+        <div class="operador-tabla-wrap" th:unless="${#lists.isEmpty(cuenta.pagos)}">
+          <table class="tabla-operador">
+            <thead><tr><th>When</th><th>Method</th><th>Registered by</th><th class="col-num">Amount</th></tr></thead>
+            <tbody>
+              <tr th:each="p : ${cuenta.pagos}">
+                <td th:text="${#temporals.format(p.fecha, 'yyyy-MM-dd HH:mm')}">2026-01-01 10:00</td>
+                <td th:text="${p.metodoPago}">CASH</td>
+                <td th:text="${p.operador != null ? p.operador.nombre : '—'}">Operator</td>
+                <td class="col-num" th:text="'$' + ${#numbers.formatDecimal(p.monto, 1, 2)}">$50.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <th:block th:if="${cuenta.estado.name() == 'ABIERTA'}">
+          <div class="operador-formularios">
+            <form th:action="@{/operator/reservas/{id}/consumos(id=${reserva.id})}" method="post" class="operador-formulario">
+              <h3 class="operador-subtitulo">Charge a service</h3>
+              <label>
+                <span>Service</span>
+                <select name="servicioId" class="operador-select" required>
+                  <option th:each="s : ${servicios}" th:value="${s.id}"
+                          th:text="${s.nombre} + ' — $' + ${#numbers.formatDecimal(s.precio, 1, 2)}">Wellness</option>
+                </select>
+              </label>
+              <label>
+                <span>Quantity</span>
+                <input type="number" name="cantidad" class="operador-input" min="1" value="1" inputmode="numeric" required>
+              </label>
+              <button type="submit" class="btn-dorado">Add to account</button>
+            </form>
+
+            <form th:action="@{/operator/reservas/{id}/pagos(id=${reserva.id})}" method="post" class="operador-formulario">
+              <h3 class="operador-subtitulo">Register payment</h3>
+              <label>
+                <span>Amount</span>
+                <input type="number" name="monto" class="operador-input" min="0.01" step="0.01" inputmode="decimal"
+                       th:value="${cuenta.saldo.signum() > 0 ? cuenta.saldo : ''}" required>
+              </label>
+              <label>
+                <span>Method</span>
+                <select name="metodoPago" class="operador-select" required>
+                  <option th:each="m : ${metodosPago}" th:value="${m}" th:text="${m}">CASH</option>
+                </select>
+              </label>
+              <button type="submit" class="btn-dorado" th:disabled="${cuenta.saldo.signum() <= 0}">Register payment</button>
+            </form>
+          </div>
+        </th:block>
+      </th:block>
+    </section>
+  </div>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<div th:replace="~{layout :: script}"></div>
+
+</body>
+</html>

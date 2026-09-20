@@ -173,3 +173,39 @@ document.addEventListener("keydown", function (evento) {
 actualizarCabeceraEnScroll();
 activarAnimacionesAparicion();
 actualizarCarrusel();
+
+// ===== Panel del operario: estado "enviando" en los formularios =====
+// Evita cargos, pagos y check-ins duplicados por doble clic: al enviar se bloquean los botones del formulario.
+// Se aplica despues del envio (setTimeout 0) para no interferir con el propio submit.
+function activarEstadoEnviando() {
+  document.querySelectorAll(".panel-operador form").forEach(function (formulario) {
+    formulario.addEventListener("submit", function (evento) {
+      if (evento.defaultPrevented) {
+        return;
+      }
+
+      setTimeout(function () {
+        formulario.classList.add("is-pending");
+        formulario.querySelectorAll("button[type='submit']").forEach(function (boton) {
+          boton.disabled = true;
+        });
+      }, 0);
+    });
+  });
+}
+
+// Al volver con el boton "atras" la pagina puede restaurarse con los botones bloqueados
+window.addEventListener("pageshow", function (evento) {
+  if (!evento.persisted) {
+    return;
+  }
+
+  document.querySelectorAll(".panel-operador form.is-pending").forEach(function (formulario) {
+    formulario.classList.remove("is-pending");
+    formulario.querySelectorAll("button[type='submit']").forEach(function (boton) {
+      boton.disabled = false;
+    });
+  });
+});
+
+activarEstadoEnviando();

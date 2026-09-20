@@ -83,55 +83,76 @@
   </section>
 </th:block>
 
+<th:block th:fragment="operator-nav(activo)">
+  <section class="admin-vistas" aria-label="Navegacion operario">
+    <div class="contenedor admin-vistas-contenido">
+      <span class="admin-vistas-label">Operations</span>
+      <nav class="admin-vistas-toggle">
+        <a th:href="@{/operator}"
+           th:classappend="${activo == 'dashboard'} ? ' admin-vistas-activo' : ''">Dashboard</a>
+        <a th:href="@{/operator/reservas}"
+           th:classappend="${activo == 'reservas'} ? ' admin-vistas-activo' : ''">Reservations</a>
+        <a th:href="@{/operator/habitaciones}"
+           th:classappend="${activo == 'habitaciones'} ? ' admin-vistas-activo' : ''">Rooms</a>
+      </nav>
+      <form th:action="@{/operator/logout}" method="post" class="operador-salir">
+        <button type="submit" class="admin-vistas-volver">Sign out</button>
+      </form>
+    </div>
+  </section>
+</th:block>
+
 <!-- ===== Footer real de la landing, reutilizable en todas las páginas ===== -->
 <footer th:fragment="pie" class="pie-pagina">
   <div class="contenedor">
 
-    <div class="newsletter-fila">
-      <div>
-        <p class="eyebrow">Newsletter</p>
-        <p class="newsletter-titulo">Stay close to The Royale.</p>
+    <div class="pie-superior">
+      <div class="pie-presentacion">
+        <a th:href="@{/}" class="pie-marca">The Royale</a>
+        <p>A luxury boutique hotel on Fifth Avenue, in the heart of New York City.</p>
       </div>
       <form class="formulario-newsletter" id="formularioNewsletter">
-        <input type="email" placeholder="Email address" required>
-        <button type="submit" class="btn-contorno-oscuro">Subscribe</button>
+        <label for="pieNewsletterEmail">Stay close to The Royale</label>
+        <div class="formulario-newsletter-campos">
+          <input id="pieNewsletterEmail" type="email" placeholder="Email address" required>
+          <button type="submit" class="pie-boton">Subscribe</button>
+        </div>
       </form>
     </div>
 
     <div class="footer-columnas">
+      <nav class="footer-columna" aria-label="Explore">
+        <span class="footer-columna-titulo">Explore</span>
+        <a href="/#rooms">Rooms</a>
+        <a href="/#services">Services</a>
+        <a href="/#experiences">Experiences</a>
+        <a th:href="@{/about}">About</a>
+      </nav>
+      <nav class="footer-columna" aria-label="Guest">
+        <span class="footer-columna-titulo">Guest</span>
+        <a th:href="@{/login}">Sign In</a>
+        <a th:href="@{/login}">My Reservations</a>
+        <a th:href="@{/login}">Book a Room</a>
+      </nav>
       <div class="footer-columna">
-        <span class="marca-nombre footer-marca">The Royale</span>
-        <p>Luxury Boutique Hotel<br>New York City</p>
+        <span class="footer-columna-titulo">Contact</span>
+        <a href="mailto:reservations@theroyale.com">reservations@theroyale.com</a>
+        <a th:href="@{/contact}">+1 507 3165 232</a>
         <div class="footer-redes">
           <a th:href="@{/contact}" aria-label="Instagram">IG</a>
           <a th:href="@{/contact}" aria-label="Facebook">FB</a>
           <a th:href="@{/contact}" aria-label="LinkedIn">IN</a>
         </div>
       </div>
-      <div class="footer-columna">
-        <span class="footer-columna-titulo">Navigation</span>
-        <a href="/#rooms">Rooms</a>
-        <a href="/#services">Services</a>
-        <a href="/#experiences">Experiences</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
-      </div>
-      <div class="footer-columna">
-        <span class="footer-columna-titulo">Guest</span>
-        <a th:href="@{/login}">Sign In</a>
-        <a th:href="@{/login}">My Reservations</a>
-        <a th:href="@{/login}">Book a Room</a>
-      </div>
-      <div class="footer-columna">
-        <span class="footer-columna-titulo">Contact</span>
-        <p>New York, NY<br>+1 XXX XXX XXXX</p>
-        <a href="mailto:reservations@theroyale.com">reservations@theroyale.com</a>
-      </div>
     </div>
 
     <div class="footer-inferior">
       <span>© 2026 The Royale. All rights reserved.</span>
-      <span>Fifth Avenue · New York City</span>
+      <span class="footer-inferior-enlaces">
+        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/login}">Staff</a>
+        <span>Fifth Avenue · New York City</span>
+      </span>
     </div>
   </div>
 </footer>

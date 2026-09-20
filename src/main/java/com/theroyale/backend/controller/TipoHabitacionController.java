@@ -36,9 +36,15 @@ public class TipoHabitacionController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute TipoHabitacion tipoHabitacion) {
-        tipoHabitacionService.guardar(tipoHabitacion);
-        return "redirect:/admin/tipos-habitacion";
+    public String guardar(@ModelAttribute TipoHabitacion tipoHabitacion, Model model) {
+        try {
+            tipoHabitacionService.guardar(tipoHabitacion);
+            return "redirect:/admin/tipos-habitacion";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("tipoHabitacion", tipoHabitacion);
+            model.addAttribute("error", ex.getMessage());
+            return "admin/tipos-habitacion-formulario";
+        }
     }
 
     @PostMapping("/{id}/eliminar")

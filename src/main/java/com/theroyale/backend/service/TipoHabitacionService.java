@@ -1,13 +1,16 @@
 package com.theroyale.backend.service;
 
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.model.Admin;
 import com.theroyale.backend.model.TipoHabitacion;
+import com.theroyale.backend.repository.AdminRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -15,11 +18,14 @@ public class TipoHabitacionService {
 
     private final TipoHabitacionRepository tipoHabitacionRepository;
     private final HabitacionRepository habitacionRepository;
+    private final AdminRepository adminRepository;
 
     public TipoHabitacionService(TipoHabitacionRepository tipoHabitacionRepository,
-                                 HabitacionRepository habitacionRepository) {
+                                 HabitacionRepository habitacionRepository,
+                                 AdminRepository adminRepository) {
         this.tipoHabitacionRepository = tipoHabitacionRepository;
         this.habitacionRepository = habitacionRepository;
+        this.adminRepository = adminRepository;
     }
 
     public List<TipoHabitacion> listarTodos() {
@@ -35,9 +41,33 @@ public class TipoHabitacionService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Tipo de habitacion no encontrado: " + id));
     }
 
+    // Al editar se copian solo los campos del formulario sobre la entidad existente:
+    // hacer merge del objeto enlazado dejaria la galeria de imagenes vacia y orphanRemoval la borraria.
     @Transactional
     public TipoHabitacion guardar(TipoHabitacion tipoHabitacion) {
-        return tipoHabitacionRepository.save(tipoHabitacion);
+        if (tipoHabitacion == null) {
+            throw new IllegalArgumentException("El tipo de habitacion es obligatorio.");
+        }
+        if (tipoHabitacion.getNombre() == null || tipoHabitacion.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del tipo de habitacion es obligatorio.");
+        }
+
+        String nombre = tipoHabitacion.getNombre().trim();
+        Optional<TipoHabitacion> conMismoNombre = tipoHabitacionRepository.findByNombreIgnoreCase(nombre);
+        if (conMismoNombre.isPresent() && !conMismoNombre.get().getId().equals(tipoHabitacion.getId())) {
+            throw new IllegalArgumentException("Ya existe un tipo de habitacion con el nombre: " + nombre);
+        }
+
+        if (tipoHabitacion.getId() == null) {
+            tipoHabitacion.setNombre(nombre);
+            return tipoHabitacionRepository.save(tipoHabitacion);
+        }
+
+        TipoHabitacion existente = obtenerPorId(tipoHabitacion.getId());
+        existente.setNombre(nombre);
+        existente.setDescripcion(tipoHabitacion.getDescripcion());
+        existente.setImagenUrl(tipoHabitacion.getImagenUrl());
+        return tipoHabitacionRepository.save(existente);
     }
 
     @Transactional
@@ -46,6 +76,11 @@ public class TipoHabitacionService {
         if (habitacionRepository.existsByTipoHabitacionId(id)) {
             throw new IllegalStateException("Ese tipo de habitacion aun tiene habitaciones asociadas.");
         }
+
+        for (Admin admin : adminRepository.findByTiposHabitacionAdministradosId(id)) {
+            admin.getTiposHabitacionAdministrados().removeIf(t -> t.getId().equals(id));
+        }
+        // Las imagenes de la galeria se borran en cascada (CascadeType.ALL)
         tipoHabitacionRepository.deleteById(id);
     }
 }

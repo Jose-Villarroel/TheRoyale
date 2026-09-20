@@ -500,3 +500,744 @@
     flex-direction: column;
   }
 }
+
+/* ================================================================
+   Panel del operario
+   Reglas de movimiento: solo transform/opacity/color, curvas ease-out fuertes,
+   hover solo con puntero fino, entradas < 300ms y nada animado en las tablas
+   (se consultan decenas de veces al dia).
+   ================================================================ */
+
+.panel-operador {
+  --op-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --admin-verde: #2f6f48;
+}
+
+/* ----- Estados de reserva, cuenta y habitacion (reutilizan .chip-estado) ----- */
+.chip-estado[data-estado="DESHABILITADA"] { color: var(--admin-etiqueta); border-style: dashed; }
+.chip-estado[data-estado="PENDIENTE"] { color: var(--admin-dorado-hover); }
+.chip-estado[data-estado="CONFIRMADA"] { color: var(--admin-verde); }
+.chip-estado[data-estado="EN_CURSO"] { color: var(--admin-oscuro); background: var(--admin-off-blanco); }
+.chip-estado[data-estado="FINALIZADA"] { color: var(--admin-etiqueta); }
+.chip-estado[data-estado="CANCELADA"] { color: var(--admin-rojo); }
+.chip-estado[data-estado="ABIERTA"] { color: var(--admin-verde); }
+.chip-estado[data-estado="CERRADA"] { color: var(--admin-etiqueta); }
+
+/* Punto de color: el estado se lee sin depender solo del texto */
+.panel-operador .chip-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.panel-operador .chip-estado::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ----- Barra del operario: cerrar sesion ----- */
+.operador-salir {
+  margin-left: auto;
+}
+
+.operador-salir .admin-vistas-volver {
+  margin-left: 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ----- Foco visible (teclado) ----- */
+.panel-operador :is(a, button, input, select):focus-visible,
+.operador-salir button:focus-visible {
+  outline: 2px solid var(--admin-dorado);
+  outline-offset: 2px;
+}
+
+/* ----- Feedback al presionar: todo lo pulsable responde ----- */
+.panel-operador :is(button, .btn-dorado, .btn-contorno-oscuro, .btn-eliminar, .operador-filtros a, .operador-stat) {
+  transition: transform 160ms var(--op-ease), background-color 200ms ease, color 200ms ease,
+    border-color 200ms ease, opacity 200ms ease;
+}
+
+.panel-operador :is(button, .btn-dorado, .btn-contorno-oscuro, .btn-eliminar, .operador-filtros a):active {
+  transform: scale(0.97);
+}
+
+.panel-operador .operador-stat:active {
+  transform: scale(0.985);
+}
+
+/* Envio en curso (lo activa script.js): evita pagos y cargos duplicados con doble clic */
+.panel-operador form.is-pending {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.panel-operador button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ----- Alertas: aparecen desde arriba, breve ----- */
+.panel-operador .perfil-alerta {
+  animation: op-alerta-entrada 240ms var(--op-ease) both;
+}
+
+@keyframes op-alerta-entrada {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ----- Dashboard: tarjetas de resumen ----- */
+.operador-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 20px;
+  margin-bottom: clamp(36px, 6vh, 64px);
+}
+
+.operador-stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 24px;
+  border: 1px solid var(--admin-borde);
+  background: #fff;
+  animation: op-subida 280ms var(--op-ease) both;
+}
+
+.operador-stat:nth-child(2) { animation-delay: 40ms; }
+.operador-stat:nth-child(3) { animation-delay: 80ms; }
+.operador-stat:nth-child(4) { animation-delay: 120ms; }
+.operador-stat:nth-child(5) { animation-delay: 160ms; }
+.operador-stat:nth-child(6) { animation-delay: 200ms; }
+
+@keyframes op-subida {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.operador-stat.requiere-atencion {
+  border-color: var(--admin-dorado);
+}
+
+.operador-stat.requiere-atencion::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--admin-dorado);
+}
+
+.operador-stat-numero {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--admin-oscuro);
+  font-variant-numeric: tabular-nums;
+}
+
+.operador-stat-etiqueta {
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--admin-etiqueta);
+}
+
+.operador-columnas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(28px, 4vw, 56px);
+}
+
+.operador-seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* ----- Pestanas de filtro con conteo ----- */
+.operador-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.operador-filtros a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--admin-borde);
+  background: #fff;
+  font-size: .64rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--admin-etiqueta);
+}
+
+.operador-filtros a.es-activo {
+  background: var(--admin-oscuro);
+  border-color: var(--admin-oscuro);
+  color: #fff;
+}
+
+.operador-filtro-conteo {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--admin-off-blanco);
+  border: 1px solid var(--admin-borde);
+  font-size: .62rem;
+  letter-spacing: 0;
+  text-align: center;
+  color: var(--admin-oscuro);
+  font-variant-numeric: tabular-nums;
+}
+
+.operador-filtros a.es-activo .operador-filtro-conteo {
+  background: transparent;
+  border-color: rgba(255, 255, 255, .35);
+  color: #fff;
+}
+
+/* ----- Tablas ----- */
+.operador-tabla-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--admin-borde);
+  background: #fff;
+}
+
+.tabla-operador {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+  color: var(--admin-cuerpo);
+}
+
+.tabla-operador th {
+  text-align: left;
+  font-size: .6rem;
+  font-weight: 400;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--admin-etiqueta);
+  background: var(--admin-off-blanco);
+}
+
+.tabla-operador th,
+.tabla-operador td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--admin-borde);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.tabla-operador tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Cifras alineadas a la derecha y con ancho fijo por digito */
+.tabla-operador .col-num,
+.operador-numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla-operador .col-acciones {
+  text-align: right;
+}
+
+.tabla-operador .col-acciones .operador-acciones {
+  justify-content: flex-end;
+}
+
+/* Celda con dato principal y secundario */
+.operador-celda-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.operador-celda-principal strong {
+  font-weight: 400;
+  color: var(--admin-oscuro);
+}
+
+.operador-celda-principal span,
+.operador-tenue {
+  font-size: .75rem;
+  color: var(--admin-etiqueta);
+}
+
+.texto-pendiente { color: var(--admin-dorado-hover) !important; }
+.texto-saldada { color: var(--admin-verde) !important; }
+
+/* Estados vacios: dicen que pasa y que hacer */
+.operador-vacio-caja {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 22px 24px;
+  border: 1px dashed var(--admin-borde);
+  color: var(--admin-etiqueta);
+  font-size: .85rem;
+}
+
+.operador-vacio-caja strong {
+  font-weight: 400;
+  font-size: .9rem;
+  color: var(--admin-oscuro);
+}
+
+.operador-form-linea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.operador-select,
+.operador-input {
+  padding: 9px 12px;
+  border: 1px solid var(--admin-borde);
+  background: #fff;
+  font-family: inherit;
+  font-size: .85rem;
+  color: var(--admin-oscuro);
+  transition: border-color 200ms ease;
+}
+
+.operador-select:focus,
+.operador-input:focus {
+  border-color: var(--admin-dorado);
+  outline: none;
+}
+
+.operador-acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+.operador-acciones form {
+  margin: 0;
+}
+
+.operador-acciones-columna {
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 24px;
+}
+
+.operador-acciones-columna .enlace-subrayado {
+  align-self: flex-start;
+}
+
+.btn-mini {
+  padding: 8px 14px;
+  font-size: .62rem;
+  letter-spacing: .16em;
+}
+
+.btn-bloque {
+  width: 100%;
+  text-align: center;
+}
+
+/* ----- Detalle de reserva ----- */
+.operador-detalle {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.4fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+
+.operador-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.operador-tarjeta {
+  padding: 24px;
+  border: 1px solid var(--admin-borde);
+  background: #fff;
+}
+
+.operador-tarjeta-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.operador-tarjeta-titulo {
+  margin: 6px 0 4px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--admin-oscuro);
+}
+
+.operador-datos {
+  margin: 14px 0 0;
+}
+
+.operador-datos div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--admin-borde);
+  font-size: .85rem;
+}
+
+.operador-datos div:last-child {
+  border-bottom: none;
+}
+
+.operador-datos dt {
+  font-size: .6rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--admin-etiqueta);
+  align-self: center;
+}
+
+.operador-datos dd {
+  margin: 0;
+  text-align: right;
+  color: var(--admin-oscuro);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.operador-enlace {
+  border-bottom: 1px solid transparent;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+
+/* Habitacion asignada */
+.operador-habitacion {
+  padding: 0;
+  overflow: hidden;
+}
+
+.operador-habitacion-imagen {
+  height: 140px;
+  overflow: hidden;
+}
+
+.operador-habitacion-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.operador-habitacion-cuerpo {
+  padding: 20px 24px 24px;
+}
+
+.operador-habitacion-tipo {
+  color: var(--admin-etiqueta);
+  font-size: .85rem;
+}
+
+.operador-habitacion-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: .85rem;
+  color: var(--admin-oscuro);
+}
+
+/* Cuenta */
+.operador-cuenta {
+  min-width: 0;
+}
+
+.operador-cuenta-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.operador-cuenta-cabecera h2 {
+  margin-top: 6px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+}
+
+.operador-totales {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.operador-totales div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid var(--admin-borde);
+  background: #fff;
+}
+
+.operador-totales span {
+  font-size: .6rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--admin-etiqueta);
+}
+
+.operador-totales strong {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.7rem;
+  font-weight: 500;
+  color: var(--admin-oscuro);
+  font-variant-numeric: tabular-nums;
+}
+
+.operador-saldo[data-saldo="pendiente"] {
+  border-color: var(--admin-dorado) !important;
+}
+
+.operador-saldo[data-saldo="pendiente"] span {
+  color: var(--admin-dorado-hover);
+}
+
+.operador-saldo[data-saldo="saldada"] span,
+.operador-saldo[data-saldo="saldada"] strong {
+  color: var(--admin-verde);
+}
+
+.operador-subtitulo {
+  margin: 32px 0 14px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--admin-oscuro);
+}
+
+/* Servicios contratados */
+.operador-servicios {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--admin-borde);
+  background: #fff;
+}
+
+.operador-servicios li {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--admin-borde);
+}
+
+.operador-servicios li:last-child {
+  border-bottom: none;
+}
+
+.operador-servicios img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+}
+
+.operador-servicio-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.operador-servicio-info strong {
+  font-weight: 400;
+  color: var(--admin-oscuro);
+}
+
+.operador-servicio-info span {
+  font-size: .75rem;
+  color: var(--admin-etiqueta);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operador-servicio-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.operador-servicio-total strong {
+  font-weight: 400;
+  color: var(--admin-oscuro);
+}
+
+.operador-pagado {
+  font-size: .58rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--admin-verde);
+}
+
+.operador-quitar {
+  padding: 6px 2px;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: none;
+  font-family: inherit;
+  font-size: .62rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--admin-etiqueta);
+  cursor: pointer;
+}
+
+.operador-formularios {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(24px, 4vw, 48px);
+  margin-top: 8px;
+}
+
+.operador-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.operador-formulario .operador-subtitulo {
+  margin: 32px 0 0;
+}
+
+.operador-formulario label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.operador-formulario label span {
+  font-size: .6rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--admin-etiqueta);
+}
+
+.operador-formulario .btn-dorado {
+  align-self: flex-start;
+}
+
+/* ----- Hover: solo con puntero fino (en tactil provoca falsos positivos) ----- */
+@media (hover: hover) and (pointer: fine) {
+  .operador-stat:hover {
+    border-color: var(--admin-dorado);
+    transform: translateY(-2px);
+  }
+
+  .operador-filtros a:not(.es-activo):hover {
+    border-color: var(--admin-dorado);
+    color: var(--admin-oscuro);
+  }
+
+  .tabla-operador tbody tr:hover {
+    background: var(--admin-off-blanco);
+  }
+
+  .operador-enlace:hover {
+    color: var(--admin-dorado-hover);
+    border-bottom-color: var(--admin-dorado);
+  }
+
+  .operador-quitar:hover {
+    color: var(--admin-rojo);
+    border-bottom-color: var(--admin-rojo);
+  }
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 960px) {
+  .operador-columnas,
+  .operador-formularios,
+  .operador-detalle {
+    grid-template-columns: 1fr;
+  }
+
+  .operador-salir {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .operador-totales {
+    grid-template-columns: 1fr;
+  }
+
+  .operador-servicios li {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+  }
+
+  .operador-servicios li form {
+    grid-column: 2 / -1;
+  }
+
+  .operador-servicios img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ----- Movimiento reducido: se mantienen opacidad y color, se quita el desplazamiento ----- */
+@media (prefers-reduced-motion: reduce) {
+  .operador-stat,
+  .panel-operador .perfil-alerta {
+    animation: none;
+  }
+
+  .panel-operador :is(button, .btn-dorado, .btn-contorno-oscuro, .btn-eliminar, .operador-filtros a, .operador-stat):active,
+  .operador-stat:hover {
+    transform: none;
+  }
+}
+
+/* ================================================================
+   Boton dorado sobre fondo blanco
+   En landing.css el hover deja el fondo transparente y el texto blanco (pensado para
+   secciones oscuras). En las pantallas de contenido blanco (admin, operario, perfil)
+   el texto desaparecia: alli el texto pasa a dorado oscuro.
+   ================================================================ */
+.seccion-admin-contenido .btn-dorado:hover,
+.perfil-seccion .btn-dorado:hover {
+  color: var(--admin-dorado-hover);
+}
+
+.seccion-admin-contenido .btn-dorado:disabled:hover {
+  background-color: var(--admin-dorado);
+  color: var(--admin-oscuro);
+}

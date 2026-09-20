@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Operator Reservations')}"></head>
+<body>
+
+<div th:replace="~{layout :: cabecera}"></div>
+
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Operator</p>
+    <h1>Reservations</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto">Every reservation with its guest, assigned room and the services charged to the account.</p>
+  </div>
+</header>
+
+<div th:replace="~{layout :: operator-nav('reservas')}"></div>
+
+<main class="contenedor seccion-admin-contenido panel-operador">
+  <p th:if="${mensaje}" th:text="${mensaje}" class="perfil-alerta perfil-alerta-ok" role="status"></p>
+  <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error" role="alert"></p>
+
+  <!-- Filtro por estado: un clic, con la cantidad a la vista (sin recargar por un select) -->
+  <nav class="operador-filtros" aria-label="Filter by status">
+    <a th:href="@{/operator/reservas}" th:classappend="${estadoFiltro == null} ? ' es-activo' : ''"
+       th:attr="aria-current=${estadoFiltro == null} ? 'page' : null">All</a>
+    <a th:each="e : ${estados}" th:href="@{/operator/reservas(estado=${e})}"
+       th:classappend="${e == estadoFiltro} ? ' es-activo' : ''"
+       th:attr="aria-current=${e == estadoFiltro} ? 'page' : null">
+      <span th:text="${e.name().replace('_', ' ')}">PENDIENTE</span>
+      <span class="operador-filtro-conteo" th:text="${conteos.get(e)}">0</span>
+    </a>
+  </nav>
+
+  <div th:if="${#lists.isEmpty(reservas)}" class="operador-vacio-caja">
+    <strong>No reservations here</strong>
+    <span>There are no reservations with this status right now.</span>
+  </div>
+
+  <div class="operador-tabla-wrap" th:unless="${#lists.isEmpty(reservas)}">
+    <table class="tabla-operador">
+      <thead>
+        <tr>
+          <th>Guest</th><th>Room</th><th>Stay</th><th>Services</th><th>Status</th><th class="col-acciones">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="r : ${reservas}">
+          <td>
+            <a th:href="@{/operator/reservas/{id}(id=${r.id})}" class="operador-celda-principal">
+              <strong th:text="${r.cliente.nombreCompleto}">Guest</strong>
+              <span th:text="${r.cliente.email}">guest@example.com</span>
+            </a>
+          </td>
+          <td>
+            <div class="operador-celda-principal">
+              <strong th:text="${r.habitacion.numero}">101</strong>
+              <span th:text="${r.habitacion.tipoHabitacion.nombre}">Normal</span>
+            </div>
+          </td>
+          <td>
+            <div class="operador-celda-principal">
+              <strong th:text="${r.fechaInicio} + ' → ' + ${r.fechaFin}">2026-01-01 → 2026-01-03</strong>
+              <span th:text="${r.noches} + (${r.noches == 1} ? ' night' : ' nights') + ' · ' + ${r.cantidadPersonas} + ' guests'">2 nights</span>
+            </div>
+          </td>
+          <td>
+            <div class="operador-celda-principal" th:if="${r.cuenta != null}">
+              <strong th:text="${#lists.size(r.cuenta.itemsConsumo)} + (${#lists.size(r.cuenta.itemsConsumo) == 1} ? ' service' : ' services')">2 services</strong>
+              <span th:classappend="${r.cuenta.saldo.signum() > 0} ? 'texto-pendiente' : ''"
+                    th:text="${r.cuenta.saldo.signum() > 0} ? ('$' + ${#numbers.formatDecimal(r.cuenta.saldo, 1, 2)} + ' due') : 'Settled'">Settled</span>
+            </div>
+            <span class="operador-tenue" th:if="${r.cuenta == null}">No account yet</span>
+          </td>
+          <td><span class="chip-estado" th:attr="data-estado=${r.estado}" th:text="${r.estado.name().replace('_', ' ')}">PENDIENTE</span></td>
+          <td class="col-acciones">
+            <div class="operador-acciones">
+              <a th:href="@{/operator/reservas/{id}(id=${r.id})}" class="enlace-subrayado">Open</a>
+
+              <form th:if="${r.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${r.id})}" method="post">
+                <input type="hidden" name="volver" value="lista">
+                <button type="submit" class="btn-contorno-oscuro btn-mini">Confirm</button>
+              </form>
+              <form th:if="${r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${r.id})}" method="post">
+                <input type="hidden" name="volver" value="lista">
+                <button type="submit" class="btn-dorado btn-mini">Check-in</button>
+              </form>
+              <form th:if="${r.estado.name() == 'EN_CURSO'}" th:action="@{/operator/reservas/{id}/check-out(id=${r.id})}" method="post">
+                <input type="hidden" name="volver" value="lista">
+                <button type="submit" class="btn-dorado btn-mini">Check-out</button>
+              </form>
+              <form th:if="${r.estado.name() == 'PENDIENTE' or r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/cancelar(id=${r.id})}" method="post">
+                <input type="hidden" name="volver" value="lista">
+                <button type="submit" class="btn-eliminar btn-mini" onclick="return confirm('Cancel this reservation?');">Cancel</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer th:replace="~{layout :: pie}"></footer>
+<div th:replace="~{layout :: script}"></div>
+
+</body>
+</html>

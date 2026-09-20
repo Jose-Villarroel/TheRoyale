@@ -3,6 +3,7 @@ package com.theroyale.backend.service;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.repository.ClienteRepository;
+import com.theroyale.backend.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +16,11 @@ import java.util.Optional;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private final ReservaRepository reservaRepository;
 
-    public ClienteService(ClienteRepository clienteRepository) {
+    public ClienteService(ClienteRepository clienteRepository, ReservaRepository reservaRepository) {
         this.clienteRepository = clienteRepository;
+        this.reservaRepository = reservaRepository;
     }
 
     public List<Cliente> listarTodos() {
@@ -78,6 +81,9 @@ public class ClienteService {
     @Transactional
     public void eliminar(Long id) {
         obtenerPorId(id);
+        if (reservaRepository.existsByClienteId(id)) {
+            throw new IllegalStateException("El cliente tiene reservas asociadas y no se puede eliminar.");
+        }
         clienteRepository.deleteById(id);
     }
 

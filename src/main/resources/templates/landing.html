@@ -301,44 +301,19 @@
         </div>
 
         <div class="tarjetas-servicios aparecer">
-          <a th:href="@{/services/Wellness}" class="tarjeta-servicio">
+          <!-- Servicios cargados desde la base de datos (los mismos que el operador carga a la cuenta) -->
+          <a th:each="servicio, iterStat : ${servicios}"
+             th:href="@{/services/{nombre}(nombre=${servicio.nombre})}"
+             class="tarjeta-servicio">
             <div class="tarjeta-servicio-imagen">
-              <img th:src="@{/images/spa.webp}" alt="Spa y bienestar">
+              <img th:src="@{${servicio.imagenUrl}}" th:alt="${servicio.nombre}">
             </div>
             <div class="tarjeta-servicio-info">
-              <span class="numero-romano">I</span>
-              <h3>Wellness</h3>
-              <p>Spa, sauna, Turkish bath, pool and gym.</p>
-            </div>
-          </a>
-          <a th:href="@{/services/Dining}" class="tarjeta-servicio">
-            <div class="tarjeta-servicio-imagen">
-              <img th:src="@{/images/dinningroom-1.webp}" alt="Restaurante y bar">
-            </div>
-            <div class="tarjeta-servicio-info">
-              <span class="numero-romano">II</span>
-              <h3>Dining</h3>
-              <p>Room service, restaurant, bar and minibar.</p>
-            </div>
-          </a>
-          <a th:href="@{/services/Business}" class="tarjeta-servicio">
-            <div class="tarjeta-servicio-imagen">
-              <img th:src="@{/images/meeting-room.jpg}" alt="Sala de reuniones">
-            </div>
-            <div class="tarjeta-servicio-info">
-              <span class="numero-romano">III</span>
-              <h3>Business</h3>
-              <p>Business center, meeting rooms and executive services.</p>
-            </div>
-          </a>
-          <a th:href="@{/services/Concierge}" class="tarjeta-servicio">
-            <div class="tarjeta-servicio-imagen">
-              <img th:src="@{/images/concierge.jpg}" alt="Recepción de conserjería">
-            </div>
-            <div class="tarjeta-servicio-info">
-              <span class="numero-romano">IV</span>
-              <h3>Concierge</h3>
-              <p>Personalized assistance and premium guest services.</p>
+              <span class="numero-romano"
+                    th:text="${iterStat.index < 8 ? {'I','II','III','IV','V','VI','VII','VIII'}[iterStat.index] : iterStat.count}">I</span>
+              <h3 th:text="${servicio.nombre}">Wellness</h3>
+              <p th:text="${#strings.substringBefore(servicio.descripcion, '.')} + '.'">Service summary.</p>
+              <span class="tarjeta-servicio-precio" th:text="'From $' + ${#numbers.formatInteger(servicio.precio, 1)}">From $45</span>
             </div>
           </a>
         </div>
@@ -453,57 +428,7 @@
   </main>
 
   <!-- ===== Footer ===== -->
-  <footer class="pie-pagina">
-    <div class="contenedor">
-
-      <div class="newsletter-fila">
-        <div>
-          <p class="eyebrow">Newsletter</p>
-          <p class="newsletter-titulo">Stay close to The Royale.</p>
-        </div>
-        <form class="formulario-newsletter" id="formularioNewsletter">
-          <input type="email" placeholder="Email address" required>
-          <button type="submit" class="btn-contorno-oscuro">Subscribe</button>
-        </form>
-      </div>
-
-      <div class="footer-columnas">
-        <div class="footer-columna">
-          <span class="marca-nombre footer-marca">The Royale</span>
-          <p>Luxury Boutique Hotel<br>New York City</p>
-          <div class="footer-redes">
-            <a th:href="@{/contact}" aria-label="Instagram">IG</a>
-            <a th:href="@{/contact}" aria-label="Facebook">FB</a>
-            <a th:href="@{/contact}" aria-label="LinkedIn">IN</a>
-          </div>
-        </div>
-        <div class="footer-columna">
-          <span class="footer-columna-titulo">Navigation</span>
-          <a href="#rooms">Rooms</a>
-          <a href="#services">Services</a>
-          <a href="#experiences">Experiences</a>
-          <a th:href="@{/about}">About</a>
-          <a th:href="@{/contact}">Contact</a>
-        </div>
-        <div class="footer-columna">
-          <span class="footer-columna-titulo">Guest</span>
-          <a th:href="@{/login}">Sign In</a>
-          <a th:href="@{/login}">My Reservations</a>
-          <a th:href="@{/login}">Book a Room</a>
-        </div>
-        <div class="footer-columna">
-          <span class="footer-columna-titulo">Contact</span>
-          <p>New York, NY<br>+1 XXX XXX XXXX</p>
-          <a href="mailto:reservations@theroyale.com">reservations@theroyale.com</a>
-        </div>
-      </div>
-
-      <div class="footer-inferior">
-        <span>© 2026 The Royale. All rights reserved.</span>
-        <span>Fifth Avenue · New York City</span>
-      </div>
-    </div>
-  </footer>
+  <footer th:replace="~{layout :: pie}"></footer>
 
   <script th:src="@{/js/script.js}"></script>
 </body>

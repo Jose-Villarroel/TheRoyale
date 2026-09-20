@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.math.BigDecimal;
 
 // ===== Modelo: una reserva de habitación hecha por un cliente =====
@@ -58,6 +59,11 @@ public class Reserva {
     @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Cuenta cuenta;
+
+    // Calculado (no se persiste: la entidad usa acceso por campo)
+    public long getNoches() {
+        return ChronoUnit.DAYS.between(fechaInicio, fechaFin);
+    }
 
     @Override
     public String toString() {

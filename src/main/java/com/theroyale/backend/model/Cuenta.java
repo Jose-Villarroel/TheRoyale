@@ -3,6 +3,7 @@ package com.theroyale.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,23 @@ public class Cuenta {
     @Builder.Default
     @ToString.Exclude
     private List<Pago> pagos = new ArrayList<>();
+
+    // ===== Totales calculados (no se persisten: la entidad usa acceso por campo) =====
+    public BigDecimal getTotalConsumos() {
+        return itemsConsumo.stream()
+                .map(ItemConsumo::getTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getTotalPagado() {
+        return pagos.stream()
+                .map(Pago::getMonto)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getSaldo() {
+        return getTotalConsumos().subtract(getTotalPagado());
+    }
 
     @Override
     public String toString() {
