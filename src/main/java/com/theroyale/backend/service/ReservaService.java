@@ -87,13 +87,13 @@ public class ReservaService {
     @Transactional
     public Reserva cancelar(Long id, Long operadorId) {
         Reserva reserva = obtenerPorId(id);
-        exigirEstado(reserva, "cancelar", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
+        exigirEstado(reserva, "cancel", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
 
         Cuenta cuenta = cuentaRepository.findByReservaId(id).orElse(null);
         if (cuenta != null) {
             if (cuenta.getSaldo().signum() != 0) {
-                throw new IllegalStateException("No se puede cancelar: la cuenta tiene un saldo pendiente de "
-                        + cuenta.getSaldo() + ". Elimina los cargos o registra el pago primero.");
+                throw new IllegalStateException("Cannot cancel: the account has an outstanding balance of "
+                        + cuenta.getSaldo() + ". Remove the charges or register a payment first.");
             }
             cuenta.setEstado(EstadoCuenta.CERRADA);
         }
@@ -106,15 +106,15 @@ public class ReservaService {
     @Transactional
     public Reserva hacerCheckIn(Long id, Long operadorId) {
         Reserva reserva = obtenerPorId(id);
-        exigirEstado(reserva, "hacer check-in de", EstadoReserva.CONFIRMADA);
+        exigirEstado(reserva, "check in", EstadoReserva.CONFIRMADA);
 
         if (reserva.getFechaInicio().isAfter(LocalDate.now())) {
-            throw new IllegalStateException("El check-in no puede hacerse antes de la fecha de llegada (" + reserva.getFechaInicio() + ").");
+            throw new IllegalStateException("Check-in cannot be done before the arrival date (" + reserva.getFechaInicio() + ").");
         }
 
         Habitacion habitacion = reserva.getHabitacion();
         if (habitacion.getEstado() != EstadoHabitacion.DISPONIBLE) {
-            throw new IllegalStateException("La habitacion " + habitacion.getNumero() + " no esta disponible (estado: " + habitacion.getEstado() + ").");
+            throw new IllegalStateException("Room " + habitacion.getNumero() + " is not available (status: " + habitacion.getEstado() + ").");
         }
 
         habitacion.setEstado(EstadoHabitacion.OCUPADA);
@@ -129,12 +129,12 @@ public class ReservaService {
     @Transactional
     public Reserva hacerCheckOut(Long id, Long operadorId) {
         Reserva reserva = obtenerPorId(id);
-        exigirEstado(reserva, "hacer check-out de", EstadoReserva.EN_CURSO);
+        exigirEstado(reserva, "check out", EstadoReserva.EN_CURSO);
 
         Cuenta cuenta = cuentaRepository.findByReservaId(id)
-                .orElseThrow(() -> new IllegalStateException("La reserva no tiene cuenta asociada."));
+                .orElseThrow(() -> new IllegalStateException("This reservation has no associated account."));
         if (cuenta.getSaldo().signum() != 0) {
-            throw new IllegalStateException("No se puede hacer check-out: la cuenta tiene un saldo pendiente de " + cuenta.getSaldo() + ".");
+            throw new IllegalStateException("Cannot check out: the account has an outstanding balance of " + cuenta.getSaldo() + ".");
         }
 
         cuenta.setEstado(EstadoCuenta.CERRADA);
@@ -160,6 +160,6 @@ public class ReservaService {
                 return;
             }
         }
-        throw new IllegalStateException("No se puede " + accion + " una reserva en estado " + reserva.getEstado() + ".");
+        throw new IllegalStateException("Cannot " + accion + " a reservation with status " + reserva.getEstado() + ".");
     }
 }

@@ -46,16 +46,16 @@ public class TipoHabitacionService {
     @Transactional
     public TipoHabitacion guardar(TipoHabitacion tipoHabitacion) {
         if (tipoHabitacion == null) {
-            throw new IllegalArgumentException("El tipo de habitacion es obligatorio.");
+            throw new IllegalArgumentException("Room type is required.");
         }
         if (tipoHabitacion.getNombre() == null || tipoHabitacion.getNombre().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre del tipo de habitacion es obligatorio.");
+            throw new IllegalArgumentException("Room type name is required.");
         }
 
         String nombre = tipoHabitacion.getNombre().trim();
         Optional<TipoHabitacion> conMismoNombre = tipoHabitacionRepository.findByNombreIgnoreCase(nombre);
         if (conMismoNombre.isPresent() && !conMismoNombre.get().getId().equals(tipoHabitacion.getId())) {
-            throw new IllegalArgumentException("Ya existe un tipo de habitacion con el nombre: " + nombre);
+            throw new IllegalArgumentException("A room type with name " + nombre + " already exists.");
         }
 
         if (tipoHabitacion.getId() == null) {
@@ -74,7 +74,7 @@ public class TipoHabitacionService {
     public void eliminar(Long id) {
         obtenerPorId(id);
         if (habitacionRepository.existsByTipoHabitacionId(id)) {
-            throw new IllegalStateException("Ese tipo de habitacion aun tiene habitaciones asociadas.");
+            throw new IllegalStateException("This room type still has associated rooms and cannot be deleted.");
         }
 
         for (Admin admin : adminRepository.findByTiposHabitacionAdministradosId(id)) {

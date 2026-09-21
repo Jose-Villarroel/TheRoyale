@@ -47,7 +47,7 @@ public class CuentaService {
         Cuenta cuenta = obtenerCuentaAbierta(reservaId);
 
         if (cantidad == null || cantidad < 1) {
-            throw new IllegalArgumentException("La cantidad debe ser al menos 1.");
+            throw new IllegalArgumentException("Quantity must be at least 1.");
         }
 
         Servicio servicio = servicioRepository.findById(servicioId)
@@ -79,10 +79,10 @@ public class CuentaService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Cargo no encontrado: " + itemId));
 
         if (Boolean.TRUE.equals(item.getPagado())) {
-            throw new IllegalStateException("Ese cargo ya esta pagado y no se puede eliminar.");
+            throw new IllegalStateException("This charge has already been paid and cannot be removed.");
         }
         if (cuenta.getSaldo().subtract(item.getTotal()).signum() < 0) {
-            throw new IllegalStateException("No se puede eliminar el cargo: los pagos registrados superarian el total de la cuenta.");
+            throw new IllegalStateException("Cannot remove charge: registered payments would exceed the account total.");
         }
 
         cuenta.getItemsConsumo().remove(item);
@@ -94,13 +94,13 @@ public class CuentaService {
         Cuenta cuenta = obtenerCuentaAbierta(reservaId);
 
         if (monto == null || monto.signum() <= 0) {
-            throw new IllegalArgumentException("El monto del pago debe ser mayor que cero.");
+            throw new IllegalArgumentException("Payment amount must be greater than zero.");
         }
         if (metodoPago == null || metodoPago.trim().isEmpty()) {
-            throw new IllegalArgumentException("El metodo de pago es obligatorio.");
+            throw new IllegalArgumentException("Payment method is required.");
         }
         if (monto.compareTo(cuenta.getSaldo()) > 0) {
-            throw new IllegalArgumentException("El pago (" + monto + ") supera el saldo pendiente (" + cuenta.getSaldo() + ").");
+            throw new IllegalArgumentException("Payment (" + monto + ") exceeds the outstanding balance (" + cuenta.getSaldo() + ").");
         }
 
         Operador operador = operadorService.obtenerOPredeterminado(operadorId);
@@ -120,18 +120,18 @@ public class CuentaService {
         return cuentaRepository.save(cuenta);
     }
 
-    // Los servicios solo se cargan a una reserva confirmada o con el huesped en la habitacion
+    // Services can only be charged to a confirmed or in-progress reservation
     private Cuenta obtenerCuentaAbierta(Long reservaId) {
         Cuenta cuenta = cuentaRepository.findByReservaId(reservaId)
-                .orElseThrow(() -> new IllegalStateException("La reserva aun no tiene cuenta: primero hay que confirmarla."));
+                .orElseThrow(() -> new IllegalStateException("This reservation does not have an account yet: confirm it first."));
 
         if (cuenta.getEstado() != EstadoCuenta.ABIERTA) {
-            throw new IllegalStateException("La cuenta de esta reserva ya esta cerrada.");
+            throw new IllegalStateException("The account for this reservation is already closed.");
         }
 
         EstadoReserva estado = cuenta.getReserva().getEstado();
         if (estado != EstadoReserva.CONFIRMADA && estado != EstadoReserva.EN_CURSO) {
-            throw new IllegalStateException("Solo se pueden cargar servicios a reservas confirmadas o en curso.");
+            throw new IllegalStateException("Services can only be charged to confirmed or in-progress reservations.");
         }
         return cuenta;
     }

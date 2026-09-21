@@ -46,7 +46,7 @@ public class ClienteService {
 
         String email = normalizarEmail(cliente.getEmail());
         if (clienteRepository.findByEmailIgnoreCase(email).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un cliente con email: " + email);
+            throw new IllegalArgumentException("A client with email " + email + " already exists.");
         }
 
         cliente.setId(null);
@@ -64,7 +64,7 @@ public class ClienteService {
         String email = normalizarEmail(clienteActualizado.getEmail());
         Optional<Cliente> clienteConEmail = clienteRepository.findByEmailIgnoreCase(email);
         if (clienteConEmail.isPresent() && !clienteConEmail.get().getId().equals(id)) {
-            throw new IllegalArgumentException("Ya existe un cliente con email: " + email);
+            throw new IllegalArgumentException("A client with email " + email + " already exists.");
         }
 
         clienteExistente.setNombre(clienteActualizado.getNombre());
@@ -81,23 +81,21 @@ public class ClienteService {
     @Transactional
     public void eliminar(Long id) {
         obtenerPorId(id);
-        if (reservaRepository.existsByClienteId(id)) {
-            throw new IllegalStateException("El cliente tiene reservas asociadas y no se puede eliminar.");
-        }
+        // Cascade deletion will handle removing associated reservations
         clienteRepository.deleteById(id);
     }
 
     private void validarCliente(Cliente cliente, boolean requierePassword) {
         if (cliente == null) {
-            throw new IllegalArgumentException("El cliente es obligatorio.");
+            throw new IllegalArgumentException("Client is required.");
         }
 
         if (estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) || estaVacio(cliente.getEmail())) {
-            throw new IllegalArgumentException("Nombre, apellido y email son obligatorios.");
+            throw new IllegalArgumentException("First name, last name and email are required.");
         }
 
         if (requierePassword && estaVacio(cliente.getPassword())) {
-            throw new IllegalArgumentException("La contrasena es obligatoria.");
+            throw new IllegalArgumentException("Password is required.");
         }
     }
 

@@ -38,7 +38,7 @@ public class Habitacion {
     @Column(nullable = false, length = 20)
     private EstadoHabitacion estado;
 
-    @OneToMany(mappedBy = "habitacion")
+    @OneToMany(mappedBy = "habitacion", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<Reserva> reservas = new ArrayList<>();

@@ -202,7 +202,7 @@ public class DataLoader implements CommandLineRunner {
         guardarHabitacion("510", vip, 320.00, EstadoHabitacion.DISPONIBLE);
 
         // ----- Luxury: piso 7-8, $350-$420 -----
-        guardarHabitacion("701", luxury, 350.00, EstadoHabitacion.DISPONIBLE);
+        guardarHabitacion("701", luxury, 350.00, EstadoHabitacion.OCUPADA);
         guardarHabitacion("702", luxury, 355.00, EstadoHabitacion.OCUPADA);
         guardarHabitacion("703", luxury, 360.00, EstadoHabitacion.DISPONIBLE);
         guardarHabitacion("704", luxury, 370.00, EstadoHabitacion.DISPONIBLE);
@@ -214,7 +214,7 @@ public class DataLoader implements CommandLineRunner {
         guardarHabitacion("710", luxury, 420.00, EstadoHabitacion.DISPONIBLE);
 
         // ----- Presidential Suite: piso 9-10, $800-$1200 -----
-        guardarHabitacion("901", presidential, 800.00, EstadoHabitacion.DISPONIBLE);
+        guardarHabitacion("901", presidential, 800.00, EstadoHabitacion.OCUPADA);
         guardarHabitacion("902", presidential, 850.00, EstadoHabitacion.DISPONIBLE);
         guardarHabitacion("903", presidential, 900.00, EstadoHabitacion.OCUPADA);
         guardarHabitacion("904", presidential, 950.00, EstadoHabitacion.DISPONIBLE);
@@ -319,7 +319,7 @@ public class DataLoader implements CommandLineRunner {
                 .build());
     }
 
-    // ===== 2 operadores (personal del hotel; entran por /login y son redirigidos a /operator) =====
+    // ===== 5 operadores (personal del hotel; entran por /login y son redirigidos a /operator) =====
     private void cargarOperadores() {
         operadorRepository.save(Operador.builder()
                 .nombre("Laura Gomez").email("laura.gomez@theroyale.com")
@@ -330,56 +330,103 @@ public class DataLoader implements CommandLineRunner {
                 .nombre("Pedro Ruiz").email("pedro.ruiz@theroyale.com")
                 .password("operator123").tipo(TipoOperador.OPERADOR)
                 .build());
+
+        operadorRepository.save(Operador.builder()
+                .nombre("Maria Castillo").email("maria.castillo@theroyale.com")
+                .password("operator123").tipo(TipoOperador.OPERADOR)
+                .build());
+
+        operadorRepository.save(Operador.builder()
+                .nombre("James Wright").email("james.wright@theroyale.com")
+                .password("operator123").tipo(TipoOperador.OPERADOR)
+                .build());
+
+        operadorRepository.save(Operador.builder()
+                .nombre("Sofia Chen").email("sofia.chen@theroyale.com")
+                .password("operator123").tipo(TipoOperador.OPERADOR)
+                .build());
     }
 
     // ===== Reservas de ejemplo en todos los estados, con fechas relativas al dia de arranque =====
     // Las habitaciones OCUPADA 102, 302 y 502 tienen una reserva EN_CURSO con su cuenta abierta.
     private void cargarReservas() {
         LocalDate hoy = LocalDate.now();
-        Operador laura = operadorRepository.findByEmail("laura.gomez@theroyale.com").orElseThrow();
+        Operador laura  = operadorRepository.findByEmail("laura.gomez@theroyale.com").orElseThrow();
+        Operador pedro  = operadorRepository.findByEmail("pedro.ruiz@theroyale.com").orElseThrow();
+        Operador maria  = operadorRepository.findByEmail("maria.castillo@theroyale.com").orElseThrow();
+        Operador james  = operadorRepository.findByEmail("james.wright@theroyale.com").orElseThrow();
+        Operador sofia  = operadorRepository.findByEmail("sofia.chen@theroyale.com").orElseThrow();
         List<Cliente> clientes = clienteRepository.findAll();
-        Servicio wellness = servicioRepository.findByNombreIgnoreCase("Wellness").orElseThrow();
-        Servicio dining = servicioRepository.findByNombreIgnoreCase("Dining").orElseThrow();
+        Servicio wellness  = servicioRepository.findByNombreIgnoreCase("Wellness").orElseThrow();
+        Servicio dining    = servicioRepository.findByNombreIgnoreCase("Dining").orElseThrow();
         Servicio concierge = servicioRepository.findByNombreIgnoreCase("Concierge").orElseThrow();
-        Servicio business = servicioRepository.findByNombreIgnoreCase("Business").orElseThrow();
+        Servicio business  = servicioRepository.findByNombreIgnoreCase("Business").orElseThrow();
 
-        // Llegan hoy. Las CONFIRMADAS ya tienen cuenta abierta (con servicios reservados de antemano);
-        // las PENDIENTES todavia no: la cuenta se abre al confirmar.
+        // ===== Llegan hoy =====
+        // CONFIRMADA con servicios pre-reservados (cuenta abierta desde ayer)
         Reserva confirmada101 = guardarReserva(clientes.get(0), "101", laura, hoy, hoy.plusDays(3), EstadoReserva.CONFIRMADA, 2);
         Cuenta cuenta101 = abrirCuenta(confirmada101, hoy.minusDays(1));
         agregarConsumo(cuenta101, concierge, laura, 1, false);
+
+        // PENDIENTE (sin cuenta aun)
         guardarReserva(clientes.get(1), "301", null, hoy, hoy.plusDays(2), EstadoReserva.PENDIENTE, 1);
 
-        // Futuras
+        // ===== Futuras =====
         guardarReserva(clientes.get(2), "103", null, hoy.plusDays(4), hoy.plusDays(7), EstadoReserva.PENDIENTE, 2);
-        Reserva confirmada703 = guardarReserva(clientes.get(3), "703", laura, hoy.plusDays(10), hoy.plusDays(14), EstadoReserva.CONFIRMADA, 3);
-        Cuenta cuenta703 = abrirCuenta(confirmada703, hoy.minusDays(2));
-        agregarConsumo(cuenta703, business, laura, 2, false);
 
-        // En curso: la 102 sale hoy y esta pagada (lista para check-out); la 302 tiene saldo pendiente
+        Reserva confirmada703 = guardarReserva(clientes.get(3), "703", james, hoy.plusDays(10), hoy.plusDays(14), EstadoReserva.CONFIRMADA, 3);
+        Cuenta cuenta703 = abrirCuenta(confirmada703, hoy.minusDays(2));
+        agregarConsumo(cuenta703, business, james, 2, false);
+
+        Reserva confirmada901 = guardarReserva(clientes.get(9), "901", sofia, hoy.plusDays(5), hoy.plusDays(9), EstadoReserva.CONFIRMADA, 2);
+        Cuenta cuenta901 = abrirCuenta(confirmada901, hoy.minusDays(1));
+        agregarConsumo(cuenta901, wellness, sofia, 1, false);
+        agregarConsumo(cuenta901, dining, sofia, 2, false);
+
+        // ===== En curso =====
+        // 102: sale hoy, pagada (lista para check-out)
         Reserva enCurso102 = guardarReserva(clientes.get(4), "102", laura, hoy.minusDays(2), hoy, EstadoReserva.EN_CURSO, 2);
         Cuenta cuenta102 = abrirCuenta(enCurso102, hoy.minusDays(2));
         agregarConsumo(cuenta102, wellness, laura, 2, true);
         agregarPago(cuenta102, laura, BigDecimal.valueOf(90), "CARD");
 
-        Reserva enCurso302 = guardarReserva(clientes.get(5), "302", laura, hoy.minusDays(1), hoy.plusDays(2), EstadoReserva.EN_CURSO, 2);
+        // 302: saldo pendiente
+        Reserva enCurso302 = guardarReserva(clientes.get(5), "302", pedro, hoy.minusDays(1), hoy.plusDays(2), EstadoReserva.EN_CURSO, 2);
         Cuenta cuenta302 = abrirCuenta(enCurso302, hoy.minusDays(1));
-        agregarConsumo(cuenta302, dining, laura, 2, false);
-        agregarConsumo(cuenta302, concierge, laura, 1, false);
-        agregarPago(cuenta302, laura, BigDecimal.valueOf(50), "CASH");
+        agregarConsumo(cuenta302, dining, pedro, 2, false);
+        agregarConsumo(cuenta302, concierge, pedro, 1, false);
+        agregarPago(cuenta302, pedro, BigDecimal.valueOf(50), "CASH");
 
-        Reserva enCurso502 = guardarReserva(clientes.get(6), "502", laura, hoy.minusDays(3), hoy.plusDays(1), EstadoReserva.EN_CURSO, 3);
-        abrirCuenta(enCurso502, hoy.minusDays(3));
+        // 502: sin consumos aun
+        Reserva enCurso502 = guardarReserva(clientes.get(6), "502", maria, hoy.minusDays(3), hoy.plusDays(1), EstadoReserva.EN_CURSO, 3);
+        Cuenta cuenta502 = abrirCuenta(enCurso502, hoy.minusDays(3));
+        agregarConsumo(cuenta502, wellness, maria, 1, false);
+        agregarPago(cuenta502, maria, BigDecimal.valueOf(45), "TRANSFER");
 
-        // Historial
-        Reserva finalizada = guardarReserva(clientes.get(7), "104", laura, hoy.minusDays(9), hoy.minusDays(6), EstadoReserva.FINALIZADA, 2);
-        Cuenta cuentaFinalizada = abrirCuenta(finalizada, hoy.minusDays(9));
-        agregarConsumo(cuentaFinalizada, dining, laura, 1, true);
-        agregarPago(cuentaFinalizada, laura, BigDecimal.valueOf(60), "CARD");
-        cuentaFinalizada.setEstado(EstadoCuenta.CERRADA);
-        cuentaRepository.save(cuentaFinalizada);
+        // 701: en curso, gestionada por James
+        Reserva enCurso701 = guardarReserva(clientes.get(7), "701", james, hoy.minusDays(1), hoy.plusDays(3), EstadoReserva.EN_CURSO, 2);
+        Cuenta cuenta701 = abrirCuenta(enCurso701, hoy.minusDays(1));
+        agregarConsumo(cuenta701, business, james, 1, false);
+        agregarConsumo(cuenta701, dining, james, 1, false);
+        agregarPago(cuenta701, james, BigDecimal.valueOf(80), "CARD");
 
-        guardarReserva(clientes.get(8), "303", laura, hoy.plusDays(1), hoy.plusDays(3), EstadoReserva.CANCELADA, 1);
+        // ===== Historial =====
+        Reserva finalizada104 = guardarReserva(clientes.get(7), "104", laura, hoy.minusDays(9), hoy.minusDays(6), EstadoReserva.FINALIZADA, 2);
+        Cuenta cuentaFinalizada104 = abrirCuenta(finalizada104, hoy.minusDays(9));
+        agregarConsumo(cuentaFinalizada104, dining, laura, 1, true);
+        agregarPago(cuentaFinalizada104, laura, BigDecimal.valueOf(60), "CARD");
+        cuentaFinalizada104.setEstado(EstadoCuenta.CERRADA);
+        cuentaRepository.save(cuentaFinalizada104);
+
+        Reserva finalizada501 = guardarReserva(clientes.get(8), "501", sofia, hoy.minusDays(7), hoy.minusDays(4), EstadoReserva.FINALIZADA, 2);
+        Cuenta cuentaFinalizada501 = abrirCuenta(finalizada501, hoy.minusDays(7));
+        agregarConsumo(cuentaFinalizada501, concierge, sofia, 2, true);
+        agregarPago(cuentaFinalizada501, sofia, BigDecimal.valueOf(50), "TRANSFER");
+        cuentaFinalizada501.setEstado(EstadoCuenta.CERRADA);
+        cuentaRepository.save(cuentaFinalizada501);
+
+        // CANCELADA
+        guardarReserva(clientes.get(8), "303", pedro, hoy.plusDays(1), hoy.plusDays(3), EstadoReserva.CANCELADA, 1);
     }
 
     private Reserva guardarReserva(Cliente cliente, String numeroHabitacion, Operador operador,

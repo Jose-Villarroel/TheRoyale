@@ -67,24 +67,24 @@
 </th:block>
 
 <th:block th:fragment="admin-nav(activo)">
-  <section class="admin-vistas" aria-label="Navegacion admin">
+  <section class="admin-vistas" aria-label="Admin Navigation">
     <div class="contenedor admin-vistas-contenido">
       <span class="admin-vistas-label">Manage</span>
       <nav class="admin-vistas-toggle">
         <a th:href="@{/admin/habitaciones}"
-           th:classappend="${activo == 'habitaciones'} ? ' admin-vistas-activo' : ''">Habitaciones</a>
+           th:classappend="${activo == 'habitaciones'} ? ' admin-vistas-activo' : ''">Rooms</a>
         <a th:href="@{/admin/tipos-habitacion}"
-           th:classappend="${activo == 'tipos'} ? ' admin-vistas-activo' : ''">Tipos de habitacion</a>
+           th:classappend="${activo == 'tipos'} ? ' admin-vistas-activo' : ''">Room Types</a>
         <a th:href="@{/admin/clientes}"
-           th:classappend="${activo == 'clientes'} ? ' admin-vistas-activo' : ''">Clientes</a>
+           th:classappend="${activo == 'clientes'} ? ' admin-vistas-activo' : ''">Clients</a>
       </nav>
-      <a th:href="@{/}" class="admin-vistas-volver">Volver al sitio</a>
+      <a th:href="@{/}" class="admin-vistas-volver">Back to Site</a>
     </div>
   </section>
 </th:block>
 
 <th:block th:fragment="operator-nav(activo)">
-  <section class="admin-vistas" aria-label="Navegacion operario">
+  <section class="admin-vistas" aria-label="Operator Navigation">
     <div class="contenedor admin-vistas-contenido">
       <span class="admin-vistas-label">Operations</span>
       <nav class="admin-vistas-toggle">

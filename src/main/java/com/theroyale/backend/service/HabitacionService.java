@@ -59,25 +59,25 @@ public class HabitacionService {
     @Transactional
     public Habitacion guardar(Habitacion habitacion) {
         if (habitacion == null) {
-            throw new IllegalArgumentException("La habitacion es obligatoria.");
+            throw new IllegalArgumentException("Room is required.");
         }
         if (habitacion.getNumero() == null || habitacion.getNumero().trim().isEmpty()) {
-            throw new IllegalArgumentException("El numero de habitacion es obligatorio.");
+            throw new IllegalArgumentException("Room number is required.");
         }
         if (habitacion.getTipoHabitacion() == null) {
-            throw new IllegalArgumentException("El tipo de habitacion es obligatorio.");
+            throw new IllegalArgumentException("Room type is required.");
         }
         if (habitacion.getEstado() == null) {
-            throw new IllegalArgumentException("El estado de la habitacion es obligatorio.");
+            throw new IllegalArgumentException("Room status is required.");
         }
         if (habitacion.getPrecio() < 0) {
-            throw new IllegalArgumentException("El precio no puede ser negativo.");
+            throw new IllegalArgumentException("Price cannot be negative.");
         }
 
         String numero = habitacion.getNumero().trim();
         Optional<Habitacion> conMismoNumero = habitacionRepository.findByNumero(numero);
         if (conMismoNumero.isPresent() && !conMismoNumero.get().getId().equals(habitacion.getId())) {
-            throw new IllegalArgumentException("Ya existe una habitacion con el numero: " + numero);
+            throw new IllegalArgumentException("A room with number " + numero + " already exists.");
         }
 
         if (habitacion.getId() == null) {
@@ -96,7 +96,7 @@ public class HabitacionService {
     @Transactional
     public Habitacion cambiarEstado(Long id, EstadoHabitacion estado) {
         if (estado == null) {
-            throw new IllegalArgumentException("El estado de la habitacion es obligatorio.");
+            throw new IllegalArgumentException("Room status is required.");
         }
         Habitacion habitacion = obtenerPorId(id);
         habitacion.setEstado(estado);
@@ -106,9 +106,7 @@ public class HabitacionService {
     @Transactional
     public void eliminar(Long id) {
         Habitacion habitacion = obtenerPorId(id);
-        if (reservaRepository.existsByHabitacionId(id)) {
-            throw new IllegalStateException("La habitacion " + habitacion.getNumero() + " tiene reservas asociadas y no se puede eliminar.");
-        }
+        // Cascade deletion will handle removing associated reservations
 
         // Los admins son el lado dueno de la relacion: hay que quitarla antes de borrar
         for (Admin admin : adminRepository.findByHabitacionesAdministradasId(id)) {
