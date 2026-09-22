@@ -380,61 +380,61 @@ public class DataLoader implements CommandLineRunner {
 
         // ===== Llegan hoy =====
         // CONFIRMADA con servicios pre-reservados (cuenta abierta desde ayer)
-        Reserva confirmada101 = guardarReserva(clientes.get(0), "101", laura, hoy, hoy.plusDays(3), EstadoReserva.CONFIRMADA, 2);
+        Reserva confirmada101 = guardarReserva(clientes.get(0), "101", hoy, hoy.plusDays(3), EstadoReserva.CONFIRMADA, 2);
         Cuenta cuenta101 = abrirCuenta(confirmada101, hoy.minusDays(1));
         agregarConsumo(cuenta101, concierge, laura, 1, false);
 
         // PENDIENTE (sin cuenta aun)
-        guardarReserva(clientes.get(1), "301", null, hoy, hoy.plusDays(2), EstadoReserva.PENDIENTE, 1);
+        guardarReserva(clientes.get(1), "301", hoy, hoy.plusDays(2), EstadoReserva.PENDIENTE, 1);
 
         // ===== Futuras =====
-        guardarReserva(clientes.get(2), "103", null, hoy.plusDays(4), hoy.plusDays(7), EstadoReserva.PENDIENTE, 2);
+        guardarReserva(clientes.get(2), "103", hoy.plusDays(4), hoy.plusDays(7), EstadoReserva.PENDIENTE, 2);
 
-        Reserva confirmada703 = guardarReserva(clientes.get(3), "703", james, hoy.plusDays(10), hoy.plusDays(14), EstadoReserva.CONFIRMADA, 3);
+        Reserva confirmada703 = guardarReserva(clientes.get(3), "703", hoy.plusDays(10), hoy.plusDays(14), EstadoReserva.CONFIRMADA, 3);
         Cuenta cuenta703 = abrirCuenta(confirmada703, hoy.minusDays(2));
         agregarConsumo(cuenta703, business, james, 2, false);
 
-        Reserva confirmada901 = guardarReserva(clientes.get(9), "901", sofia, hoy.plusDays(5), hoy.plusDays(9), EstadoReserva.CONFIRMADA, 2);
+        Reserva confirmada901 = guardarReserva(clientes.get(9), "901", hoy.plusDays(5), hoy.plusDays(9), EstadoReserva.CONFIRMADA, 2);
         Cuenta cuenta901 = abrirCuenta(confirmada901, hoy.minusDays(1));
         agregarConsumo(cuenta901, wellness, sofia, 1, false);
         agregarConsumo(cuenta901, dining, sofia, 2, false);
 
         // ===== En curso =====
         // 102: sale hoy, pagada (lista para check-out)
-        Reserva enCurso102 = guardarReserva(clientes.get(4), "102", laura, hoy.minusDays(2), hoy, EstadoReserva.EN_CURSO, 2);
+        Reserva enCurso102 = guardarReserva(clientes.get(4), "102", hoy.minusDays(2), hoy, EstadoReserva.EN_CURSO, 2);
         Cuenta cuenta102 = abrirCuenta(enCurso102, hoy.minusDays(2));
         agregarConsumo(cuenta102, wellness, laura, 2, true);
         agregarPago(cuenta102, laura, BigDecimal.valueOf(90), "CARD");
 
         // 302: saldo pendiente
-        Reserva enCurso302 = guardarReserva(clientes.get(5), "302", pedro, hoy.minusDays(1), hoy.plusDays(2), EstadoReserva.EN_CURSO, 2);
+        Reserva enCurso302 = guardarReserva(clientes.get(5), "302", hoy.minusDays(1), hoy.plusDays(2), EstadoReserva.EN_CURSO, 2);
         Cuenta cuenta302 = abrirCuenta(enCurso302, hoy.minusDays(1));
         agregarConsumo(cuenta302, dining, pedro, 2, false);
         agregarConsumo(cuenta302, concierge, pedro, 1, false);
         agregarPago(cuenta302, pedro, BigDecimal.valueOf(50), "CASH");
 
         // 502: sin consumos aun
-        Reserva enCurso502 = guardarReserva(clientes.get(6), "502", maria, hoy.minusDays(3), hoy.plusDays(1), EstadoReserva.EN_CURSO, 3);
+        Reserva enCurso502 = guardarReserva(clientes.get(6), "502", hoy.minusDays(3), hoy.plusDays(1), EstadoReserva.EN_CURSO, 3);
         Cuenta cuenta502 = abrirCuenta(enCurso502, hoy.minusDays(3));
         agregarConsumo(cuenta502, wellness, maria, 1, false);
         agregarPago(cuenta502, maria, BigDecimal.valueOf(45), "TRANSFER");
 
         // 701: en curso, gestionada por James
-        Reserva enCurso701 = guardarReserva(clientes.get(7), "701", james, hoy.minusDays(1), hoy.plusDays(3), EstadoReserva.EN_CURSO, 2);
+        Reserva enCurso701 = guardarReserva(clientes.get(7), "701", hoy.minusDays(1), hoy.plusDays(3), EstadoReserva.EN_CURSO, 2);
         Cuenta cuenta701 = abrirCuenta(enCurso701, hoy.minusDays(1));
         agregarConsumo(cuenta701, business, james, 1, false);
         agregarConsumo(cuenta701, dining, james, 1, false);
         agregarPago(cuenta701, james, BigDecimal.valueOf(80), "CARD");
 
         // ===== Historial =====
-        Reserva finalizada104 = guardarReserva(clientes.get(7), "104", laura, hoy.minusDays(9), hoy.minusDays(6), EstadoReserva.FINALIZADA, 2);
+        Reserva finalizada104 = guardarReserva(clientes.get(7), "104", hoy.minusDays(9), hoy.minusDays(6), EstadoReserva.FINALIZADA, 2);
         Cuenta cuentaFinalizada104 = abrirCuenta(finalizada104, hoy.minusDays(9));
         agregarConsumo(cuentaFinalizada104, dining, laura, 1, true);
         agregarPago(cuentaFinalizada104, laura, BigDecimal.valueOf(60), "CARD");
         cuentaFinalizada104.setEstado(EstadoCuenta.CERRADA);
         cuentaRepository.save(cuentaFinalizada104);
 
-        Reserva finalizada501 = guardarReserva(clientes.get(8), "501", sofia, hoy.minusDays(7), hoy.minusDays(4), EstadoReserva.FINALIZADA, 2);
+        Reserva finalizada501 = guardarReserva(clientes.get(8), "501", hoy.minusDays(7), hoy.minusDays(4), EstadoReserva.FINALIZADA, 2);
         Cuenta cuentaFinalizada501 = abrirCuenta(finalizada501, hoy.minusDays(7));
         agregarConsumo(cuentaFinalizada501, concierge, sofia, 2, true);
         agregarPago(cuentaFinalizada501, sofia, BigDecimal.valueOf(50), "TRANSFER");
@@ -442,16 +442,15 @@ public class DataLoader implements CommandLineRunner {
         cuentaRepository.save(cuentaFinalizada501);
 
         // CANCELADA
-        guardarReserva(clientes.get(8), "303", pedro, hoy.plusDays(1), hoy.plusDays(3), EstadoReserva.CANCELADA, 1);
+        guardarReserva(clientes.get(8), "303", hoy.plusDays(1), hoy.plusDays(3), EstadoReserva.CANCELADA, 1);
     }
 
-    private Reserva guardarReserva(Cliente cliente, String numeroHabitacion, Operador operador,
+    private Reserva guardarReserva(Cliente cliente, String numeroHabitacion,
                                    LocalDate inicio, LocalDate fin, EstadoReserva estado, int personas) {
         Habitacion habitacion = habitacionRepository.findByNumero(numeroHabitacion).orElseThrow();
         return reservaRepository.save(Reserva.builder()
                 .cliente(cliente)
                 .habitacion(habitacion)
-                .operador(operador)
                 .fechaInicio(inicio)
                 .fechaFin(fin)
                 .estado(estado)

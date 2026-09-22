@@ -99,36 +99,32 @@ public class OperatorController {
     @PostMapping("/reservas/{id}/confirmar")
     public String confirmar(@PathVariable Long id,
                             @RequestParam(defaultValue = "detalle") String volver,
-                            @SessionAttribute(name = ATRIBUTO_SESION, required = false) Long operadorId,
                             RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Reservation confirmed.", () -> reservaService.confirmar(id, operadorId));
+        ejecutar(redirectAttributes, "Reservation confirmed.", () -> reservaService.confirmar(id));
         return destino(id, volver);
     }
 
     @PostMapping("/reservas/{id}/cancelar")
     public String cancelar(@PathVariable Long id,
                            @RequestParam(defaultValue = "detalle") String volver,
-                           @SessionAttribute(name = ATRIBUTO_SESION, required = false) Long operadorId,
                            RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Reservation cancelled.", () -> reservaService.cancelar(id, operadorId));
+        ejecutar(redirectAttributes, "Reservation cancelled.", () -> reservaService.cancelar(id));
         return destino(id, volver);
     }
 
     @PostMapping("/reservas/{id}/check-in")
     public String checkIn(@PathVariable Long id,
                           @RequestParam(defaultValue = "detalle") String volver,
-                          @SessionAttribute(name = ATRIBUTO_SESION, required = false) Long operadorId,
                           RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Check-in completed. The guest account is open.", () -> reservaService.hacerCheckIn(id, operadorId));
+        ejecutar(redirectAttributes, "Check-in completed. The guest account is open.", () -> reservaService.hacerCheckIn(id));
         return destino(id, volver);
     }
 
     @PostMapping("/reservas/{id}/check-out")
     public String checkOut(@PathVariable Long id,
                            @RequestParam(defaultValue = "detalle") String volver,
-                           @SessionAttribute(name = ATRIBUTO_SESION, required = false) Long operadorId,
                            RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Check-out completed. The room is available again.", () -> reservaService.hacerCheckOut(id, operadorId));
+        ejecutar(redirectAttributes, "Check-out completed. The room is available again.", () -> reservaService.hacerCheckOut(id));
         return destino(id, volver);
     }
 

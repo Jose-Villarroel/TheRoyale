@@ -30,12 +30,6 @@ public class Reserva {
     @JoinColumn(name = "habitacion_id", nullable = false)
     private Habitacion habitacion;
 
-    // Nullable: la reserva puede crearse sin que un operador la haya gestionado todavía
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "operador_id", nullable = true)
-    @ToString.Exclude
-    private Operador operador;
-
     @Column(nullable = false)
     private LocalDate fechaInicio;
 

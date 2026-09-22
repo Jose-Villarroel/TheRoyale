@@ -112,7 +112,7 @@ Habitacion "1" -- "0..*" Reserva : es reservada en >
 Reserva "1" -- "0..*" ItemConsumo : genera >
 Servicio "1" -- "0..*" ItemConsumo : es consumido como >
 Operador "1" -- "0..*" ItemConsumo : registra >
-Operador "1" -- "0..*" Reserva : cancela / gestiona >
+Operador ..> Reserva : cancela / gestiona (sin vinculo persistido)
 
 Administrador ..> Operador : administra (CRUD)
 Administrador ..> Servicio : administra (CRUD)

@@ -169,10 +169,56 @@ document.addEventListener("keydown", function (evento) {
   }
 });
 
+// ===== Nav activo: resalta la sección o página en la que está el visitante =====
+function activarNavActivoPorRuta() {
+  const ruta = window.location.pathname;
+  const enlaces = document.querySelectorAll(".nav-principal a, .enlace-menu-movil");
+
+  enlaces.forEach(function (enlace) {
+    const href = enlace.getAttribute("href") || "";
+    const esPaginaPropia = href.startsWith("/") && !href.includes("#") && href === ruta;
+    enlace.classList.toggle("nav-activo", esPaginaPropia);
+  });
+}
+
+function activarScrollSpy() {
+  const idsSeccion = ["rooms", "services", "experiences"];
+  const secciones = idsSeccion.map(function (id) { return document.getElementById(id); }).filter(Boolean);
+
+  if (secciones.length === 0) {
+    return;
+  }
+
+  const enlaces = document.querySelectorAll('.nav-principal a[href*="#"], .enlace-menu-movil[href*="#"]');
+
+  const observador = new IntersectionObserver(
+    function (entradas) {
+      entradas.forEach(function (entrada) {
+        if (!entrada.isIntersecting) {
+          return;
+        }
+
+        const idActivo = entrada.target.id;
+        enlaces.forEach(function (enlace) {
+          const href = enlace.getAttribute("href") || "";
+          enlace.classList.toggle("nav-activo", href.endsWith("#" + idActivo));
+        });
+      });
+    },
+    { rootMargin: "-45% 0px -50% 0px", threshold: 0 }
+  );
+
+  secciones.forEach(function (seccion) {
+    observador.observe(seccion);
+  });
+}
+
 // ===== Inicialización =====
 actualizarCabeceraEnScroll();
 activarAnimacionesAparicion();
 actualizarCarrusel();
+activarNavActivoPorRuta();
+activarScrollSpy();
 
 // ===== Panel del operario: estado "enviando" en los formularios =====
 // Evita cargos, pagos y check-ins duplicados por doble clic: al enviar se bloquean los botones del formulario.

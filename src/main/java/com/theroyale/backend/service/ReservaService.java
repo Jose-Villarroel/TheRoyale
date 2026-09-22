@@ -27,14 +27,11 @@ public class ReservaService {
 
     private final ReservaRepository reservaRepository;
     private final CuentaRepository cuentaRepository;
-    private final OperadorService operadorService;
 
     public ReservaService(ReservaRepository reservaRepository,
-                          CuentaRepository cuentaRepository,
-                          OperadorService operadorService) {
+                          CuentaRepository cuentaRepository) {
         this.reservaRepository = reservaRepository;
         this.cuentaRepository = cuentaRepository;
-        this.operadorService = operadorService;
     }
 
     public List<Reserva> listar(EstadoReserva estado) {
@@ -71,12 +68,11 @@ public class ReservaService {
     }
 
     @Transactional
-    public Reserva confirmar(Long id, Long operadorId) {
+    public Reserva confirmar(Long id) {
         Reserva reserva = obtenerPorId(id);
         exigirEstado(reserva, "confirmar", EstadoReserva.PENDIENTE);
 
         reserva.setEstado(EstadoReserva.CONFIRMADA);
-        reserva.setOperador(operadorService.obtenerOPredeterminado(operadorId));
         Reserva guardada = reservaRepository.save(reserva);
 
         // La cuenta nace con la reserva confirmada: desde aqui se le pueden cargar servicios
@@ -85,7 +81,7 @@ public class ReservaService {
     }
 
     @Transactional
-    public Reserva cancelar(Long id, Long operadorId) {
+    public Reserva cancelar(Long id) {
         Reserva reserva = obtenerPorId(id);
         exigirEstado(reserva, "cancel", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
 
@@ -99,12 +95,11 @@ public class ReservaService {
         }
 
         reserva.setEstado(EstadoReserva.CANCELADA);
-        reserva.setOperador(operadorService.obtenerOPredeterminado(operadorId));
         return reservaRepository.save(reserva);
     }
 
     @Transactional
-    public Reserva hacerCheckIn(Long id, Long operadorId) {
+    public Reserva hacerCheckIn(Long id) {
         Reserva reserva = obtenerPorId(id);
         exigirEstado(reserva, "check in", EstadoReserva.CONFIRMADA);
 
@@ -119,7 +114,6 @@ public class ReservaService {
 
         habitacion.setEstado(EstadoHabitacion.OCUPADA);
         reserva.setEstado(EstadoReserva.EN_CURSO);
-        reserva.setOperador(operadorService.obtenerOPredeterminado(operadorId));
         Reserva guardada = reservaRepository.save(reserva);
 
         abrirCuentaSiNoExiste(guardada);
@@ -127,7 +121,7 @@ public class ReservaService {
     }
 
     @Transactional
-    public Reserva hacerCheckOut(Long id, Long operadorId) {
+    public Reserva hacerCheckOut(Long id) {
         Reserva reserva = obtenerPorId(id);
         exigirEstado(reserva, "check out", EstadoReserva.EN_CURSO);
 
@@ -140,7 +134,6 @@ public class ReservaService {
         cuenta.setEstado(EstadoCuenta.CERRADA);
         reserva.getHabitacion().setEstado(EstadoHabitacion.DISPONIBLE);
         reserva.setEstado(EstadoReserva.FINALIZADA);
-        reserva.setOperador(operadorService.obtenerOPredeterminado(operadorId));
         return reservaRepository.save(reserva);
     }
 

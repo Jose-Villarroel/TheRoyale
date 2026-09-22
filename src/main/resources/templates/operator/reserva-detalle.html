@@ -36,7 +36,6 @@
           <div><dt>Check-out</dt><dd th:text="${reserva.fechaFin}">2026-01-03</dd></div>
           <div><dt>Nights</dt><dd th:text="${reserva.noches}">2</dd></div>
           <div><dt>Guests</dt><dd th:text="${reserva.cantidadPersonas}">2</dd></div>
-          <div><dt>Handled by</dt><dd th:text="${reserva.operador != null ? reserva.operador.nombre : 'Not assigned yet'}">Not assigned yet</dd></div>
         </dl>
 
         <div class="operador-acciones operador-acciones-columna">

@@ -287,37 +287,38 @@
 
     <!-- ===== 03 — Services ===== -->
     <section class="seccion seccion-off-blanca" id="services">
-      <div class="contenedor">
-        <div class="services-encabezado aparecer">
-          <div>
-            <p class="eyebrow">03 — Services</p>
-            <h2>Everything You Need. Nothing You Don't.</h2>
+      <div class="contenedor services-encabezado aparecer">
+        <div>
+          <p class="eyebrow">03 — Services</p>
+          <h2>Everything You Need. Nothing You Don't.</h2>
+        </div>
+        <p class="parrafo-cuerpo">
+          From wellness and dining to transportation and private experiences, The Royale
+          gives you the freedom to personalize your stay. Services are optional and charged
+          individually to your room account.
+        </p>
+      </div>
+
+      <div class="tarjetas-servicios aparecer" id="tarjetasServicios">
+        <!-- Servicios cargados desde la base de datos (los mismos que el operador carga a la cuenta) -->
+        <a th:each="servicio, iterStat : ${servicios}"
+           th:href="@{/services/{nombre}(nombre=${servicio.nombre})}"
+           class="tarjeta-servicio">
+          <div class="tarjeta-servicio-imagen">
+            <img th:src="@{${servicio.imagenUrl}}" th:alt="${servicio.nombre}">
           </div>
-          <p class="parrafo-cuerpo">
-            From wellness and dining to transportation and private experiences, The Royale
-            gives you the freedom to personalize your stay. Services are optional and charged
-            individually to your room account.
-          </p>
-        </div>
+          <div class="tarjeta-servicio-info">
+            <span class="numero-romano"
+                  th:text="${iterStat.index < 8 ? {'I','II','III','IV','V','VI','VII','VIII'}[iterStat.index] : iterStat.count}">I</span>
+            <h3 th:text="${servicio.nombre}">Wellness</h3>
+            <p th:text="${#strings.substringBefore(servicio.descripcion, '.')} + '.'">Service summary.</p>
+            <span class="tarjeta-servicio-precio" th:text="'From $' + ${#numbers.formatInteger(servicio.precio, 1)}">From $45</span>
+          </div>
+        </a>
+      </div>
+      <p class="servicios-scroll-hint">Scroll →</p>
 
-        <div class="tarjetas-servicios aparecer">
-          <!-- Servicios cargados desde la base de datos (los mismos que el operador carga a la cuenta) -->
-          <a th:each="servicio, iterStat : ${servicios}"
-             th:href="@{/services/{nombre}(nombre=${servicio.nombre})}"
-             class="tarjeta-servicio">
-            <div class="tarjeta-servicio-imagen">
-              <img th:src="@{${servicio.imagenUrl}}" th:alt="${servicio.nombre}">
-            </div>
-            <div class="tarjeta-servicio-info">
-              <span class="numero-romano"
-                    th:text="${iterStat.index < 8 ? {'I','II','III','IV','V','VI','VII','VIII'}[iterStat.index] : iterStat.count}">I</span>
-              <h3 th:text="${servicio.nombre}">Wellness</h3>
-              <p th:text="${#strings.substringBefore(servicio.descripcion, '.')} + '.'">Service summary.</p>
-              <span class="tarjeta-servicio-precio" th:text="'From $' + ${#numbers.formatInteger(servicio.precio, 1)}">From $45</span>
-            </div>
-          </a>
-        </div>
-
+      <div class="contenedor">
         <a th:href="@{/services/cards}" class="btn-contorno-oscuro btn-centrado aparecer">Explore Services</a>
       </div>
     </section>

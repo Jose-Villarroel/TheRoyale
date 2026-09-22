@@ -33,12 +33,7 @@ public class Operador {
     @Column(nullable = false, length = 20)
     private TipoOperador tipo;
 
-    // ===== Lados inversos: reservas, consumos y pagos que este operador ha gestionado =====
-    @OneToMany(mappedBy = "operador")
-    @Builder.Default
-    @ToString.Exclude
-    private List<Reserva> reservasGestionadas = new ArrayList<>();
-
+    // ===== Lados inversos: consumos y pagos que este operador ha registrado =====
     @OneToMany(mappedBy = "operador")
     @Builder.Default
     @ToString.Exclude

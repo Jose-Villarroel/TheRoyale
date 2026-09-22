@@ -19,37 +19,41 @@
 <main class="contenedor seccion-admin-contenido">
   <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error"></p>
 
-  <form th:action="@{/admin/tipos-habitacion/guardar}" th:object="${tipoHabitacion}" method="post" class="formulario-admin">
+  <div class="formulario-admin-panel">
+    <form th:action="@{/admin/tipos-habitacion/guardar}" th:object="${tipoHabitacion}" method="post" class="formulario-admin">
 
-    <!-- Campo oculto: si tiene id, el guardado actualiza en vez de crear -->
-    <input type="hidden" th:field="*{id}">
+      <!-- Campo oculto: si tiene id, el guardado actualiza en vez de crear -->
+      <input type="hidden" th:field="*{id}">
 
-    <label>
-      <span>Name</span>
-      <input type="text" th:field="*{nombre}" required>
-    </label>
+      <label>
+        <span>Name</span>
+        <input type="text" th:field="*{nombre}" required>
+      </label>
 
-    <label>
-      <span>Description</span>
-      <textarea th:field="*{descripcion}" rows="4" required></textarea>
-    </label>
+      <label>
+        <span>Description</span>
+        <textarea th:field="*{descripcion}" rows="4" required></textarea>
+      </label>
 
-    <label>
-      <span>Image URL</span>
-      <input type="text" id="imagenUrlInput" th:field="*{imagenUrl}" placeholder="/images/suite-1.webp">
-    </label>
+      <div class="formulario-admin-imagen">
+        <label>
+          <span>Image URL</span>
+          <input type="text" id="imagenUrlInput" th:field="*{imagenUrl}" placeholder="/images/suite-1.webp">
+        </label>
 
-    <div class="imagen-previa-wrap">
-      <img id="imagenPrevia"
-           th:src="@{${tipoHabitacion.imagenUrl != null and !tipoHabitacion.imagenUrl.isEmpty() ? tipoHabitacion.imagenUrl : '/images/hotel.webp'}}"
-           alt="Preview">
-    </div>
+        <div class="imagen-previa-wrap">
+          <img id="imagenPrevia"
+               th:src="@{${tipoHabitacion.imagenUrl != null and !tipoHabitacion.imagenUrl.isEmpty() ? tipoHabitacion.imagenUrl : '/images/hotel.webp'}}"
+               alt="Preview">
+        </div>
+      </div>
 
-    <div class="formulario-admin-botones">
-      <button type="submit" class="btn-dorado">Save</button>
-      <a th:href="@{/admin/tipos-habitacion}" class="btn-contorno-oscuro">Cancel</a>
-    </div>
-  </form>
+      <div class="formulario-admin-botones">
+        <button type="submit" class="btn-dorado">Save</button>
+        <a th:href="@{/admin/tipos-habitacion}" class="btn-contorno-oscuro">Cancel</a>
+      </div>
+    </form>
+  </div>
 </main>
 
 <script th:inline="javascript">

@@ -166,7 +166,7 @@ Servicio "1" -- "0..*" ItemConsumo : corresponde a >
 
 Operador "1" -- "0..*" ItemConsumo : registra >
 Operador "1" -- "0..*" Pago : registra >
-Operador "1" -- "0..*" Reserva : cancela / gestiona >
+Operador ..> Reserva : gestiona / cancela (sin vinculo persistido)
 
 Administrador ..> Operador : administra (CRUD)
 Administrador ..> Servicio : administra (CRUD)

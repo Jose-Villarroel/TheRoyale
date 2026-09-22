@@ -67,7 +67,6 @@ entity Reserva {
   --
   # cliente_id : int <<FK -> Cliente.id>>
   # habitacion_id : int <<FK -> Habitacion.id>>
-  # operador_id : int <<FK -> Operador.id, nullable>>
   fecha_inicio : DATE
   fecha_fin : DATE
   estado : VARCHAR(20) <<check: PENDIENTE|CONFIRMADA|CANCELADA|FINALIZADA>>
@@ -121,7 +120,6 @@ entity Pago {
 ' ==========================================================
 
 Cliente          ||--o{ Reserva            : realiza
-Operador          |o--o{ Reserva            : gestiona/cancela
 
 TipoHabitacion   ||--o{ Habitacion         : clasifica
 TipoHabitacion   ||--o{ Imagen             : tiene

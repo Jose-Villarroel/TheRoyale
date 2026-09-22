@@ -142,7 +142,9 @@ ul {
   color: var(--color-texto-claro);
 }
 
-.seccion:not(.seccion-oscura) .btn-dorado:hover {
+.seccion:not(.seccion-oscura) .btn-dorado:hover,
+.seccion-formulario .btn-dorado:hover,
+.envoltorio-cabecera.cabecera-solida .btn-dorado:hover {
   color: var(--color-dorado);
 }
 
@@ -328,6 +330,20 @@ ul {
 }
 
 .nav-principal a:hover {
+  border-bottom-color: var(--color-dorado);
+}
+
+.nav-principal a.nav-activo {
+  color: var(--color-dorado);
+  border-bottom-color: var(--color-dorado);
+}
+
+.envoltorio-cabecera.cabecera-solida .nav-principal a.nav-activo {
+  color: var(--color-dorado-hover);
+}
+
+.enlace-menu-movil.nav-activo {
+  color: var(--color-dorado);
   border-bottom-color: var(--color-dorado);
 }
 
@@ -859,16 +875,37 @@ ul {
 }
 
 .tarjetas-servicios {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1px;
-  background-color: var(--color-blanco);
+  display: flex;
+  gap: clamp(14px, 1.6vw, 22px);
+  overflow-x: auto;
+  padding: 4px clamp(20px, 4vw, 64px) 20px;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: clamp(20px, 4vw, 64px);
+}
+
+.tarjetas-servicios::-webkit-scrollbar {
+  height: 2px;
+}
+
+.tarjetas-servicios::-webkit-scrollbar-thumb {
+  background-color: var(--color-borde-claro);
 }
 
 .tarjeta-servicio {
+  flex: 0 0 clamp(260px, 30vw, 320px);
+  scroll-snap-align: start;
+  border: 1px solid var(--color-borde-claro);
   background-color: var(--color-blanco);
   display: flex;
   flex-direction: column;
+}
+
+.servicios-scroll-hint {
+  margin: 4px clamp(20px, 4vw, 64px) 28px;
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
 }
 
 .tarjeta-servicio-imagen {

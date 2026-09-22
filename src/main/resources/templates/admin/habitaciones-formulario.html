@@ -7,9 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" th:href="@{/css/landing.css}">
   <link rel="stylesheet" th:href="@{/css/servicios.css}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
@@ -27,59 +27,64 @@
 
 <div th:replace="~{layout :: admin-nav('habitaciones')}"></div>
 
-<main class="contenedor seccion-admin-contenido tema-royale" style="max-width: 640px;">
+<main class="contenedor seccion-admin-contenido tema-royale">
   <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error"></p>
 
-  <form th:action="@{/admin/habitaciones/guardar}" th:object="${habitacion}" method="post">
+  <div class="formulario-admin-panel">
+    <form th:action="@{/admin/habitaciones/guardar}" th:object="${habitacion}" method="post">
 
-    <!-- Campo oculto: si tiene id, el guardado actualiza en vez de crear -->
-    <input type="hidden" th:field="*{id}">
+      <!-- Campo oculto: si tiene id, el guardado actualiza en vez de crear -->
+      <input type="hidden" th:field="*{id}">
 
-    <div class="mb-3">
-      <label class="form-label">Number</label>
-      <input type="text" th:field="*{numero}" class="form-control" required>
-    </div>
+      <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+          <label class="form-label">Number</label>
+          <input type="text" th:field="*{numero}" class="form-control" required>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label">Price</label>
+          <input type="number" step="0.01" min="0" th:field="*{precio}" class="form-control" required>
+        </div>
+      </div>
 
-    <div class="mb-3">
-      <label class="form-label">Room Type</label>
-      <select id="tipoHabitacionSelect" name="tipoHabitacionId" class="form-select" required>
-        <option value="">Select a room type</option>
-        <option th:each="tipo : ${tiposHabitacion}"
-                th:value="${tipo.id}"
-                th:text="${tipo.nombre}"
-                th:attr="data-imagen=${tipo.imagenUrl != null and !tipo.imagenUrl.isEmpty() ? tipo.imagenUrl : '/images/hotel.webp'}"
-                th:selected="${habitacion.tipoHabitacion != null and habitacion.tipoHabitacion.id == tipo.id}">
-          Normal
-        </option>
-      </select>
-    </div>
+      <div class="d-flex gap-3 align-items-start mb-3">
+        <div class="flex-grow-1">
+          <label class="form-label">Room Type</label>
+          <select id="tipoHabitacionSelect" name="tipoHabitacionId" class="form-select" required>
+            <option value="">Select a room type</option>
+            <option th:each="tipo : ${tiposHabitacion}"
+                    th:value="${tipo.id}"
+                    th:text="${tipo.nombre}"
+                    th:attr="data-imagen=${tipo.imagenUrl != null and !tipo.imagenUrl.isEmpty() ? tipo.imagenUrl : '/images/hotel.webp'}"
+                    th:selected="${habitacion.tipoHabitacion != null and habitacion.tipoHabitacion.id == tipo.id}">
+              Normal
+            </option>
+          </select>
+        </div>
 
-    <div class="imagen-previa-wrap">
-      <img id="imagenPrevia"
-           th:src="@{${habitacion.tipoHabitacion != null and habitacion.tipoHabitacion.imagenUrl != null and !habitacion.tipoHabitacion.imagenUrl.isEmpty() ? habitacion.tipoHabitacion.imagenUrl : '/images/hotel.webp'}}"
-           alt="Selected room type preview">
-    </div>
+        <div class="imagen-previa-wrap" style="margin-top: 30px;">
+          <img id="imagenPrevia"
+               th:src="@{${habitacion.tipoHabitacion != null and habitacion.tipoHabitacion.imagenUrl != null and !habitacion.tipoHabitacion.imagenUrl.isEmpty() ? habitacion.tipoHabitacion.imagenUrl : '/images/hotel.webp'}}"
+               alt="Selected room type preview">
+        </div>
+      </div>
 
-    <div class="mb-3 mt-3">
-      <label class="form-label">Price</label>
-      <input type="number" step="0.01" min="0" th:field="*{precio}" class="form-control" required>
-    </div>
+      <div class="mb-4">
+        <label class="form-label">Status</label>
+        <select th:field="*{estado}" class="form-select" required>
+          <option value="DISPONIBLE">Disponible</option>
+          <option value="OCUPADA">Ocupada</option>
+          <option value="MANTENIMIENTO">Mantenimiento</option>
+          <option value="DESHABILITADA">Deshabilitada</option>
+        </select>
+      </div>
 
-    <div class="mb-4">
-      <label class="form-label">Status</label>
-      <select th:field="*{estado}" class="form-select" required>
-        <option value="DISPONIBLE">Disponible</option>
-        <option value="OCUPADA">Ocupada</option>
-        <option value="MANTENIMIENTO">Mantenimiento</option>
-        <option value="DESHABILITADA">Deshabilitada</option>
-      </select>
-    </div>
-
-    <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary">Save</button>
-      <a th:href="@{/admin/habitaciones}" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-  </form>
+      <div class="formulario-admin-botones">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a th:href="@{/admin/habitaciones}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
 </main>
 
 <script>
