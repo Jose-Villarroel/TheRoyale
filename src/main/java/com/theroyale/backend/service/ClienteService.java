@@ -81,7 +81,10 @@ public class ClienteService {
     @Transactional
     public void eliminar(Long id) {
         obtenerPorId(id);
-        // Cascade deletion will handle removing associated reservations
+        if (reservaRepository.existsByClienteId(id)) {
+            throw new IllegalStateException("Este cliente tiene reservas asociadas y no puede ser eliminado.");
+        }
+
         clienteRepository.deleteById(id);
     }
 

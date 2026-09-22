@@ -41,7 +41,7 @@ public class Cliente {
 
     private LocalDate fechaRegistro;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cliente")
     @Builder.Default
     @ToString.Exclude
     private List<Reserva> reservas = new ArrayList<>();

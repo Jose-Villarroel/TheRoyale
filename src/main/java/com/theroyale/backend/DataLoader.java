@@ -236,7 +236,7 @@ public class DataLoader implements CommandLineRunner {
                 .build());
     }
 
-    // ===== 4 servicios del hotel =====
+    // ===== 5 servicios del hotel =====
     private void cargarServicios() {
         guardarServicio("Wellness",
                 "Immerse yourself in total relaxation at The Royale Spa. Our full wellness sanctuary is designed around your wellbeing - from ancient thermal rituals to modern fitness, every detail is curated for the discerning guest.",
@@ -301,6 +301,22 @@ public class DataLoader implements CommandLineRunner {
                         "Multilingual Assistance - Staff fluent in 8+ languages"
                 ),
                 List.of("/images/concierge.jpg", "/images/broadway.jpg", "/images/new_concierge.jpg"));
+
+        guardarServicio("Transportation",
+                "Move through New York with the same ease and discretion you expect inside The Royale. Our transportation service coordinates private transfers, chauffeured vehicles and curated city routes for guests who value punctuality, comfort and privacy.",
+                80.0,
+                "/images/private-transport.jpg",
+                List.of(
+                        "Airport Transfers - Private arrivals and departures from JFK, LaGuardia and Newark",
+                        "Chauffeured Vehicles - Luxury sedans and SUVs available by the hour",
+                        "City Routes - Tailored itineraries across Manhattan, Brooklyn and beyond",
+                        "Event Transfers - Coordinated pickups for galas, meetings and private dinners",
+                        "Family Transport - Spacious vehicles with child seats on request",
+                        "Executive Mobility - Quiet rides with Wi-Fi and bottled water",
+                        "Late-Night Service - Reserved transport for evenings out in the city",
+                        "Luggage Assistance - Door-to-door handling from room to vehicle"
+                ),
+                List.of("/images/private-transport.jpg", "/images/airport-transfer.jpg", "/images/private-transport.jpg"));
     }
 
     private void guardarServicio(String nombre, String descripcion, double precio, String imagenUrl,

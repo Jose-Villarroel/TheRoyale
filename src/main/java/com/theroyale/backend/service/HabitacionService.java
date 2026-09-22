@@ -106,7 +106,9 @@ public class HabitacionService {
     @Transactional
     public void eliminar(Long id) {
         Habitacion habitacion = obtenerPorId(id);
-        // Cascade deletion will handle removing associated reservations
+        if (reservaRepository.existsByHabitacionId(id)) {
+            throw new IllegalStateException("Esta habitacion tiene reservas asociadas y no puede ser eliminada.");
+        }
 
         // Los admins son el lado dueno de la relacion: hay que quitarla antes de borrar
         for (Admin admin : adminRepository.findByHabitacionesAdministradasId(id)) {
