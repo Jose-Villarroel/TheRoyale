@@ -3,6 +3,7 @@ package com.theroyale.backend.service;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Operador;
 import com.theroyale.backend.repository.OperadorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,11 +13,8 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class OperadorService {
 
-    private final OperadorRepository operadorRepository;
-
-    public OperadorService(OperadorRepository operadorRepository) {
-        this.operadorRepository = operadorRepository;
-    }
+    @Autowired
+    private OperadorRepository operadorRepository;
 
     public Optional<Operador> autenticar(String email, String password) {
         if (email == null || password == null) {

@@ -3,6 +3,7 @@ package com.theroyale.backend.controller;
 import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.service.HabitacionService;
 import com.theroyale.backend.service.TipoHabitacionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +13,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/admin/habitaciones")
 public class HabitacionController {
 
-    private final HabitacionService habitacionService;
+    @Autowired
+    private HabitacionService habitacionService;
 
-    private final TipoHabitacionService tipoHabitacionService;
-
-    public HabitacionController(HabitacionService habitacionService, TipoHabitacionService tipoHabitacionService) {
-        this.habitacionService = habitacionService;
-        this.tipoHabitacionService = tipoHabitacionService;
-    }
+    @Autowired
+    private TipoHabitacionService tipoHabitacionService;
 
     @GetMapping
     public String listar(@RequestParam(required = false) String error, Model model) {

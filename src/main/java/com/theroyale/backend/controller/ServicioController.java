@@ -2,6 +2,7 @@ package com.theroyale.backend.controller;
 
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.service.InterfaceService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,11 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class ServicioController {
 
-    private final InterfaceService servicioService;
-
-    public ServicioController(InterfaceService servicioService) {
-        this.servicioService = servicioService;
-    }
+    @Autowired
+    private InterfaceService servicioService;
 
     @GetMapping("/services/table")
     public String mostrarTabla(Model model) {

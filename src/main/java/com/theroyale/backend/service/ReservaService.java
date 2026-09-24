@@ -9,6 +9,7 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.ReservaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,14 +26,11 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class ReservaService {
 
-    private final ReservaRepository reservaRepository;
-    private final CuentaRepository cuentaRepository;
+    @Autowired
+    private ReservaRepository reservaRepository;
 
-    public ReservaService(ReservaRepository reservaRepository,
-                          CuentaRepository cuentaRepository) {
-        this.reservaRepository = reservaRepository;
-        this.cuentaRepository = cuentaRepository;
-    }
+    @Autowired
+    private CuentaRepository cuentaRepository;
 
     public List<Reserva> listar(EstadoReserva estado) {
         return estado == null

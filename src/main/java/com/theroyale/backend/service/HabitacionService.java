@@ -7,6 +7,7 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.repository.AdminRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.ReservaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,17 +18,14 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class HabitacionService {
 
-    private final HabitacionRepository habitacionRepository;
-    private final ReservaRepository reservaRepository;
-    private final AdminRepository adminRepository;
+    @Autowired
+    private HabitacionRepository habitacionRepository;
 
-    public HabitacionService(HabitacionRepository habitacionRepository,
-                             ReservaRepository reservaRepository,
-                             AdminRepository adminRepository) {
-        this.habitacionRepository = habitacionRepository;
-        this.reservaRepository = reservaRepository;
-        this.adminRepository = adminRepository;
-    }
+    @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
+    private AdminRepository adminRepository;
 
     public List<Habitacion> listarTodos() {
         return habitacionRepository.findAll();

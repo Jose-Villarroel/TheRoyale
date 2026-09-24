@@ -5,6 +5,7 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.service.HabitacionService;
 import com.theroyale.backend.service.TipoHabitacionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,13 +20,11 @@ import java.util.stream.Collectors;
 @Controller
 public class RoomController {
 
-    private final TipoHabitacionService tipoHabitacionService;
-    private final HabitacionService habitacionService;
+    @Autowired
+    private TipoHabitacionService tipoHabitacionService;
 
-    public RoomController(TipoHabitacionService tipoHabitacionService, HabitacionService habitacionService) {
-        this.tipoHabitacionService = tipoHabitacionService;
-        this.habitacionService = habitacionService;
-    }
+    @Autowired
+    private HabitacionService habitacionService;
 
     @GetMapping("/rooms")
     public String listarRooms(Model model) {

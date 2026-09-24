@@ -7,6 +7,7 @@ import com.theroyale.backend.service.HabitacionService;
 import com.theroyale.backend.service.InterfaceService;
 import com.theroyale.backend.service.OperadorService;
 import com.theroyale.backend.service.ReservaService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,23 +26,20 @@ public class OperatorController {
 
     private static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER");
 
-    private final HabitacionService habitacionService;
-    private final ReservaService reservaService;
-    private final CuentaService cuentaService;
-    private final OperadorService operadorService;
-    private final InterfaceService servicioService;
+    @Autowired
+    private HabitacionService habitacionService;
 
-    public OperatorController(HabitacionService habitacionService,
-                              ReservaService reservaService,
-                              CuentaService cuentaService,
-                              OperadorService operadorService,
-                              InterfaceService servicioService) {
-        this.habitacionService = habitacionService;
-        this.reservaService = reservaService;
-        this.cuentaService = cuentaService;
-        this.operadorService = operadorService;
-        this.servicioService = servicioService;
-    }
+    @Autowired
+    private ReservaService reservaService;
+
+    @Autowired
+    private CuentaService cuentaService;
+
+    @Autowired
+    private OperadorService operadorService;
+
+    @Autowired
+    private InterfaceService servicioService;
 
     @GetMapping
     public String dashboard(@RequestParam(required = false) Long operadorId,

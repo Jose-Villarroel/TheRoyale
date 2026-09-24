@@ -10,6 +10,7 @@ import com.theroyale.backend.model.Pago;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.ServicioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +23,14 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CuentaService {
 
-    private final CuentaRepository cuentaRepository;
-    private final ServicioRepository servicioRepository;
-    private final OperadorService operadorService;
+    @Autowired
+    private CuentaRepository cuentaRepository;
 
-    public CuentaService(CuentaRepository cuentaRepository,
-                         ServicioRepository servicioRepository,
-                         OperadorService operadorService) {
-        this.cuentaRepository = cuentaRepository;
-        this.servicioRepository = servicioRepository;
-        this.operadorService = operadorService;
-    }
+    @Autowired
+    private ServicioRepository servicioRepository;
+
+    @Autowired
+    private OperadorService operadorService;
 
     public Optional<Cuenta> buscarPorReserva(Long reservaId) {
         return cuentaRepository.findByReservaId(reservaId);

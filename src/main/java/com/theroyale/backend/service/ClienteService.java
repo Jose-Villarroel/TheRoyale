@@ -4,6 +4,7 @@ import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.ReservaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,13 +16,11 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class ClienteService {
 
-    private final ClienteRepository clienteRepository;
-    private final ReservaRepository reservaRepository;
+    @Autowired
+    private ClienteRepository clienteRepository;
 
-    public ClienteService(ClienteRepository clienteRepository, ReservaRepository reservaRepository) {
-        this.clienteRepository = clienteRepository;
-        this.reservaRepository = reservaRepository;
-    }
+    @Autowired
+    private ReservaRepository reservaRepository;
 
     public List<Cliente> listarTodos() {
         return clienteRepository.findAll();

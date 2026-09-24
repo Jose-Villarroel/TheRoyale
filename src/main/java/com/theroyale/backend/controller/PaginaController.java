@@ -2,6 +2,7 @@ package com.theroyale.backend.controller;
 
 import com.theroyale.backend.service.InterfaceService;
 import com.theroyale.backend.service.TipoHabitacionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,13 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class PaginaController {
 
-    private final TipoHabitacionService tipoHabitacionService;
-    private final InterfaceService servicioService;
+    @Autowired
+    private TipoHabitacionService tipoHabitacionService;
 
-    public PaginaController(TipoHabitacionService tipoHabitacionService, InterfaceService servicioService) {
-        this.tipoHabitacionService = tipoHabitacionService;
-        this.servicioService = servicioService;
-    }
+    @Autowired
+    private InterfaceService servicioService;
 
 
     @GetMapping("/")
