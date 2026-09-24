@@ -16,7 +16,8 @@ public class ClienteController {
     private ClienteService clienteService;
 
     @GetMapping
-    public String listar(Model model) {
+    public String listar(@RequestParam(required = false) String error, Model model) {
+        model.addAttribute("error", error);
         model.addAttribute("clientes", clienteService.listarTodos());
         return "admin/clientes-lista";
     }
@@ -54,7 +55,7 @@ public class ClienteController {
         try {
             clienteService.eliminar(id);
         } catch (IllegalStateException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addAttribute("error", ex.getMessage());
         }
         return "redirect:/admin/clientes";
     }

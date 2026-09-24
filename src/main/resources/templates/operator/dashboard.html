@@ -21,27 +21,27 @@
   <p th:if="${error}" th:text="${error}" class="perfil-alerta perfil-alerta-error" role="alert"></p>
 
   <div class="operador-resumen">
-    <a th:href="@{/operator/habitaciones}" class="operador-stat">
+    <a th:href="@{/operator/habitaciones(operadorId=${operadorId})}" class="operador-stat">
       <span class="operador-stat-numero" th:text="${habitacionesDisponibles}">0</span>
       <span class="operador-stat-etiqueta">Rooms available</span>
     </a>
-    <a th:href="@{/operator/habitaciones}" class="operador-stat">
+    <a th:href="@{/operator/habitaciones(operadorId=${operadorId})}" class="operador-stat">
       <span class="operador-stat-numero" th:text="${habitacionesOcupadas}">0</span>
       <span class="operador-stat-etiqueta">Rooms occupied</span>
     </a>
-    <a th:href="@{/operator/habitaciones}" class="operador-stat">
+    <a th:href="@{/operator/habitaciones(operadorId=${operadorId})}" class="operador-stat">
       <span class="operador-stat-numero" th:text="${habitacionesMantenimiento}">0</span>
       <span class="operador-stat-etiqueta">In maintenance</span>
     </a>
-    <a th:href="@{/operator/reservas(estado=PENDIENTE)}" class="operador-stat" th:classappend="${reservasPendientes > 0} ? ' requiere-atencion' : ''">
+    <a th:href="@{/operator/reservas(estado=PENDIENTE,operadorId=${operadorId})}" class="operador-stat" th:classappend="${reservasPendientes > 0} ? ' requiere-atencion' : ''">
       <span class="operador-stat-numero" th:text="${reservasPendientes}">0</span>
       <span class="operador-stat-etiqueta">Pending reservations</span>
     </a>
-    <a th:href="@{/operator/reservas(estado=EN_CURSO)}" class="operador-stat">
+    <a th:href="@{/operator/reservas(estado=EN_CURSO,operadorId=${operadorId})}" class="operador-stat">
       <span class="operador-stat-numero" th:text="${reservasEnCurso}">0</span>
       <span class="operador-stat-etiqueta">Guests in house</span>
     </a>
-    <a th:href="@{/operator/reservas(estado=EN_CURSO)}" class="operador-stat">
+    <a th:href="@{/operator/reservas(estado=EN_CURSO,operadorId=${operadorId})}" class="operador-stat">
       <span class="operador-stat-numero" th:text="${cuentasAbiertas}">0</span>
       <span class="operador-stat-etiqueta">Open accounts</span>
     </a>
@@ -63,7 +63,7 @@
           <tbody>
             <tr th:each="r : ${llegadas}">
               <td>
-                <a th:href="@{/operator/reservas/{id}(id=${r.id})}" class="operador-celda-principal">
+                <a th:href="@{/operator/reservas/{id}(id=${r.id},operadorId=${operadorId})}" class="operador-celda-principal">
                   <strong th:text="${r.cliente.nombreCompleto}">Guest</strong>
                   <span th:text="${r.noches} + (${r.noches == 1} ? ' night' : ' nights')">2 nights</span>
                 </a>
@@ -71,11 +71,11 @@
               <td th:text="${r.habitacion.numero}">101</td>
               <td><span class="chip-estado" th:attr="data-estado=${r.estado}" th:text="${r.estado}">PENDIENTE</span></td>
               <td class="col-acciones">
-                <form th:if="${r.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${r.id})}" method="post">
+                <form th:if="${r.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${r.id},operadorId=${operadorId})}" method="post">
                   <input type="hidden" name="volver" value="dashboard">
                   <button type="submit" class="btn-contorno-oscuro btn-mini">Confirm</button>
                 </form>
-                <form th:if="${r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${r.id})}" method="post">
+                <form th:if="${r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${r.id},operadorId=${operadorId})}" method="post">
                   <input type="hidden" name="volver" value="dashboard">
                   <button type="submit" class="btn-dorado btn-mini">Check-in</button>
                 </form>
@@ -101,7 +101,7 @@
           <tbody>
             <tr th:each="r : ${salidas}">
               <td>
-                <a th:href="@{/operator/reservas/{id}(id=${r.id})}" class="operador-celda-principal">
+                <a th:href="@{/operator/reservas/{id}(id=${r.id},operadorId=${operadorId})}" class="operador-celda-principal">
                   <strong th:text="${r.cliente.nombreCompleto}">Guest</strong>
                   <span th:text="${r.cuenta != null ? #lists.size(r.cuenta.itemsConsumo) + ' services charged' : 'No account'}">2 services charged</span>
                 </a>
@@ -112,7 +112,7 @@
                       th:text="${r.cuenta.saldo.signum() > 0} ? ('$' + ${#numbers.formatDecimal(r.cuenta.saldo, 1, 2)} + ' due') : 'Settled'">Settled</span>
               </td>
               <td class="col-acciones">
-                <form th:action="@{/operator/reservas/{id}/check-out(id=${r.id})}" method="post">
+                <form th:action="@{/operator/reservas/{id}/check-out(id=${r.id},operadorId=${operadorId})}" method="post">
                   <input type="hidden" name="volver" value="dashboard">
                   <button type="submit" class="btn-dorado btn-mini">Check-out</button>
                 </form>

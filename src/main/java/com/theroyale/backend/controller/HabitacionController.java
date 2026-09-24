@@ -22,7 +22,8 @@ public class HabitacionController {
     }
 
     @GetMapping
-    public String listar(Model model) {
+    public String listar(@RequestParam(required = false) String error, Model model) {
+        model.addAttribute("error", error);
         model.addAttribute("habitaciones", habitacionService.listarTodos());
         return "admin/habitaciones-lista";
     }
@@ -64,7 +65,7 @@ public class HabitacionController {
         try {
             habitacionService.eliminar(id);
         } catch (IllegalStateException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addAttribute("error", ex.getMessage());
         }
         return "redirect:/admin/habitaciones";
     }

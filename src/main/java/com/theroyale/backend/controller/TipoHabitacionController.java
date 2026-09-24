@@ -18,7 +18,8 @@ public class TipoHabitacionController {
     }
 
     @GetMapping
-    public String listar(Model model) {
+    public String listar(@RequestParam(required = false) String error, Model model) {
+        model.addAttribute("error", error);
         model.addAttribute("tipos", tipoHabitacionService.listarTodos());
         return "admin/tipos-habitacion-lista";
     }
@@ -52,7 +53,7 @@ public class TipoHabitacionController {
         try {
             tipoHabitacionService.eliminar(id);
         } catch (IllegalStateException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addAttribute("error", ex.getMessage());
         }
         return "redirect:/admin/tipos-habitacion";
     }

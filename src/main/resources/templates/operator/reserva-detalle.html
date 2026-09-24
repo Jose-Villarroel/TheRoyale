@@ -39,19 +39,19 @@
         </dl>
 
         <div class="operador-acciones operador-acciones-columna">
-          <form th:if="${reserva.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${reserva.id})}" method="post">
+          <form th:if="${reserva.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${reserva.id},operadorId=${operadorId})}" method="post">
             <button type="submit" class="btn-dorado btn-bloque">Confirm reservation</button>
           </form>
-          <form th:if="${reserva.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${reserva.id})}" method="post">
+          <form th:if="${reserva.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${reserva.id},operadorId=${operadorId})}" method="post">
             <button type="submit" class="btn-dorado btn-bloque">Check-in</button>
           </form>
-          <form th:if="${reserva.estado.name() == 'EN_CURSO'}" th:action="@{/operator/reservas/{id}/check-out(id=${reserva.id})}" method="post">
+          <form th:if="${reserva.estado.name() == 'EN_CURSO'}" th:action="@{/operator/reservas/{id}/check-out(id=${reserva.id},operadorId=${operadorId})}" method="post">
             <button type="submit" class="btn-dorado btn-bloque">Check-out</button>
           </form>
-          <form th:if="${reserva.estado.name() == 'PENDIENTE' or reserva.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/cancelar(id=${reserva.id})}" method="post">
+          <form th:if="${reserva.estado.name() == 'PENDIENTE' or reserva.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/cancelar(id=${reserva.id},operadorId=${operadorId})}" method="post">
             <button type="submit" class="btn-eliminar" onclick="return confirm('Cancel this reservation?');">Cancel reservation</button>
           </form>
-          <a th:href="@{/operator/reservas}" class="enlace-subrayado">← Back to reservations</a>
+          <a th:href="@{/operator/reservas(operadorId=${operadorId})}" class="enlace-subrayado">← Back to reservations</a>
         </div>
       </section>
 
@@ -126,7 +126,7 @@
               <span class="operador-pagado" th:if="${i.pagado}">Paid</span>
             </span>
             <form th:if="${cuenta.estado.name() == 'ABIERTA' and !i.pagado}"
-                  th:action="@{/operator/reservas/{id}/consumos/{itemId}/eliminar(id=${reserva.id},itemId=${i.id})}" method="post">
+                  th:action="@{/operator/reservas/{id}/consumos/{itemId}/eliminar(id=${reserva.id},itemId=${i.id},operadorId=${operadorId})}" method="post">
               <button type="submit" class="operador-quitar" aria-label="Remove charge"
                       onclick="return confirm('Remove this charge from the account?');">Remove</button>
             </form>
@@ -154,7 +154,7 @@
 
         <th:block th:if="${cuenta.estado.name() == 'ABIERTA'}">
           <div class="operador-formularios">
-            <form th:action="@{/operator/reservas/{id}/consumos(id=${reserva.id})}" method="post" class="operador-formulario">
+            <form th:action="@{/operator/reservas/{id}/consumos(id=${reserva.id},operadorId=${operadorId})}" method="post" class="operador-formulario">
               <h3 class="operador-subtitulo">Charge a service</h3>
               <label>
                 <span>Service</span>
@@ -170,7 +170,7 @@
               <button type="submit" class="btn-dorado">Add to account</button>
             </form>
 
-            <form th:action="@{/operator/reservas/{id}/pagos(id=${reserva.id})}" method="post" class="operador-formulario">
+            <form th:action="@{/operator/reservas/{id}/pagos(id=${reserva.id},operadorId=${operadorId})}" method="post" class="operador-formulario">
               <h3 class="operador-subtitulo">Register payment</h3>
               <label>
                 <span>Amount</span>

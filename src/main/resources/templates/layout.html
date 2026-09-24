@@ -88,11 +88,11 @@
     <div class="contenedor admin-vistas-contenido">
       <span class="admin-vistas-label">Operations</span>
       <nav class="admin-vistas-toggle">
-        <a th:href="@{/operator}"
+        <a th:href="@{/operator(operadorId=${operadorId})}"
            th:classappend="${activo == 'dashboard'} ? ' admin-vistas-activo' : ''">Dashboard</a>
-        <a th:href="@{/operator/reservas}"
+        <a th:href="@{/operator/reservas(operadorId=${operadorId})}"
            th:classappend="${activo == 'reservas'} ? ' admin-vistas-activo' : ''">Reservations</a>
-        <a th:href="@{/operator/habitaciones}"
+        <a th:href="@{/operator/habitaciones(operadorId=${operadorId})}"
            th:classappend="${activo == 'habitaciones'} ? ' admin-vistas-activo' : ''">Rooms</a>
       </nav>
       <form th:action="@{/operator/logout}" method="post" class="operador-salir">

@@ -6,7 +6,6 @@ import com.theroyale.backend.service.AutenticacionService;
 import com.theroyale.backend.service.AutenticacionService.ResultadoRegistro;
 import com.theroyale.backend.service.ClienteService;
 import com.theroyale.backend.service.OperadorService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,7 +48,7 @@ public class AutenticacionController {
     }
 
     @PostMapping("/login")
-    public String iniciarSesion(String email, String password, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String iniciarSesion(String email, String password, RedirectAttributes redirectAttributes) {
         Optional<Cliente> clienteAutenticado = autenticacionService.autenticar(email, password);
 
         if (clienteAutenticado.isPresent()) {
@@ -60,8 +59,7 @@ public class AutenticacionController {
         Optional<Operador> operadorAutenticado = operadorService.autenticar(email, password);
 
         if (operadorAutenticado.isPresent()) {
-            session.setAttribute(OperatorController.ATRIBUTO_SESION, operadorAutenticado.get().getId());
-            return "redirect:/operator";
+            return "redirect:/operator?operadorId=" + operadorAutenticado.get().getId();
         }
 
         redirectAttributes.addAttribute("error", "invalid");
@@ -129,6 +127,7 @@ public class AutenticacionController {
     @GetMapping("/profile")
     public String mostrarPerfil(@RequestParam(required = false) Long clienteId,
                                 @RequestParam(required = false) String mensaje,
+                                @RequestParam(required = false) String error,
                                 Model model) {
         Optional<Cliente> cliente = autenticacionService.obtenerClienteAutenticado(clienteId);
 
@@ -142,6 +141,10 @@ public class AutenticacionController {
 
         if ("profileUpdated".equals(mensaje)) {
             model.addAttribute("mensaje", "Profile updated successfully.");
+        }
+
+        if (error != null) {
+            model.addAttribute("error", error);
         }
 
         return "profile";
@@ -182,7 +185,7 @@ public class AutenticacionController {
             clienteService.eliminar(clienteId);
         } catch (IllegalStateException ex) {
             redirectAttributes.addAttribute("clienteId", clienteId);
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addAttribute("error", ex.getMessage());
             return "redirect:/profile";
         }
 

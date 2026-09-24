@@ -7,7 +7,6 @@ import com.theroyale.backend.service.HabitacionService;
 import com.theroyale.backend.service.InterfaceService;
 import com.theroyale.backend.service.OperadorService;
 import com.theroyale.backend.service.ReservaService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +17,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 // ===== Panel del operario: habitaciones, reservas y cuenta de consumo de cada estadia =====
-// Por ahora /operator es accesible sin iniciar sesion. Si el operador si entro por /login, sus acciones quedan
-// a su nombre; si no, se atribuyen al operador predeterminado (ver OperadorService.obtenerOPredeterminado).
+// El operador que inicio sesion viaja en la URL como ?operadorId= (igual que ?clienteId= para los huespedes).
+// Si no llega, las acciones se atribuyen al operador predeterminado (ver OperadorService.obtenerOPredeterminado).
 @Controller
 @RequestMapping("/operator")
 public class OperatorController {
-
-    // Nombre con el que AutenticacionController guarda el id del operador en la sesion al iniciar sesion
-    public static final String ATRIBUTO_SESION = "operadorId";
 
     private static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER");
 
@@ -48,7 +44,11 @@ public class OperatorController {
     }
 
     @GetMapping
-    public String dashboard(@SessionAttribute(name = ATRIBUTO_SESION, required = false) Long operadorId, Model model) {
+    public String dashboard(@RequestParam(required = false) Long operadorId,
+                            @RequestParam(required = false) String mensaje,
+                            @RequestParam(required = false) String error,
+                            Model model) {
+        prepararVista(model, operadorId, mensaje, error);
         model.addAttribute("operador", operadorService.obtenerOPredeterminado(operadorId));
         model.addAttribute("habitacionesDisponibles", habitacionService.contarPorEstado(EstadoHabitacion.DISPONIBLE));
         model.addAttribute("habitacionesOcupadas", habitacionService.contarPorEstado(EstadoHabitacion.OCUPADA));
@@ -63,7 +63,11 @@ public class OperatorController {
 
     // ===== Habitaciones =====
     @GetMapping("/habitaciones")
-    public String habitaciones(Model model) {
+    public String habitaciones(@RequestParam(required = false) Long operadorId,
+                               @RequestParam(required = false) String mensaje,
+                               @RequestParam(required = false) String error,
+                               Model model) {
+        prepararVista(model, operadorId, mensaje, error);
         model.addAttribute("habitaciones", habitacionService.listarOrdenadas());
         model.addAttribute("estados", EstadoHabitacion.values());
         return "operator/habitaciones";
@@ -72,14 +76,20 @@ public class OperatorController {
     @PostMapping("/habitaciones/{id}/estado")
     public String cambiarEstadoHabitacion(@PathVariable Long id,
                                           @RequestParam EstadoHabitacion estado,
+                                          @RequestParam(required = false) Long operadorId,
                                           RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Room status updated.", () -> habitacionService.cambiarEstado(id, estado));
+        ejecutar(redirectAttributes, operadorId, "Room status updated.", () -> habitacionService.cambiarEstado(id, estado));
         return "redirect:/operator/habitaciones";
     }
 
     // ===== Reservas =====
     @GetMapping("/reservas")
-    public String reservas(@RequestParam(required = false) EstadoReserva estado, Model model) {
+    public String reservas(@RequestParam(required = false) EstadoReserva estado,
+                           @RequestParam(required = false) Long operadorId,
+                           @RequestParam(required = false) String mensaje,
+                           @RequestParam(required = false) String error,
+                           Model model) {
+        prepararVista(model, operadorId, mensaje, error);
         model.addAttribute("reservas", reservaService.listar(estado));
         model.addAttribute("estados", EstadoReserva.values());
         model.addAttribute("conteos", reservaService.contarTodasPorEstado());
@@ -88,7 +98,12 @@ public class OperatorController {
     }
 
     @GetMapping("/reservas/{id}")
-    public String detalleReserva(@PathVariable Long id, Model model) {
+    public String detalleReserva(@PathVariable Long id,
+                                 @RequestParam(required = false) Long operadorId,
+                                 @RequestParam(required = false) String mensaje,
+                                 @RequestParam(required = false) String error,
+                                 Model model) {
+        prepararVista(model, operadorId, mensaje, error);
         model.addAttribute("reserva", reservaService.obtenerPorId(id));
         model.addAttribute("cuenta", cuentaService.buscarPorReserva(id).orElse(null));
         model.addAttribute("servicios", servicioService.listarServicios());
@@ -99,32 +114,36 @@ public class OperatorController {
     @PostMapping("/reservas/{id}/confirmar")
     public String confirmar(@PathVariable Long id,
                             @RequestParam(defaultValue = "detalle") String volver,
+                            @RequestParam(required = false) Long operadorId,
                             RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Reservation confirmed.", () -> reservaService.confirmar(id));
+        ejecutar(redirectAttributes, operadorId, "Reservation confirmed.", () -> reservaService.confirmar(id));
         return destino(id, volver);
     }
 
     @PostMapping("/reservas/{id}/cancelar")
     public String cancelar(@PathVariable Long id,
                            @RequestParam(defaultValue = "detalle") String volver,
+                           @RequestParam(required = false) Long operadorId,
                            RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Reservation cancelled.", () -> reservaService.cancelar(id));
+        ejecutar(redirectAttributes, operadorId, "Reservation cancelled.", () -> reservaService.cancelar(id));
         return destino(id, volver);
     }
 
     @PostMapping("/reservas/{id}/check-in")
     public String checkIn(@PathVariable Long id,
                           @RequestParam(defaultValue = "detalle") String volver,
+                          @RequestParam(required = false) Long operadorId,
                           RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Check-in completed. The guest account is open.", () -> reservaService.hacerCheckIn(id));
+        ejecutar(redirectAttributes, operadorId, "Check-in completed. The guest account is open.", () -> reservaService.hacerCheckIn(id));
         return destino(id, volver);
     }
 
     @PostMapping("/reservas/{id}/check-out")
     public String checkOut(@PathVariable Long id,
                            @RequestParam(defaultValue = "detalle") String volver,
+                           @RequestParam(required = false) Long operadorId,
                            RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Check-out completed. The room is available again.", () -> reservaService.hacerCheckOut(id));
+        ejecutar(redirectAttributes, operadorId, "Check-out completed. The room is available again.", () -> reservaService.hacerCheckOut(id));
         return destino(id, volver);
     }
 
@@ -133,17 +152,18 @@ public class OperatorController {
     public String agregarConsumo(@PathVariable Long id,
                                  @RequestParam Long servicioId,
                                  @RequestParam Integer cantidad,
-                                 @SessionAttribute(name = ATRIBUTO_SESION, required = false) Long operadorId,
+                                 @RequestParam(required = false) Long operadorId,
                                  RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Charge added to the account.", () -> cuentaService.agregarConsumo(id, servicioId, cantidad, operadorId));
+        ejecutar(redirectAttributes, operadorId, "Charge added to the account.", () -> cuentaService.agregarConsumo(id, servicioId, cantidad, operadorId));
         return destino(id, "detalle");
     }
 
     @PostMapping("/reservas/{id}/consumos/{itemId}/eliminar")
     public String eliminarConsumo(@PathVariable Long id,
                                   @PathVariable Long itemId,
+                                  @RequestParam(required = false) Long operadorId,
                                   RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Charge removed from the account.", () -> cuentaService.eliminarConsumo(id, itemId));
+        ejecutar(redirectAttributes, operadorId, "Charge removed from the account.", () -> cuentaService.eliminarConsumo(id, itemId));
         return destino(id, "detalle");
     }
 
@@ -151,26 +171,35 @@ public class OperatorController {
     public String registrarPago(@PathVariable Long id,
                                 @RequestParam BigDecimal monto,
                                 @RequestParam String metodoPago,
-                                @SessionAttribute(name = ATRIBUTO_SESION, required = false) Long operadorId,
+                                @RequestParam(required = false) Long operadorId,
                                 RedirectAttributes redirectAttributes) {
-        ejecutar(redirectAttributes, "Payment registered.", () -> cuentaService.registrarPago(id, monto, metodoPago, operadorId));
+        ejecutar(redirectAttributes, operadorId, "Payment registered.", () -> cuentaService.registrarPago(id, monto, metodoPago, operadorId));
         return destino(id, "detalle");
     }
 
     @PostMapping("/logout")
-    public String cerrarSesion(HttpSession session) {
-        session.invalidate();
+    public String cerrarSesion() {
         return "redirect:/login";
     }
 
     // ===== Utilidades =====
+    // Pasa a la vista el operador actual (para propagarlo en links y formularios) y los avisos recibidos por URL.
+    private void prepararVista(Model model, Long operadorId, String mensaje, String error) {
+        model.addAttribute("operadorId", operadorId);
+        model.addAttribute("mensaje", mensaje);
+        model.addAttribute("error", error);
+    }
+
     // Los errores de negocio (transicion invalida, saldo, etc.) se muestran como alerta en la misma vista.
-    private void ejecutar(RedirectAttributes redirectAttributes, String exito, Supplier<?> accion) {
+    private void ejecutar(RedirectAttributes redirectAttributes, Long operadorId, String exito, Supplier<?> accion) {
+        if (operadorId != null) {
+            redirectAttributes.addAttribute("operadorId", operadorId);
+        }
         try {
             accion.get();
-            redirectAttributes.addFlashAttribute("mensaje", exito);
+            redirectAttributes.addAttribute("mensaje", exito);
         } catch (IllegalStateException | IllegalArgumentException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            redirectAttributes.addAttribute("error", ex.getMessage());
         }
     }
 

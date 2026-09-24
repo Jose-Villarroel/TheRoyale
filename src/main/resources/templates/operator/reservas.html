@@ -22,9 +22,9 @@
 
   <!-- Filtro por estado: un clic, con la cantidad a la vista (sin recargar por un select) -->
   <nav class="operador-filtros" aria-label="Filter by status">
-    <a th:href="@{/operator/reservas}" th:classappend="${estadoFiltro == null} ? ' es-activo' : ''"
+    <a th:href="@{/operator/reservas(operadorId=${operadorId})}" th:classappend="${estadoFiltro == null} ? ' es-activo' : ''"
        th:attr="aria-current=${estadoFiltro == null} ? 'page' : null">All</a>
-    <a th:each="e : ${estados}" th:href="@{/operator/reservas(estado=${e})}"
+    <a th:each="e : ${estados}" th:href="@{/operator/reservas(estado=${e},operadorId=${operadorId})}"
        th:classappend="${e == estadoFiltro} ? ' es-activo' : ''"
        th:attr="aria-current=${e == estadoFiltro} ? 'page' : null">
       <span th:text="${e.name().replace('_', ' ')}">PENDIENTE</span>
@@ -47,7 +47,7 @@
       <tbody>
         <tr th:each="r : ${reservas}">
           <td>
-            <a th:href="@{/operator/reservas/{id}(id=${r.id})}" class="operador-celda-principal">
+            <a th:href="@{/operator/reservas/{id}(id=${r.id},operadorId=${operadorId})}" class="operador-celda-principal">
               <strong th:text="${r.cliente.nombreCompleto}">Guest</strong>
               <span th:text="${r.cliente.email}">guest@example.com</span>
             </a>
@@ -75,21 +75,21 @@
           <td><span class="chip-estado" th:attr="data-estado=${r.estado}" th:text="${r.estado.name().replace('_', ' ')}">PENDIENTE</span></td>
           <td class="col-acciones">
             <div class="operador-acciones">
-              <a th:href="@{/operator/reservas/{id}(id=${r.id})}" class="enlace-subrayado">Open</a>
+              <a th:href="@{/operator/reservas/{id}(id=${r.id},operadorId=${operadorId})}" class="enlace-subrayado">Open</a>
 
-              <form th:if="${r.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${r.id})}" method="post">
+              <form th:if="${r.estado.name() == 'PENDIENTE'}" th:action="@{/operator/reservas/{id}/confirmar(id=${r.id},operadorId=${operadorId})}" method="post">
                 <input type="hidden" name="volver" value="lista">
                 <button type="submit" class="btn-contorno-oscuro btn-mini">Confirm</button>
               </form>
-              <form th:if="${r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${r.id})}" method="post">
+              <form th:if="${r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/check-in(id=${r.id},operadorId=${operadorId})}" method="post">
                 <input type="hidden" name="volver" value="lista">
                 <button type="submit" class="btn-dorado btn-mini">Check-in</button>
               </form>
-              <form th:if="${r.estado.name() == 'EN_CURSO'}" th:action="@{/operator/reservas/{id}/check-out(id=${r.id})}" method="post">
+              <form th:if="${r.estado.name() == 'EN_CURSO'}" th:action="@{/operator/reservas/{id}/check-out(id=${r.id},operadorId=${operadorId})}" method="post">
                 <input type="hidden" name="volver" value="lista">
                 <button type="submit" class="btn-dorado btn-mini">Check-out</button>
               </form>
-              <form th:if="${r.estado.name() == 'PENDIENTE' or r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/cancelar(id=${r.id})}" method="post">
+              <form th:if="${r.estado.name() == 'PENDIENTE' or r.estado.name() == 'CONFIRMADA'}" th:action="@{/operator/reservas/{id}/cancelar(id=${r.id},operadorId=${operadorId})}" method="post">
                 <input type="hidden" name="volver" value="lista">
                 <button type="submit" class="btn-eliminar btn-mini" onclick="return confirm('Cancel this reservation?');">Cancel</button>
               </form>

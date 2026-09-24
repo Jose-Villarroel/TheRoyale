@@ -32,7 +32,7 @@
           <td class="col-num" th:text="'$' + ${#numbers.formatDecimal(h.precio, 1, 2)}">$120.00</td>
           <td><span class="chip-estado" th:attr="data-estado=${h.estado}" th:text="${h.estado}">DISPONIBLE</span></td>
           <td>
-            <form th:action="@{/operator/habitaciones/{id}/estado(id=${h.id})}" method="post" class="operador-form-linea">
+            <form th:action="@{/operator/habitaciones/{id}/estado(id=${h.id},operadorId=${operadorId})}" method="post" class="operador-form-linea">
               <select name="estado" class="operador-select" aria-label="New status">
                 <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == h.estado}">DISPONIBLE</option>
               </select>
