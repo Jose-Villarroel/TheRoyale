@@ -1,0 +1,384 @@
+<!-- ===== Barra utilitaria + navegación ===== -->
+<div class="envoltorio-cabecera" id="envoltorioCabecera">
+
+  <div class="barra-utilitaria" id="barraUtilitaria">
+    <div class="barra-utilitaria-izquierda">
+      <a href="/admin" class="btn-admin-acceso">Admin</a>
+    </div>
+    <div class="barra-utilitaria-derecha">
+      <a href="/contact">+1 507 3165 232</a>
+      <a href="/login">Sign In</a>
+    </div>
+  </div>
+
+  <header class="cabecera" id="cabecera">
+    <a href="/" class="marca">
+      <img src="/images/logo-removebg-preview.png" alt="The Royale" class="marca-logo">
+    </a>
+
+    <nav class="nav-principal" id="navPrincipal">
+      <a href="#rooms">Rooms</a>
+      <a href="#services">Services</a>
+      <a href="#experiences">Experiences</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+
+    <a href="/login" class="btn-dorado btn-nav-reserva">Book Now</a>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" (click)="abrirMenuMovil()">
+      <span></span><span></span>
+    </button>
+  </header>
+</div>
+
+<!-- ===== Menú móvil ===== -->
+<div class="menu-movil" id="menuMovil">
+  <div class="menu-movil-encabezado">
+    <img src="/images/logo.jpeg" alt="The Royale" class="marca-logo marca-logo-movil">
+    <button id="menuCerrar" aria-label="Cerrar menú" (click)="cerrarMenuMovil()">&times;</button>
+  </div>
+  <nav class="menu-movil-nav">
+    <a href="/admin" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Admin</a>
+    <a href="#rooms" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Rooms</a>
+    <a href="#services" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Services</a>
+    <a href="#experiences" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Experiences</a>
+    <a href="/about" class="enlace-menu-movil" (click)="cerrarMenuMovil()">About</a>
+    <a href="/contact" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Contact</a>
+  </nav>
+  <div class="menu-movil-pie">
+    <a href="/login">Sign In</a>
+    <a href="/login" class="btn-dorado">Book Now</a>
+  </div>
+</div>
+
+<main>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero" id="top">
+    <div class="hero-media" id="heroMedia">
+      <img src="/images/entrada2.PNG" alt="Entrada de The Royale">
+    </div>
+    <div class="hero-degradado"></div>
+
+    <div class="hero-contenido aparecer">
+      <h1>Stay Above<br>the Ordinary.</h1>
+      <p class="hero-subtexto">Experience refined luxury in the heart of New York.</p>
+      <div class="hero-botones">
+        <a href="/login" class="btn-dorado">Book Your Stay</a>
+        <a href="#about" class="btn-contorno-claro">Explore The Royale</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Formulario de reserva flotante ===== -->
+  <section class="seccion-formulario">
+    <form class="formulario-reserva aparecer" (ngSubmit)="manejarFormularioReserva($event)">
+      <label>
+        <span>Arrival</span>
+        <input type="date" name="llegada" required>
+      </label>
+      <label>
+        <span>Departure</span>
+        <input type="date" name="salida" required>
+      </label>
+      <label>
+        <span>Guests</span>
+        <select name="huespedes">
+          <option>1 guest</option>
+          <option>2 guests</option>
+          <option>3 guests</option>
+          <option>4 guests</option>
+        </select>
+      </label>
+      <label>
+        <span>Room</span>
+        <select name="habitacion">
+          <option *ngFor="let tipo of tiposHabitacion">{{ tipo.nombre }}</option>
+        </select>
+      </label>
+      <button type="submit" class="btn-dorado">Check Availability</button>
+    </form>
+    <p class="formulario-nota">Sign in required to confirm a reservation.</p>
+  </section>
+
+  <!-- ===== 01 — The Hotel ===== -->
+  <section class="seccion" id="about">
+    <div class="contenedor grid-about">
+      <div class="about-texto aparecer">
+        <p class="eyebrow">01 — The Hotel</p>
+        <h2>A Different Kind of Luxury</h2>
+        <span class="linea-dorada-horizontal"></span>
+        <p class="parrafo-cuerpo">
+          The Royale brings together contemporary elegance, personalized service and the
+          unmistakable energy of New York. Every detail is designed for guests who expect
+          more from their stay.
+        </p>
+        <div class="stats-fila">
+          <div class="stat">
+            <span class="stat-numero">48</span>
+            <span class="stat-label">Rooms &amp; Suites</span>
+          </div>
+          <div class="stat">
+            <span class="stat-numero">24/7</span>
+            <span class="stat-label">Concierge</span>
+          </div>
+          <div class="stat">
+            <span class="stat-numero">5th Ave</span>
+            <span class="stat-label">Midtown Manhattan</span>
+          </div>
+        </div>
+        <a href="/about" class="enlace-subrayado">About The Royale</a>
+      </div>
+
+      <div class="about-imagenes aparecer">
+        <div class="about-imagen-grande">
+          <img src="/images/dinningroom-1.webp" alt="Lobby de The Royale">
+        </div>
+        <div class="about-imagen-pequena">
+          <img src="/images/suite-2.webp" alt="Detalle de una suite de The Royale">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Cita destacada ===== -->
+  <section class="seccion seccion-oscura seccion-cita">
+    <div class="linea-vertical-dorada"></div>
+    <blockquote class="aparecer">
+      Luxury is not what is added. It is what is understood.
+    </blockquote>
+    <p class="cita-atribucion aparecer">The Royale, New York</p>
+  </section>
+
+  <!-- ===== 02 — Accommodation (carrusel de habitaciones) ===== -->
+  <section class="seccion" id="rooms">
+    <div class="contenedor">
+      <div class="rooms-encabezado aparecer">
+        <div>
+          <p class="eyebrow">02 — Accommodation</p>
+          <h2>Rooms &amp; Suites</h2>
+          <p class="parrafo-cuerpo">Spaces designed around the way you travel.</p>
+        </div>
+        <div class="carrusel-controles">
+          <button class="btn-carrusel" aria-label="Habitación anterior" (click)="irHabitacionAnterior()">&#8592;</button>
+          <button class="btn-carrusel" aria-label="Siguiente habitación" (click)="irHabitacionSiguiente()">&#8594;</button>
+        </div>
+      </div>
+
+      <div class="carrusel-ventana aparecer">
+        <div class="carrusel-track" id="carruselTrack">
+
+          <article class="habitacion-slide" *ngFor="let tipo of tiposHabitacion; let i = index">
+            <div class="habitacion-imagen">
+              <img [src]="tipo.imagenUrl || '/images/hotel.webp'" [alt]="tipo.nombre">
+            </div>
+            <div class="habitacion-info">
+              <span class="numero-dorado">{{ (i + 1).toString().padStart(2, '0') }} / {{ tipo.nombre }}</span>
+              <h3>{{ tipo.descripcion }}</h3>
+              <a [href]="'/rooms/' + tipo.id" class="enlace-subrayado">View Room</a>
+            </div>
+          </article>
+
+          <p class="parrafo-cuerpo" *ngIf="tiposHabitacion.length === 0">No room types are available yet.</p>
+
+        </div>
+      </div>
+
+      <div class="carrusel-pie aparecer">
+        <div class="carrusel-progreso-contenedor">
+          <span id="carruselContador">01 / 05</span>
+          <span class="carrusel-barra">
+            <span class="carrusel-barra-relleno" id="carruselProgreso"></span>
+          </span>
+        </div>
+        <a href="/rooms" class="btn-contorno-oscuro">Explore All Rooms</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 03 — Services ===== -->
+  <section class="seccion seccion-off-blanca" id="services">
+    <div class="contenedor services-encabezado aparecer">
+      <div>
+        <p class="eyebrow">03 — Services</p>
+        <h2>Everything You Need. Nothing You Don't.</h2>
+      </div>
+      <p class="parrafo-cuerpo">
+        From wellness and dining to transportation and private experiences, The Royale
+        gives you the freedom to personalize your stay. Services are optional and charged
+        individually to your room account.
+      </p>
+    </div>
+
+    <div class="tarjetas-servicios aparecer" id="tarjetasServicios">
+      <a *ngFor="let servicio of servicios; let i = index"
+         [href]="'/services/' + servicio.nombre"
+         class="tarjeta-servicio">
+        <div class="tarjeta-servicio-imagen">
+          <img [src]="servicio.imagenUrl" [alt]="servicio.nombre">
+        </div>
+        <div class="tarjeta-servicio-info">
+          <span class="numero-romano">{{ ['I','II','III','IV','V','VI','VII','VIII'][i] || (i + 1) }}</span>
+          <h3>{{ servicio.nombre }}</h3>
+          <p>{{ servicio.descripcion.split('.')[0] }}.</p>
+          <span class="tarjeta-servicio-precio">From ${{ servicio.precio }}</span>
+        </div>
+      </a>
+    </div>
+    <p class="servicios-scroll-hint">Scroll →</p>
+
+    <div class="contenedor">
+      <a href="/services/cards" class="btn-contorno-oscuro btn-centrado aparecer">Explore Services</a>
+    </div>
+  </section>
+
+  <!-- ===== 04 — Experiences ===== -->
+  <section class="seccion seccion-oscura seccion-experiencias" id="experiences">
+    <div class="experiencias-media" id="experienciasMedia"></div>
+    <div class="experiencias-degradado"></div>
+
+    <div class="contenedor experiencias-encabezado aparecer">
+      <div>
+        <p class="eyebrow eyebrow-claro">04 — Experiences</p>
+        <h2>New York, Your Way.</h2>
+        <p class="parrafo-cuerpo parrafo-claro">
+          Discover New York beyond your room. Our curated experiences and trusted
+          partners make exploring the city effortless.
+        </p>
+      </div>
+      <a href="/experiences" class="btn-dorado">Discover Experiences</a>
+    </div>
+
+    <div class="experiencias-tira aparecer" id="experienciasTira">
+      <a href="/experiences" class="experiencia-tarjeta">
+        <img src="/images/nyc-tour.jpg" alt="Tour guiado por la ciudad">
+        <span>Guided city tours</span>
+      </a>
+      <a href="/experiences" class="experiencia-tarjeta">
+        <img src="/images/private-transport.jpg" alt="Transporte privado">
+        <span>Private transportation</span>
+      </a>
+      <a href="/experiences" class="experiencia-tarjeta">
+        <img src="/images/airport-transfer.jpg" alt="Traslado al aeropuerto">
+        <span>Airport transfers</span>
+      </a>
+      <a href="/experiences" class="experiencia-tarjeta">
+        <img src="/images/bike-rental.jpg" alt="Alquiler de bicicletas">
+        <span>Bicycle rentals</span>
+      </a>
+      <a href="/experiences" class="experiencia-tarjeta">
+        <img src="/images/broadway.jpg" alt="Entradas para Broadway">
+        <span>Broadway tickets</span>
+      </a>
+      <a href="/experiences" class="experiencia-tarjeta">
+        <img src="/images/the-MET.jpg" alt="Museos y atracciones">
+        <span>Museums &amp; attractions</span>
+      </a>
+      <a href="/experiences" class="experiencia-tarjeta">
+        <img src="/images/private-chef.jpg" alt="Experiencias privadas en Nueva York">
+        <span>Private experiences</span>
+      </a>
+    </div>
+    <p class="experiencias-scroll-hint">Scroll →</p>
+  </section>
+
+  <!-- ===== 05 — Business Travel ===== -->
+  <section class="seccion">
+    <div class="contenedor grid-business">
+      <div class="business-imagen aparecer">
+        <img src="/images/meeting-room.jpg" alt="Espacio de trabajo en habitación ejecutiva">
+      </div>
+      <div class="business-texto aparecer">
+        <p class="eyebrow">05 — Business Travel</p>
+        <h2>Designed for Business. Made for Living.</h2>
+        <span class="linea-dorada-horizontal"></span>
+        <div class="business-lista">
+          <p>Executive rooms</p>
+          <p>Workspaces</p>
+          <p>Business center</p>
+          <p>Meeting rooms</p>
+          <p>High-speed Wi-Fi</p>
+          <p>Concierge assistance</p>
+        </div>
+        <a href="/rooms" class="enlace-subrayado">View Executive Rooms</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 06 — Gallery ===== -->
+  <section class="seccion" id="gallery">
+    <div class="contenedor">
+      <div class="aparecer">
+        <p class="eyebrow">06 — Gallery</p>
+        <h2>The Royale in Detail</h2>
+      </div>
+
+      <div class="galeria-bento aparecer">
+        <div class="galeria-item galeria-grande"><img src="/images/fachada-exterior.jpg" alt="Fachada exterior de The Royale"></div>
+        <div class="galeria-item galeria-alta"><img src="/images/lobby.jpg" alt="Lobby de The Royale"></div>
+        <div class="galeria-item"><img src="/images/suite-2.webp" alt="Habitación de huéspedes"></div>
+        <div class="galeria-item"><img src="/images/architecture.jpg" alt="Detalle arquitectónico"></div>
+        <div class="galeria-item galeria-ancha"><img src="/images/suite-3.webp" alt="Suite de lujo"></div>
+        <div class="galeria-item"><img src="/images/restaurant.jpg" alt="Restaurante de The Royale"></div>
+        <div class="galeria-item"><img src="/images/spa.webp" alt="Spa de The Royale"></div>
+        <div class="galeria-item galeria-ancha"><img src="/images/skyline.jpg" alt="Vista al skyline de Manhattan"></div>
+        <div class="galeria-item galeria-ancha"><img src="/images/vessel.jpg" alt="The Vessel, New York"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA final ===== -->
+  <section class="seccion seccion-oscura seccion-cta">
+    <div class="linea-vertical-dorada aparecer"></div>
+    <h2 class="aparecer">Your New York Story Starts Here.</h2>
+    <p class="cta-subtexto aparecer">Stay at The Royale and experience New York with a different perspective.</p>
+    <a href="/login" class="btn-dorado aparecer">Book Your Stay</a>
+  </section>
+
+</main>
+
+<!-- ===== Footer ===== -->
+<footer class="pie-pagina">
+  <div class="contenedor">
+    <div class="pie-superior">
+      <div class="pie-presentacion">
+        <span class="pie-marca">The Royale</span>
+        <p>Boutique luxury in the heart of New York City.</p>
+      </div>
+      <form class="formulario-newsletter" (ngSubmit)="manejarFormularioNewsletter($event)">
+        <label>Newsletter</label>
+        <div class="formulario-newsletter-campos">
+          <input type="email" placeholder="Your email" required>
+          <button type="submit" class="pie-boton">Subscribe</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="footer-columnas">
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Explore</span>
+        <a href="#rooms">Rooms</a>
+        <a href="#services">Services</a>
+        <a href="#experiences">Experiences</a>
+        <a href="/about">About</a>
+      </div>
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Guest</span>
+        <a href="/login">Sign In</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Follow</span>
+        <div class="footer-redes">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="Facebook">FB</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-inferior">
+      <span>© 2026 The Royale. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
