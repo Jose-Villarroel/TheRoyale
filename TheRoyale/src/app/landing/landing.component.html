@@ -3,7 +3,7 @@
 
   <div class="barra-utilitaria" id="barraUtilitaria">
     <div class="barra-utilitaria-izquierda">
-      <a href="/admin" class="btn-admin-acceso">Admin</a>
+      <a routerLink="/admin/tipos-habitacion" class="btn-admin-acceso">Admin</a>
     </div>
     <div class="barra-utilitaria-derecha">
       <a href="/contact">+1 507 3165 232</a>
@@ -39,7 +39,7 @@
     <button id="menuCerrar" aria-label="Cerrar menú" (click)="cerrarMenuMovil()">&times;</button>
   </div>
   <nav class="menu-movil-nav">
-    <a href="/admin" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Admin</a>
+    <a routerLink="/admin/tipos-habitacion" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Admin</a>
     <a href="#rooms" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Rooms</a>
     <a href="#services" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Services</a>
     <a href="#experiences" class="enlace-menu-movil" (click)="cerrarMenuMovil()">Experiences</a>

@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { TipoHabitacionService } from '../services/tipo-habitacion.service';
 import { ServicioService } from '../services/servicio.service';
 import { TipoHabitacion } from '../models/tipo-habitacion.model';
@@ -8,7 +9,7 @@ import { Servicio } from '../models/servicio.model';
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './landing.component.html'
 })
 export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {

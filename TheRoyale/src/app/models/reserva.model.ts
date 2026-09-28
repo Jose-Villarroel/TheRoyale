@@ -1,10 +1,9 @@
-export type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA' | 'FINALIZADA';
+export type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'EN_CURSO' | 'CANCELADA' | 'FINALIZADA';
 
 export interface Reserva {
   id: number;
   clienteId: number;
   habitacionId: number;
-  operadorId: number | null;
   fechaInicio: string;
   fechaFin: string;
   estado: EstadoReserva;

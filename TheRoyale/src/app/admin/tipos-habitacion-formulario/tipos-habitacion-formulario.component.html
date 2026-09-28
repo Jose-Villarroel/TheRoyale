@@ -1,0 +1,44 @@
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Admin</p>
+    <h1>{{ id !== null ? 'Edit Room Type' : 'New Room Type' }}</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto">Give this tier a name, a description guests will read, and a photo that represents it.</p>
+  </div>
+</header>
+
+<main class="contenedor seccion-admin-contenido">
+  <p *ngIf="error" class="perfil-alerta perfil-alerta-error">{{ error }}</p>
+
+  <div class="formulario-admin-panel">
+    <form (ngSubmit)="guardar()" class="formulario-admin">
+
+      <label>
+        <span>Name</span>
+        <input type="text" name="nombre" [(ngModel)]="nombre" required>
+      </label>
+
+      <label>
+        <span>Description</span>
+        <textarea name="descripcion" [(ngModel)]="descripcion" rows="4" required></textarea>
+      </label>
+
+      <div class="formulario-admin-imagen">
+        <label>
+          <span>Image URL</span>
+          <input type="text" name="imagenUrl" [(ngModel)]="imagenUrl" placeholder="/images/suite-1.webp">
+        </label>
+
+        <!-- La previa se actualiza sola con el binding, sin el script de Thymeleaf -->
+        <div class="imagen-previa-wrap">
+          <img [src]="imagenUrl || '/images/hotel.webp'" alt="Preview">
+        </div>
+      </div>
+
+      <div class="formulario-admin-botones">
+        <button type="submit" class="btn-dorado">Save</button>
+        <a routerLink="/admin/tipos-habitacion" class="btn-contorno-oscuro">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
