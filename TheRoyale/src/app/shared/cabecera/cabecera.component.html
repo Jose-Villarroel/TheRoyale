@@ -1,0 +1,33 @@
+<!-- ===== Barra utilitaria + navegación ===== -->
+<div class="envoltorio-cabecera" [class.cabecera-solida]="solida">
+
+  <div class="barra-utilitaria">
+    <div class="barra-utilitaria-izquierda">
+      <a routerLink="/admin/tipos-habitacion" class="btn-admin-acceso">Admin</a>
+    </div>
+    <div class="barra-utilitaria-derecha">
+      <a href="/contact">+1 507 3165 232</a>
+      <a href="/login">Sign In</a>
+    </div>
+  </div>
+
+  <header class="cabecera">
+    <a href="/" class="marca">
+      <img src="/images/logo-removebg-preview.png" alt="The Royale" class="marca-logo">
+    </a>
+
+    <nav class="nav-principal">
+      <a href="#rooms">Rooms</a>
+      <a href="#services">Services</a>
+      <a href="#experiences">Experiences</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+
+    <a href="/login" class="btn-dorado btn-nav-reserva">Book Now</a>
+
+    <button class="menu-toggle" aria-label="Abrir menú" (click)="abrirMenu.emit()">
+      <span></span><span></span>
+    </button>
+  </header>
+</div>

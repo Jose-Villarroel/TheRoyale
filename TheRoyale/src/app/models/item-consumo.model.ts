@@ -1,8 +1,12 @@
+import { Cuenta } from './cuenta.model';
+import { Operador } from './operador.model';
+import { Servicio } from './servicio.model';
+
 export interface ItemConsumo {
   id: number;
-  cuentaId: number;
-  servicioId: number;
-  operadorId: number;
+  cuenta: Cuenta;
+  servicio: Servicio;
+  operador: Operador;
   cantidad: number;
   fechaHora: string;
   precioUnitario: number;

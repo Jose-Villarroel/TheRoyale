@@ -1,0 +1,47 @@
+<!-- ===== 02 — Accommodation (carrusel de habitaciones) ===== -->
+<section class="seccion" id="rooms">
+  <div class="contenedor">
+    <div class="rooms-encabezado" appAparecer>
+      <div>
+        <p class="eyebrow">02 — Accommodation</p>
+        <h2>Rooms &amp; Suites</h2>
+        <p class="parrafo-cuerpo">Spaces designed around the way you travel.</p>
+      </div>
+      <div class="carrusel-controles">
+        <button class="btn-carrusel" aria-label="Habitación anterior" (click)="irHabitacionAnterior()">&#8592;</button>
+        <button class="btn-carrusel" aria-label="Siguiente habitación" (click)="irHabitacionSiguiente()">&#8594;</button>
+      </div>
+    </div>
+
+    <div class="carrusel-ventana" appAparecer>
+      <div class="carrusel-track" [style.transform]="'translateX(-' + indice * 100 + '%)'">
+
+        <article class="habitacion-slide" *ngFor="let tipo of tipos; let i = index">
+          <div class="habitacion-imagen">
+            <img [src]="tipo.imagenUrl || '/images/hotel.webp'" [alt]="tipo.nombre">
+          </div>
+          <div class="habitacion-info">
+            <span class="numero-dorado">{{ (i + 1).toString().padStart(2, '0') }} / {{ tipo.nombre }}</span>
+            <h3>{{ tipo.descripcion }}</h3>
+            <a [href]="'/rooms/' + tipo.id" class="enlace-subrayado">View Room</a>
+          </div>
+        </article>
+
+        <p class="parrafo-cuerpo" *ngIf="tipos.length === 0">No room types are available yet.</p>
+
+      </div>
+    </div>
+
+    <div class="carrusel-pie" appAparecer>
+      <div class="carrusel-progreso-contenedor">
+        <span>{{ contador }}</span>
+        <span class="carrusel-barra">
+          <span class="carrusel-barra-relleno"
+                [style.width.%]="anchoProgreso"
+                [style.transform]="'translateX(' + indice * 100 + '%)'"></span>
+        </span>
+      </div>
+      <a href="/rooms" class="btn-contorno-oscuro">Explore All Rooms</a>
+    </div>
+  </div>
+</section>

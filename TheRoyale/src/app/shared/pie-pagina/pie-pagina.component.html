@@ -1,0 +1,44 @@
+<!-- ===== Footer ===== -->
+<footer class="pie-pagina">
+  <div class="contenedor">
+    <div class="pie-superior">
+      <div class="pie-presentacion">
+        <span class="pie-marca">The Royale</span>
+        <p>Boutique luxury in the heart of New York City.</p>
+      </div>
+      <form class="formulario-newsletter" (ngSubmit)="manejarFormularioNewsletter($event)">
+        <label>Newsletter</label>
+        <div class="formulario-newsletter-campos">
+          <input type="email" placeholder="Your email" required>
+          <button type="submit" class="pie-boton">Subscribe</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="footer-columnas">
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Explore</span>
+        <a href="#rooms">Rooms</a>
+        <a href="#services">Services</a>
+        <a href="#experiences">Experiences</a>
+        <a href="/about">About</a>
+      </div>
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Guest</span>
+        <a href="/login">Sign In</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <div class="footer-columna">
+        <span class="footer-columna-titulo">Follow</span>
+        <div class="footer-redes">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="Facebook">FB</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-inferior">
+      <span>© 2026 The Royale. All rights reserved.</span>
+    </div>
+  </div>
+</footer>

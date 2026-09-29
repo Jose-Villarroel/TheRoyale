@@ -1,0 +1,30 @@
+<!-- ===== Formulario de reserva flotante ===== -->
+<section class="seccion-formulario">
+  <form class="formulario-reserva" appAparecer (ngSubmit)="buscar.emit($event)">
+    <label>
+      <span>Arrival</span>
+      <input type="date" name="llegada" required>
+    </label>
+    <label>
+      <span>Departure</span>
+      <input type="date" name="salida" required>
+    </label>
+    <label>
+      <span>Guests</span>
+      <select name="huespedes">
+        <option>1 guest</option>
+        <option>2 guests</option>
+        <option>3 guests</option>
+        <option>4 guests</option>
+      </select>
+    </label>
+    <label>
+      <span>Room</span>
+      <select name="habitacion">
+        <option *ngFor="let tipo of tipos">{{ tipo.nombre }}</option>
+      </select>
+    </label>
+    <button type="submit" class="btn-dorado">Check Availability</button>
+  </form>
+  <p class="formulario-nota">Sign in required to confirm a reservation.</p>
+</section>

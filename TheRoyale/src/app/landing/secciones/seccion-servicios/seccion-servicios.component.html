@@ -1,0 +1,35 @@
+<!-- ===== 03 — Services ===== -->
+<section class="seccion seccion-off-blanca" id="services">
+  <div class="contenedor services-encabezado" appAparecer>
+    <div>
+      <p class="eyebrow">03 — Services</p>
+      <h2>Everything You Need. Nothing You Don't.</h2>
+    </div>
+    <p class="parrafo-cuerpo">
+      From wellness and dining to transportation and private experiences, The Royale
+      gives you the freedom to personalize your stay. Services are optional and charged
+      individually to your room account.
+    </p>
+  </div>
+
+  <div class="tarjetas-servicios" appAparecer id="tarjetasServicios">
+    <a *ngFor="let servicio of servicios; let i = index"
+       [href]="'/services/' + servicio.nombre"
+       class="tarjeta-servicio">
+      <div class="tarjeta-servicio-imagen">
+        <img [src]="servicio.imagenUrl" [alt]="servicio.nombre">
+      </div>
+      <div class="tarjeta-servicio-info">
+        <span class="numero-romano">{{ ['I','II','III','IV','V','VI','VII','VIII'][i] || (i + 1) }}</span>
+        <h3>{{ servicio.nombre }}</h3>
+        <p>{{ servicio.descripcion.split('.')[0] }}.</p>
+        <span class="tarjeta-servicio-precio">From ${{ servicio.precio }}</span>
+      </div>
+    </a>
+  </div>
+  <p class="servicios-scroll-hint">Scroll →</p>
+
+  <div class="contenedor">
+    <a href="/services/cards" class="btn-contorno-oscuro btn-centrado" appAparecer>Explore Services</a>
+  </div>
+</section>

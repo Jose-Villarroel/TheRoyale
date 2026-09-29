@@ -1,0 +1,19 @@
+<!-- ===== Menú móvil ===== -->
+<div class="menu-movil" [class.abierto]="abierto">
+  <div class="menu-movil-encabezado">
+    <img src="/images/logo.jpeg" alt="The Royale" class="marca-logo marca-logo-movil">
+    <button id="menuCerrar" aria-label="Cerrar menú" (click)="cerrar.emit()">&times;</button>
+  </div>
+  <nav class="menu-movil-nav">
+    <a routerLink="/admin/tipos-habitacion" class="enlace-menu-movil" (click)="cerrar.emit()">Admin</a>
+    <a href="#rooms" class="enlace-menu-movil" (click)="cerrar.emit()">Rooms</a>
+    <a href="#services" class="enlace-menu-movil" (click)="cerrar.emit()">Services</a>
+    <a href="#experiences" class="enlace-menu-movil" (click)="cerrar.emit()">Experiences</a>
+    <a href="/about" class="enlace-menu-movil" (click)="cerrar.emit()">About</a>
+    <a href="/contact" class="enlace-menu-movil" (click)="cerrar.emit()">Contact</a>
+  </nav>
+  <div class="menu-movil-pie">
+    <a href="/login">Sign In</a>
+    <a href="/login" class="btn-dorado">Book Now</a>
+  </div>
+</div>
