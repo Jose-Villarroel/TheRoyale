@@ -8,35 +8,55 @@
 </header>
 
 <main class="contenedor seccion-admin-contenido">
-  <p *ngIf="error" class="perfil-alerta perfil-alerta-error">{{ error }}</p>
+  @if (error) {
+    <p class="perfil-alerta perfil-alerta-error">{{ error }}</p>
+  }
 
   <div class="formulario-admin-panel">
-    <form (ngSubmit)="guardar()" class="formulario-admin">
+    <form [formGroup]="tipoForm" (ngSubmit)="guardar()" class="formulario-admin">
 
       <label>
         <span>Name</span>
-        <input type="text" name="nombre" [(ngModel)]="nombre" required>
+        <input type="text" formControlName="nombre">
+        @if (tipoForm.get('nombre')?.touched && tipoForm.get('nombre')?.invalid) {
+          <div style="color: var(--admin-rojo); font-size: 0.8rem;">
+            @if (tipoForm.get('nombre')?.errors?.['required']) { <span>Name is required.</span> }
+            @if (tipoForm.get('nombre')?.errors?.['minlength']) { <span>Minimum 3 characters.</span> }
+            @if (tipoForm.get('nombre')?.errors?.['maxlength']) { <span>Maximum 100 characters.</span> }
+          </div>
+        }
       </label>
 
       <label>
         <span>Description</span>
-        <textarea name="descripcion" [(ngModel)]="descripcion" rows="4" required></textarea>
+        <textarea formControlName="descripcion" rows="4"></textarea>
+        @if (tipoForm.get('descripcion')?.touched && tipoForm.get('descripcion')?.invalid) {
+          <div style="color: var(--admin-rojo); font-size: 0.8rem;">
+            @if (tipoForm.get('descripcion')?.errors?.['required']) { <span>Description is required.</span> }
+            @if (tipoForm.get('descripcion')?.errors?.['maxlength']) { <span>Maximum 500 characters.</span> }
+          </div>
+        }
       </label>
 
       <div class="formulario-admin-imagen">
         <label>
           <span>Image URL</span>
-          <input type="text" name="imagenUrl" [(ngModel)]="imagenUrl" placeholder="/images/suite-1.webp">
+          <input type="text" formControlName="imagenUrl" placeholder="/images/suite-1.webp">
+          @if (tipoForm.get('imagenUrl')?.errors?.['maxlength']) {
+            <div style="color: var(--admin-rojo); font-size: 0.8rem;">
+              <span>Maximum 255 characters.</span>
+            </div>
+          }
         </label>
 
-        <!-- La previa se actualiza sola con el binding, sin el script de Thymeleaf -->
+        <!-- La previa se actualiza sola con el valor del control, sin el script de Thymeleaf -->
         <div class="imagen-previa-wrap">
-          <img [src]="imagenUrl || '/images/hotel.webp'" alt="Preview">
+          <img [src]="tipoForm.get('imagenUrl')?.value || '/images/hotel.webp'" alt="Preview">
         </div>
       </div>
 
       <div class="formulario-admin-botones">
-        <button type="submit" class="btn-dorado">Save</button>
+        <button type="submit" class="btn-dorado" [disabled]="tipoForm.invalid">Save</button>
         <a routerLink="/admin/tipos-habitacion" class="btn-contorno-oscuro">Cancel</a>
       </div>
     </form>
