@@ -1,0 +1,25 @@
+<app-cabecera [siempreSolida]="true" (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+@if (tipo) {
+  <main>
+    <section class="seccion-detalle room-detalle">
+      <div class="contenedor detalle-grid">
+        <app-imagen-room class="detalle-imagen-col" [url]="tipo.imagenUrl" [alt]="tipo.nombre"></app-imagen-room>
+        <app-info-room
+          class="detalle-info-col"
+          [tipo]="tipo"
+          [precioDesde]="precioDesde"
+          [disponibles]="habitacionesDisponibles"
+          [total]="habitaciones.length">
+        </app-info-room>
+      </div>
+
+      <app-disponibilidad-room [habitaciones]="habitaciones"></app-disponibilidad-room>
+    </section>
+
+    <app-cta-interior></app-cta-interior>
+  </main>
+}
+
+<app-pie-pagina></app-pie-pagina>

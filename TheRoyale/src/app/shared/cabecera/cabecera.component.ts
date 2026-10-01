@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -11,6 +11,9 @@ export class CabeceraComponent {
 
   // El menú móvil es hermano de la cabecera, así que quien la usa decide cuándo abrirlo.
   @Output() abrirMenu = new EventEmitter<void>();
+
+  // Páginas interiores sin hero oscuro detrás: cabecera sólida desde el inicio (como layout.html)
+  @Input() siempreSolida = false;
 
   // Cabecera sólida una vez que se bajan 90px, igual que antes pero con binding en vez de classList
   solida = false;

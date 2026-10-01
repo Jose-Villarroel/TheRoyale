@@ -75,6 +75,10 @@ export class HabitacionService {
     return this.habitaciones;
   }
 
+  obtenerPorTipoHabitacionId(tipoHabitacionId: number): Habitacion[] {
+    return this.habitaciones.filter(habitacion => habitacion.tipoHabitacion.id === tipoHabitacionId);
+  }
+
   existePorTipoHabitacionId(tipoHabitacionId: number): boolean {
     return this.habitaciones.some(habitacion => habitacion.tipoHabitacion.id === tipoHabitacionId);
   }

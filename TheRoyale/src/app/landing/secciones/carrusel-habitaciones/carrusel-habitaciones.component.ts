@@ -1,12 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { TipoHabitacion } from '../../../models/tipo-habitacion.model';
 import { AparecerDirective } from '../../../shared/aparecer.directive';
 
 @Component({
   selector: 'app-carrusel-habitaciones',
   standalone: true,
-  imports: [CommonModule, AparecerDirective],
+  imports: [CommonModule, RouterLink, AparecerDirective],
   templateUrl: './carrusel-habitaciones.component.html'
 })
 export class CarruselHabitacionesComponent {

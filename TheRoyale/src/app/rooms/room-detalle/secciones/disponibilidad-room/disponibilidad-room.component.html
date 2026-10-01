@@ -1,0 +1,18 @@
+@if (habitaciones().length > 0) {
+  <div class="contenedor room-disponibilidad">
+    <div class="room-disponibilidad-encabezado">
+      <p class="eyebrow">Availability</p>
+      <h2>Rooms in this category</h2>
+    </div>
+
+    <div class="room-disponibilidad-lista">
+      @for (habitacion of habitaciones(); track habitacion.id) {
+        <article class="room-disponibilidad-item">
+          <span class="room-numero">Room {{ habitacion.numero }}</span>
+          <span class="room-estado" [attr.data-estado]="habitacion.estado">{{ habitacion.estado }}</span>
+          <span class="room-precio">${{ habitacion.precio | number:'1.0-0' }} / night</span>
+        </article>
+      }
+    </div>
+  </div>
+}

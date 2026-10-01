@@ -23,7 +23,7 @@
           <div class="habitacion-info">
             <span class="numero-dorado">{{ (i + 1).toString().padStart(2, '0') }} / {{ tipo.nombre }}</span>
             <h3>{{ tipo.descripcion }}</h3>
-            <a [href]="'/rooms/' + tipo.id" class="enlace-subrayado">View Room</a>
+            <a [routerLink]="['/rooms', tipo.id]" class="enlace-subrayado">View Room</a>
           </div>
         </article>
 
