@@ -1,0 +1,7 @@
+@if (erroresVisibles.length > 0) {
+  <div style="color: var(--admin-rojo); font-size: 0.8rem;">
+    @for (mensaje of erroresVisibles; track mensaje) {
+      <span>{{ mensaje }}</span>
+    }
+  </div>
+}

@@ -1,16 +1,13 @@
-<header class="hero-interior">
-  <div class="contenedor">
-    <p class="eyebrow eyebrow-claro-int">Admin</p>
-    <h1>{{ id !== null ? 'Edit Room Type' : 'New Room Type' }}</h1>
-    <span class="linea-dorada-horizontal-int"></span>
-    <p class="hero-interior-subtexto">Give this tier a name, a description guests will read, and a photo that represents it.</p>
-  </div>
-</header>
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-admin
+  [titulo]="id !== null ? 'Edit Room Type' : 'New Room Type'"
+  subtitulo="Give this tier a name, a description guests will read, and a photo that represents it.">
+</app-hero-admin>
 
 <main class="contenedor seccion-admin-contenido">
-  @if (error) {
-    <p class="perfil-alerta perfil-alerta-error">{{ error }}</p>
-  }
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
 
   <div class="formulario-admin-panel">
     <form [formGroup]="tipoForm" (ngSubmit)="guardar()" class="formulario-admin">
@@ -18,41 +15,33 @@
       <label>
         <span>Name</span>
         <input type="text" formControlName="nombre">
-        @if (tipoForm.get('nombre')?.touched && tipoForm.get('nombre')?.invalid) {
-          <div style="color: var(--admin-rojo); font-size: 0.8rem;">
-            @if (tipoForm.get('nombre')?.errors?.['required']) { <span>Name is required.</span> }
-            @if (tipoForm.get('nombre')?.errors?.['minlength']) { <span>Minimum 3 characters.</span> }
-            @if (tipoForm.get('nombre')?.errors?.['maxlength']) { <span>Maximum 100 characters.</span> }
-          </div>
-        }
+        <app-campo-error
+          [control]="tipoForm.get('nombre')"
+          [mensajes]="{ required: 'Name is required.', minlength: 'Minimum 3 characters.', maxlength: 'Maximum 100 characters.' }">
+        </app-campo-error>
       </label>
 
       <label>
         <span>Description</span>
         <textarea formControlName="descripcion" rows="4"></textarea>
-        @if (tipoForm.get('descripcion')?.touched && tipoForm.get('descripcion')?.invalid) {
-          <div style="color: var(--admin-rojo); font-size: 0.8rem;">
-            @if (tipoForm.get('descripcion')?.errors?.['required']) { <span>Description is required.</span> }
-            @if (tipoForm.get('descripcion')?.errors?.['maxlength']) { <span>Maximum 500 characters.</span> }
-          </div>
-        }
+        <app-campo-error
+          [control]="tipoForm.get('descripcion')"
+          [mensajes]="{ required: 'Description is required.', maxlength: 'Maximum 500 characters.' }">
+        </app-campo-error>
       </label>
 
       <div class="formulario-admin-imagen">
         <label>
           <span>Image URL</span>
           <input type="text" formControlName="imagenUrl" placeholder="/images/suite-1.webp">
-          @if (tipoForm.get('imagenUrl')?.errors?.['maxlength']) {
-            <div style="color: var(--admin-rojo); font-size: 0.8rem;">
-              <span>Maximum 255 characters.</span>
-            </div>
-          }
+          <app-campo-error
+            [control]="tipoForm.get('imagenUrl')"
+            [mensajes]="{ maxlength: 'Maximum 255 characters.' }"
+            [soloSiTocado]="false">
+          </app-campo-error>
         </label>
 
-        <!-- La previa se actualiza sola con el valor del control, sin el script de Thymeleaf -->
-        <div class="imagen-previa-wrap">
-          <img [src]="tipoForm.get('imagenUrl')?.value || '/images/hotel.webp'" alt="Preview">
-        </div>
+        <app-imagen-previa [url]="tipoForm.get('imagenUrl')?.value"></app-imagen-previa>
       </div>
 
       <div class="formulario-admin-botones">
@@ -62,3 +51,5 @@
     </form>
   </div>
 </main>
+
+<app-pie-pagina></app-pie-pagina>

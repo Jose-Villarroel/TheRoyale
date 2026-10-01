@@ -3,11 +3,28 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TipoHabitacionService } from '../../services/tipo-habitacion.service';
 import { TipoHabitacion } from '../../models/tipo-habitacion.model';
+import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
+import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
+import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
+import { HeroAdminComponent } from '../secciones/hero-admin/hero-admin.component';
+import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
+import { CampoErrorComponent } from './secciones/campo-error/campo-error.component';
+import { ImagenPreviaComponent } from './secciones/imagen-previa/imagen-previa.component';
 
 @Component({
   selector: 'app-tipos-habitacion-formulario',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    CabeceraComponent,
+    MenuMovilComponent,
+    PiePaginaComponent,
+    HeroAdminComponent,
+    AlertaErrorComponent,
+    CampoErrorComponent,
+    ImagenPreviaComponent
+  ],
   templateUrl: './tipos-habitacion-formulario.component.html'
 })
 export class TiposHabitacionFormularioComponent implements OnInit {
@@ -19,6 +36,7 @@ export class TiposHabitacionFormularioComponent implements OnInit {
   // Si id es null el guardado crea; si tiene id, actualiza (igual que el campo oculto de Thymeleaf)
   id: number | null = null;
   error: string | null = null;
+  menuAbierto = false;
 
   // Mismos límites que las columnas de TipoHabitacion en el backend
   tipoForm: FormGroup = this.fb.group({

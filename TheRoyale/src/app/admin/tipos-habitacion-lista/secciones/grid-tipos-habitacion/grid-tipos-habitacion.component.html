@@ -1,0 +1,7 @@
+<div class="tarjetas-admin-grid">
+  @for (tipo of tipos(); track tipo.id) {
+    <app-tarjeta-tipo-habitacion [tipo]="tipo" (eliminar)="eliminar.emit($event)"></app-tarjeta-tipo-habitacion>
+  } @empty {
+    <p class="parrafo-cuerpo">No room types yet.</p>
+  }
+</div>
