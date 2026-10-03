@@ -1,0 +1,70 @@
+<header class="hero-interior">
+  <div class="contenedor">
+    <p class="eyebrow eyebrow-claro-int">Admin</p>
+    <h1>{{ id !== null ? 'Edit Service' : 'New Service' }}</h1>
+    <span class="linea-dorada-horizontal-int"></span>
+    <p class="hero-interior-subtexto">Describe what's included, set the price, and add the images guests will see.</p>
+  </div>
+</header>
+
+<main class="contenedor seccion-admin-contenido">
+  <p *ngIf="error" class="perfil-alerta perfil-alerta-error">{{ error }}</p>
+
+  <div class="formulario-admin-panel">
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" class="formulario-admin">
+
+      <label>
+        <span>Name</span>
+        <input type="text" formControlName="nombre">
+        <small class="perfil-alerta perfil-alerta-error" *ngIf="nombre.invalid && nombre.touched">
+          <span *ngIf="nombre.errors?.['required']">Name is required.</span>
+          <span *ngIf="nombre.errors?.['minlength']">Name must have at least 3 characters.</span>
+        </small>
+      </label>
+
+      <label>
+        <span>Description</span>
+        <textarea formControlName="descripcion" rows="4"></textarea>
+        <small class="perfil-alerta perfil-alerta-error" *ngIf="descripcion.invalid && descripcion.touched">
+          <span *ngIf="descripcion.errors?.['required']">Description is required.</span>
+          <span *ngIf="descripcion.errors?.['minlength']">Description must have at least 10 characters.</span>
+        </small>
+      </label>
+
+      <label>
+        <span>Price (USD)</span>
+        <input type="number" formControlName="precio" min="1" step="1">
+        <small class="perfil-alerta perfil-alerta-error" *ngIf="precio.invalid && precio.touched">
+          <span *ngIf="precio.errors?.['required']">Price is required.</span>
+          <span *ngIf="precio.errors?.['min']">Price must be greater than 0.</span>
+        </small>
+      </label>
+
+      <div class="formulario-admin-imagen">
+        <label>
+          <span>Main Image URL</span>
+          <input type="text" formControlName="imagenUrl" placeholder="/images/spa.webp">
+        </label>
+
+        <div class="imagen-previa-wrap">
+          <img [src]="formulario.get('imagenUrl')?.value || '/images/hotel.webp'" alt="Preview">
+        </div>
+      </div>
+
+      <label>
+        <span>Features (one per line)</span>
+        <textarea formControlName="caracteristicasTexto" rows="6" placeholder="Heated Indoor Pool - Open daily 06:00 to 22:00"></textarea>
+      </label>
+
+      <label>
+        <span>Gallery Image URLs (one per line)</span>
+        <textarea formControlName="galeriaUrlsTexto" rows="3" placeholder="/images/spa.webp"></textarea>
+      </label>
+
+      <div class="formulario-admin-botones">
+        <button type="submit" class="btn-dorado">Save</button>
+        <a routerLink="/admin/servicios" class="btn-contorno-oscuro">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
