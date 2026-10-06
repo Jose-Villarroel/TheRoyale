@@ -1,0 +1,15 @@
+<nav class="nav-admin" aria-label="Admin sections">
+  <p class="eyebrow">Manage</p>
+  <div class="nav-admin-botones">
+    <!-- Todavía no existe pantalla de admin de habitaciones: va como texto, no como enlace -->
+    <span class="btn-nav-admin btn-nav-admin-inactivo" aria-disabled="true">Rooms</span>
+    <a routerLink="/admin/tipos-habitacion"
+       routerLinkActive="btn-nav-admin-activo"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="btn-nav-admin">Room Types</a>
+    <a routerLink="/admin/servicios"
+       routerLinkActive="btn-nav-admin-activo"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="btn-nav-admin">Services</a>
+  </div>
+</nav>

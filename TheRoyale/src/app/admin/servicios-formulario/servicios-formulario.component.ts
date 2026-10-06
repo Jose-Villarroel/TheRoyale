@@ -4,11 +4,25 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ServicioService } from '../../services/servicio.service';
 import { Servicio } from '../../models/servicio.model';
+import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
+import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
+import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
+import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
+import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
 
 @Component({
   selector: 'app-servicios-formulario',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    CabeceraComponent,
+    MenuMovilComponent,
+    PiePaginaComponent,
+    HeroInteriorComponent,
+    AlertaErrorComponent
+  ],
   templateUrl: './servicios-formulario.component.html'
 })
 export class ServiciosFormularioComponent implements OnInit {
@@ -16,6 +30,7 @@ export class ServiciosFormularioComponent implements OnInit {
   // Si id es null el guardado crea; si tiene id, actualiza
   id: number | null = null;
   error: string | null = null;
+  menuAbierto = false;
 
   // ===== Reactive Form: caracteristicas/galeriaUrls viajan como texto, una línea por ítem =====
   formulario: FormGroup;

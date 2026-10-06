@@ -6,7 +6,7 @@ import { TipoHabitacion } from '../../models/tipo-habitacion.model';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
-import { HeroAdminComponent } from '../secciones/hero-admin/hero-admin.component';
+import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
 import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
 import { CampoErrorComponent } from './secciones/campo-error/campo-error.component';
 import { ImagenPreviaComponent } from './secciones/imagen-previa/imagen-previa.component';
@@ -20,7 +20,7 @@ import { ImagenPreviaComponent } from './secciones/imagen-previa/imagen-previa.c
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,
-    HeroAdminComponent,
+    HeroInteriorComponent,
     AlertaErrorComponent,
     CampoErrorComponent,
     ImagenPreviaComponent

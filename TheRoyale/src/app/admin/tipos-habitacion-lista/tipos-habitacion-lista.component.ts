@@ -2,8 +2,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
-import { HeroAdminComponent } from '../secciones/hero-admin/hero-admin.component';
+import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
 import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
+import { NavAdminComponent } from '../secciones/nav-admin/nav-admin.component';
 import { EncabezadoListaComponent } from './secciones/encabezado-lista/encabezado-lista.component';
 import { GridTiposHabitacionComponent } from './secciones/grid-tipos-habitacion/grid-tipos-habitacion.component';
 import { TipoHabitacionService } from '../../services/tipo-habitacion.service';
@@ -18,8 +19,9 @@ import { TipoHabitacion } from '../../models/tipo-habitacion.model';
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,
-    HeroAdminComponent,
+    HeroInteriorComponent,
     AlertaErrorComponent,
+    NavAdminComponent,
     EncabezadoListaComponent,
     GridTiposHabitacionComponent
   ],

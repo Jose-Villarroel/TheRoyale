@@ -1,10 +1,10 @@
 <app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
 <app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
 
-<app-hero-admin
+<app-hero-interior
   [titulo]="id !== null ? 'Edit Room Type' : 'New Room Type'"
   subtitulo="Give this tier a name, a description guests will read, and a photo that represents it.">
-</app-hero-admin>
+</app-hero-interior>
 
 <main class="contenedor seccion-admin-contenido">
   <app-alerta-error [mensaje]="error"></app-alerta-error>

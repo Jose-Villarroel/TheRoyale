@@ -3,10 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
-import { ImagenRoomComponent } from './secciones/imagen-room/imagen-room.component';
+import { ImagenDetalleComponent } from '../../shared/imagen-detalle/imagen-detalle.component';
 import { InfoRoomComponent } from './secciones/info-room/info-room.component';
 import { DisponibilidadRoomComponent } from './secciones/disponibilidad-room/disponibilidad-room.component';
-import { CtaInteriorComponent } from './secciones/cta-interior/cta-interior.component';
+import { CtaInteriorComponent } from '../../shared/cta-interior/cta-interior.component';
 import { TipoHabitacionService } from '../../services/tipo-habitacion.service';
 import { HabitacionService } from '../../services/habitacion.service';
 import { TipoHabitacion } from '../../models/tipo-habitacion.model';
@@ -21,7 +21,7 @@ import { Habitacion } from '../../models/habitacion.model';
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,
-    ImagenRoomComponent,
+    ImagenDetalleComponent,
     InfoRoomComponent,
     DisponibilidadRoomComponent,
     CtaInteriorComponent

@@ -14,7 +14,7 @@
 
   <div class="tarjetas-servicios" appAparecer id="tarjetasServicios">
     <a *ngFor="let servicio of servicios; let i = index"
-       [href]="'/services/' + servicio.nombre"
+       [routerLink]="['/services', servicio.id]"
        class="tarjeta-servicio">
       <div class="tarjeta-servicio-imagen">
         <img [src]="servicio.imagenUrl" [alt]="servicio.nombre">
@@ -30,6 +30,6 @@
   <p class="servicios-scroll-hint">Scroll →</p>
 
   <div class="contenedor">
-    <a href="/services/cards" class="btn-contorno-oscuro btn-centrado" appAparecer>Explore Services</a>
+    <a routerLink="/services/cards" class="btn-contorno-oscuro btn-centrado" appAparecer>Explore Services</a>
   </div>
 </section>

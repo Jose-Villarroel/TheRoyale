@@ -1,12 +1,13 @@
 <app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
 <app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
 
-<app-hero-admin
+<app-hero-interior
   titulo="Room Types"
   subtitulo="The tiers that define every stay at The Royale — manage their names, descriptions and imagery.">
-</app-hero-admin>
+</app-hero-interior>
 
 <main class="contenedor seccion-admin-contenido">
+  <app-nav-admin></app-nav-admin>
   <app-alerta-error [mensaje]="error"></app-alerta-error>
   <app-encabezado-lista></app-encabezado-lista>
   <app-grid-tipos-habitacion [tipos]="tipos" (eliminar)="eliminar($event)"></app-grid-tipos-habitacion>

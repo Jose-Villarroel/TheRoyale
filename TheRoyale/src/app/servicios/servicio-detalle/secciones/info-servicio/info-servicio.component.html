@@ -1,0 +1,20 @@
+<p class="eyebrow eyebrow-dorado-det">Service Detail</p>
+<h1 class="detalle-titulo">{{ servicio().nombre }}</h1>
+<span class="linea-dorada-det"></span>
+<p class="detalle-descripcion">{{ servicio().descripcion }}</p>
+
+<div class="detalle-precio-bloque">
+  <span class="detalle-precio-label">Starting from</span>
+  <span class="detalle-precio-valor">${{ servicio().precio | number:'1.0-0' }}</span>
+  <span class="detalle-precio-nota">per stay &middot; billed to room account</span>
+</div>
+
+<app-features-servicio [caracteristicas]="servicio().caracteristicas"></app-features-servicio>
+
+<div class="detalle-acciones">
+  <a href="/login" class="btn-dorado-interior">Request This Service</a>
+  <a routerLink="/services/cards" class="detalle-volver">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M10 5.5H1M1 5.5L5 1.5M1 5.5L5 9.5" stroke="currentColor" stroke-width="0.9" stroke-linecap="square"/></svg>
+    Back to Services
+  </a>
+</div>

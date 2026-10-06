@@ -1,0 +1,22 @@
+<td class="td-imagen">
+  <div class="tabla-imagen-wrapper">
+    <img [src]="servicio().imagenUrl || '/images/hotel.webp'" [alt]="servicio().nombre" class="tabla-imagen">
+  </div>
+</td>
+<td class="td-nombre">
+  <span class="tabla-num-fila">{{ posicion() | number:'2.0-0' }}</span>
+  <span class="tabla-nombre-texto">{{ servicio().nombre }}</span>
+</td>
+<td class="td-descripcion">
+  <p class="tabla-descripcion-texto">{{ servicio().descripcion }}</p>
+</td>
+<td class="td-precio">
+  <span class="tabla-precio">${{ servicio().precio | number:'1.0-0' }}</span>
+  <span class="tabla-precio-label">per stay</span>
+</td>
+<td class="td-accion">
+  <a [routerLink]="['/services', servicio().id]" class="tabla-btn-detalle">
+    View Detail
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5H10M10 5.5L6 1.5M10 5.5L6 9.5" stroke="currentColor" stroke-width="0.9" stroke-linecap="square"/></svg>
+  </a>
+</td>

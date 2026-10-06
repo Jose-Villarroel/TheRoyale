@@ -1,14 +1,13 @@
-<header class="hero-interior">
-  <div class="contenedor">
-    <p class="eyebrow eyebrow-claro-int">Admin</p>
-    <h1>{{ id !== null ? 'Edit Service' : 'New Service' }}</h1>
-    <span class="linea-dorada-horizontal-int"></span>
-    <p class="hero-interior-subtexto">Describe what's included, set the price, and add the images guests will see.</p>
-  </div>
-</header>
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  [titulo]="id !== null ? 'Edit Service' : 'New Service'"
+  subtitulo="Describe what's included, set the price, and add the images guests will see.">
+</app-hero-interior>
 
 <main class="contenedor seccion-admin-contenido">
-  <p *ngIf="error" class="perfil-alerta perfil-alerta-error">{{ error }}</p>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
 
   <div class="formulario-admin-panel">
     <form [formGroup]="formulario" (ngSubmit)="guardar()" class="formulario-admin">
@@ -68,3 +67,5 @@
     </form>
   </div>
 </main>
+
+<app-pie-pagina></app-pie-pagina>

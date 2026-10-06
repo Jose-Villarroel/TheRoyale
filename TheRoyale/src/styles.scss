@@ -1443,6 +1443,58 @@ ul {
   padding: clamp(48px, 8vh, 96px) 0 clamp(72px, 12vh, 130px);
 }
 
+/* ===== Navegación entre secciones del panel admin ===== */
+.nav-admin {
+  padding-bottom: 28px;
+  margin-bottom: 34px;
+  border-bottom: 1px solid var(--color-borde-claro);
+}
+
+.nav-admin .eyebrow {
+  margin-bottom: 14px;
+}
+
+.nav-admin-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn-nav-admin {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-texto-oscuro);
+  background-color: transparent;
+  border: 1px solid var(--color-borde-claro);
+  padding: 12px 24px;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.btn-nav-admin:hover {
+  background-color: var(--color-oscuro);
+  border-color: var(--color-oscuro);
+  color: var(--color-texto-claro);
+}
+
+.btn-nav-admin-activo,
+.btn-nav-admin-activo:hover {
+  background-color: var(--color-dorado);
+  border-color: var(--color-dorado);
+  color: var(--color-oscuro);
+}
+
+/* Rooms: sin pantalla de admin todavía */
+.btn-nav-admin-inactivo,
+.btn-nav-admin-inactivo:hover {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background-color: transparent;
+  border-color: var(--color-borde-claro);
+  color: var(--color-texto-oscuro);
+}
+
 .admin-encabezado {
   display: flex;
   align-items: center;
@@ -2036,5 +2088,451 @@ ul {
 
   .room-precio {
     justify-self: start;
+  }
+}
+
+/* ================================================================
+   SERVICIOS PUBLICOS — portado de static/css/servicios.css del backend
+   ================================================================ */
+
+/* ===== Barra "View as" de las vistas publicas de servicios ===== */
+.barra-vistas {
+  border-bottom: 1px solid var(--color-borde-claro);
+  background: var(--color-blanco);
+}
+
+.barra-vistas-contenido {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  height: 54px;
+}
+
+.barra-vistas-label {
+  font-size: .64rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+}
+
+.barra-vistas-toggle {
+  display: flex;
+  border: 1px solid var(--color-borde-claro);
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+  background: transparent;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+
+.toggle-btn + .toggle-btn { border-left: 1px solid var(--color-borde-claro); }
+
+.toggle-btn:hover {
+  background: var(--color-off-blanco);
+  color: var(--color-oscuro);
+}
+
+.toggle-activo {
+  background: var(--color-oscuro);
+  color: var(--color-blanco);
+}
+
+.toggle-activo:hover {
+  background: var(--color-oscuro);
+  color: var(--color-blanco);
+}
+
+.barra-vistas-count {
+  margin-left: auto;
+  font-size: .64rem;
+  letter-spacing: .14em;
+  color: var(--color-texto-etiqueta);
+}
+
+/* ===== Tabla de servicios ===== */
+.seccion-tabla {
+  padding: clamp(48px, 8vh, 96px) 0 clamp(72px, 12vh, 130px);
+  background: var(--color-blanco);
+}
+
+.tabla-servicios {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* thead */
+.tabla-servicios thead tr {
+  border-bottom: 1px solid var(--color-oscuro);
+}
+
+.tabla-servicios th {
+  font-family: var(--fuente-cuerpo);
+  font-size: .59rem;
+  font-weight: 400;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+  padding: 0 24px 18px 0;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.th-imagen   { width: 106px; }
+.th-nombre   { width: 200px; }
+.th-descripcion { }
+.th-precio   { width: 120px; text-align: right; padding-right: 0; }
+.th-accion   { width: 150px; text-align: right; padding-right: 0; }
+
+/* tbody */
+.fila-servicio {
+  border-bottom: 1px solid var(--color-borde-claro);
+  transition: background .25s;
+}
+
+.fila-servicio:hover { background: var(--color-off-blanco); }
+
+.tabla-servicios td {
+  padding: 24px 24px 24px 0;
+  vertical-align: middle;
+}
+
+/* — Imagen */
+.td-imagen { width: 106px; }
+
+.tabla-imagen-wrapper {
+  width: 82px;
+  height: 62px;
+  overflow: hidden;
+}
+
+.tabla-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .8s ease;
+}
+
+.fila-servicio:hover .tabla-imagen { transform: scale(1.08); }
+
+/* — Nombre */
+.td-nombre {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+
+.tabla-num-fila {
+  font-size: .58rem;
+  letter-spacing: .24em;
+  color: var(--color-dorado);
+  font-family: var(--fuente-titulos);
+}
+
+.tabla-nombre-texto {
+  font-family: var(--fuente-titulos);
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--color-oscuro);
+}
+
+/* — Descripción */
+.td-descripcion { max-width: 380px; }
+
+.tabla-descripcion-texto {
+  font-size: .85rem;
+  line-height: 1.75;
+  color: var(--color-texto-cuerpo);
+  /* recortar a 3 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* — Precio */
+.td-precio {
+  text-align: right;
+  white-space: nowrap;
+  padding-right: 0;
+}
+
+.tabla-precio {
+  display: block;
+  font-family: var(--fuente-titulos);
+  font-size: 1.45rem;
+  font-weight: 300;
+  color: var(--color-oscuro);
+}
+
+.tabla-precio-label {
+  font-size: .58rem;
+  letter-spacing: .15em;
+  color: var(--color-texto-etiqueta);
+  text-transform: uppercase;
+}
+
+/* — Acción */
+.td-accion {
+  text-align: right;
+  padding-right: 0;
+}
+
+.tabla-btn-detalle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-oscuro);
+  border-bottom: 1px solid var(--color-borde-claro);
+  padding-bottom: 4px;
+  transition: border-color .25s, color .25s;
+  white-space: nowrap;
+}
+
+.tabla-btn-detalle:hover {
+  border-color: var(--color-dorado);
+  color: var(--color-dorado);
+}
+
+/* ===== Tarjetas de servicios ===== */
+.seccion-tarjetas {
+  padding: clamp(48px, 8vh, 96px) 0 clamp(72px, 12vh, 130px);
+  background: var(--color-off-blanco);
+}
+
+.tarjetas-servicios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.tarjeta-servicio-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-blanco);
+  border: 1px solid var(--color-borde-claro);
+  color: inherit;
+  transition: box-shadow .3s, border-color .3s;
+  position: relative;
+}
+
+.tarjeta-servicio-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--color-dorado);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .35s cubic-bezier(.22,.61,.36,1);
+}
+
+.tarjeta-servicio-item:hover::after { transform: scaleX(1); }
+
+.tarjeta-servicio-item:hover {
+  box-shadow: 0 16px 48px -16px rgba(37,37,37,.15);
+  z-index: 1;
+}
+
+/* Imagen */
+.tarjeta-servicio-imagen-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.tarjeta-servicio-imagen-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 1.2s cubic-bezier(.22,.61,.36,1);
+}
+
+.tarjeta-servicio-item:hover .tarjeta-servicio-imagen-wrap img {
+  transform: scale(1.06);
+}
+
+/* Badge de número */
+.tarjeta-numero-romano {
+  position: absolute;
+  top: 14px; left: 14px;
+  font-family: var(--fuente-titulos);
+  font-size: .75rem;
+  color: var(--color-blanco);
+  background: rgba(37,37,37,.6);
+  padding: 4px 11px;
+  letter-spacing: .12em;
+  backdrop-filter: blur(4px);
+}
+
+/* Info */
+.tarjeta-servicio-info-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 24px 28px;
+  flex: 1;
+}
+
+.tarjeta-servicio-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tarjeta-servicio-encabezado h3 {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--color-oscuro);
+}
+
+.tarjeta-precio {
+  font-family: var(--fuente-titulos);
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--color-dorado);
+  white-space: nowrap;
+}
+
+.tarjeta-descripcion {
+  font-size: .85rem;
+  line-height: 1.75;
+  color: var(--color-texto-etiqueta);
+  flex: 1;
+  /* recortar a 3 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tarjeta-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-oscuro);
+  border-bottom: 1px solid var(--color-borde-claro);
+  padding-bottom: 4px;
+  width: fit-content;
+  margin-top: 6px;
+  transition: border-color .25s, color .25s;
+}
+
+.tarjeta-servicio-item:hover .tarjeta-enlace {
+  border-color: var(--color-dorado);
+  color: var(--color-dorado);
+}
+
+/* ===== Features del detalle ===== */
+.detalle-features {
+  margin-bottom: 28px;
+}
+
+.detalle-features-titulo {
+  font-size: .59rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+  margin-bottom: 10px;
+}
+
+.detalle-feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(207,207,207,.45);
+}
+
+.detalle-feature-row:last-child { border-bottom: none; }
+
+/* ===== Galeria inferior del detalle ===== */
+.detalle-galeria {
+  margin-top: clamp(60px, 10vh, 120px);
+}
+
+.detalle-galeria-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.detalle-galeria-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform .6s ease;
+}
+
+.detalle-galeria-grid img:hover {
+  transform: scale(1.02);
+}
+
+/* El icono y el texto de cada feature no tenian regla en el backend */
+.feature-icon {
+  flex-shrink: 0;
+  margin-top: 4px;
+  line-height: 0;
+}
+
+.feature-texto {
+  font-size: .85rem;
+  line-height: 1.7;
+  color: var(--color-texto-cuerpo);
+}
+
+/* Servicio inexistente: no hay hero oscuro, asi que se baja el contenido
+   para que la cabecera fija no tape el titulo */
+.seccion-no-encontrado {
+  padding-top: calc(var(--alto-cabecera) + clamp(32px, 6vh, 72px));
+  padding-bottom: clamp(72px, 12vh, 130px);
+}
+
+.seccion-no-encontrado h1 {
+  margin: 10px 0 14px;
+}
+
+.seccion-no-encontrado .parrafo-cuerpo {
+  margin-bottom: 26px;
+}
+
+@media (max-width: 960px) {
+  /* tabla: ocultar descripcion en tablet */
+  .th-descripcion, .td-descripcion { display: none; }
+  .th-precio, .td-precio { text-align: left; }
+  .th-accion, .td-accion { text-align: left; }
+}
+
+@media (max-width: 768px) {
+  .detalle-galeria-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .barra-vistas-count { display: none; }
+
+  .tarjetas-servicios-grid {
+    grid-template-columns: 1fr;
   }
 }

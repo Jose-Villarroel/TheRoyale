@@ -1,0 +1,21 @@
+<app-cabecera [siempreSolida]="true" (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+@if (servicio) {
+  <main>
+    <section class="seccion-detalle">
+      <div class="contenedor detalle-grid">
+        <app-imagen-detalle class="detalle-imagen-col" [url]="servicio.imagenUrl" [alt]="servicio.nombre"></app-imagen-detalle>
+        <app-info-servicio class="detalle-info-col" [servicio]="servicio"></app-info-servicio>
+      </div>
+
+      <app-galeria-servicio [urls]="servicio.galeriaUrls" [nombre]="servicio.nombre"></app-galeria-servicio>
+    </section>
+
+    <app-cta-interior texto="Ready to personalize your stay?"></app-cta-interior>
+  </main>
+} @else {
+  <app-servicio-no-encontrado></app-servicio-no-encontrado>
+}
+
+<app-pie-pagina></app-pie-pagina>
