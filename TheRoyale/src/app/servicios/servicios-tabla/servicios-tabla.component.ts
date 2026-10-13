@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
@@ -24,7 +24,14 @@ import { Servicio } from '../../models/servicio.model';
   ],
   templateUrl: './servicios-tabla.component.html'
 })
-export class ServiciosTablaComponent {
-  servicios: Servicio[] = inject(ServicioService).obtenerTodos();
+export class ServiciosTablaComponent implements OnInit {
+  private servicioService = inject(ServicioService);
+  servicios: Servicio[] = [];
   menuAbierto = false;
+
+  ngOnInit(): void {
+    this.servicioService.obtenerTodos().subscribe(servicios => {
+      this.servicios = servicios;
+    });
+  }
 }

@@ -42,18 +42,25 @@ export class TiposHabitacionListaComponent implements OnInit {
     if (!confirm('Delete this room type?')) {
       return;
     }
-    try {
-      this.tipoHabitacionService.eliminar(tipo.id);
-      this.error = null;
-      this.cargarTipos();
-    } catch (ex) {
-      this.error = (ex as Error).message;
-    }
+    this.tipoHabitacionService.eliminar(tipo.id).subscribe({
+      next: () => {
+        this.error = null;
+        this.cargarTipos();
+      },
+      error: (err) => {
+        this.error = err.error?.message || err.message || 'Error deleting room type';
+      }
+    });
   }
 
-  // El servicio devuelve siempre el mismo array (y lo muta); se copia para que el
-  // input() de la grilla reciba una referencia nueva y se vuelva a pintar.
   private cargarTipos(): void {
-    this.tipos = [...this.tipoHabitacionService.obtenerTodos()];
+    this.tipoHabitacionService.obtenerTodos().subscribe({
+      next: (tipos) => {
+        this.tipos = tipos;
+      },
+      error: (err) => {
+        this.error = err.error?.message || err.message || 'Error loading room types';
+      }
+    });
   }
 }

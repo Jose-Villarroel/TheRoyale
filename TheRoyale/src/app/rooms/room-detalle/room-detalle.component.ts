@@ -43,17 +43,28 @@ export class RoomDetalleComponent implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    const tipo = this.tipoHabitacionService.obtenerPorId(id);
-    if (!tipo) {
-      this.router.navigate(['/']);
-      return;
-    }
+    this.tipoHabitacionService.obtenerPorId(id).subscribe({
+      next: (tipo) => {
+        this.tipo = tipo;
+      },
+      error: () => {
+        this.router.navigate(['/']);
+      }
+    });
 
-    this.tipo = tipo;
-    this.habitaciones = this.habitacionService.obtenerPorTipoHabitacionId(id);
-    this.precioDesde = this.habitaciones.length > 0
-      ? Math.min(...this.habitaciones.map(h => h.precio))
-      : null;
-    this.habitacionesDisponibles = this.habitaciones.filter(h => h.estado === 'DISPONIBLE').length;
+    this.habitacionService.obtenerPorTipoHabitacionId(id).subscribe({
+      next: (habitaciones) => {
+        this.habitaciones = habitaciones;
+        this.precioDesde = this.habitaciones.length > 0
+          ? Math.min(...this.habitaciones.map(h => h.precio))
+          : null;
+        this.habitacionesDisponibles = this.habitaciones.filter(h => h.estado === 'DISPONIBLE').length;
+      },
+      error: () => {
+        this.habitaciones = [];
+        this.precioDesde = null;
+        this.habitacionesDisponibles = 0;
+      }
+    });
   }
 }

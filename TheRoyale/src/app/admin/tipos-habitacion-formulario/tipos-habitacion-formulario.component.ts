@@ -51,16 +51,18 @@ export class TiposHabitacionFormularioComponent implements OnInit {
       return;
     }
 
-    const tipo = this.tipoHabitacionService.obtenerPorId(Number(parametroId));
-    if (!tipo) {
-      this.router.navigate(['/admin/tipos-habitacion']);
-      return;
-    }
-    this.id = tipo.id;
-    this.tipoForm.patchValue({
-      nombre: tipo.nombre,
-      descripcion: tipo.descripcion,
-      imagenUrl: tipo.imagenUrl
+    this.tipoHabitacionService.obtenerPorId(Number(parametroId)).subscribe({
+      next: (tipo) => {
+        this.id = tipo.id;
+        this.tipoForm.patchValue({
+          nombre: tipo.nombre,
+          descripcion: tipo.descripcion,
+          imagenUrl: tipo.imagenUrl
+        });
+      },
+      error: () => {
+        this.router.navigate(['/admin/tipos-habitacion']);
+      }
     });
   }
 
@@ -77,17 +79,21 @@ export class TiposHabitacionFormularioComponent implements OnInit {
       imagenUrl: valores.imagenUrl || ''
     };
 
-    // El servicio sigue validando reglas de negocio (nombre único), por eso se mantiene el try/catch
-    try {
-      if (this.id === null) {
-        this.tipoHabitacionService.crear(datos);
-      } else {
-        const tipo: TipoHabitacion = { id: this.id, ...datos };
-        this.tipoHabitacionService.actualizar(tipo);
-      }
-      this.router.navigate(['/admin/tipos-habitacion']);
-    } catch (ex) {
-      this.error = (ex as Error).message;
+    if (this.id === null) {
+      this.tipoHabitacionService.crear(datos).subscribe({
+        next: () => this.router.navigate(['/admin/tipos-habitacion']),
+        error: (ex) => {
+          this.error = ex.error?.message || ex.message || 'Error creating room type';
+        }
+      });
+    } else {
+      const tipo: TipoHabitacion = { id: this.id, ...datos };
+      this.tipoHabitacionService.actualizar(this.id, tipo).subscribe({
+        next: () => this.router.navigate(['/admin/tipos-habitacion']),
+        error: (ex) => {
+          this.error = ex.error?.message || ex.message || 'Error updating room type';
+        }
+      });
     }
   }
 }

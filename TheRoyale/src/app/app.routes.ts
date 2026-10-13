@@ -8,9 +8,11 @@ import { ServiciosFormularioComponent } from './admin/servicios-formulario/servi
 import { ServiciosTablaComponent } from './servicios/servicios-tabla/servicios-tabla.component';
 import { ServiciosTarjetasComponent } from './servicios/servicios-tarjetas/servicios-tarjetas.component';
 import { ServicioDetalleComponent } from './servicios/servicio-detalle/servicio-detalle.component';
+import { LoginComponent } from './auth/login/login.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
+  { path: 'login', component: LoginComponent },
   { path: 'rooms/:id', component: RoomDetalleComponent },
   // Las rutas fijas van antes de 'services/:id' o se intentarian resolver como un id
   { path: 'services/table', component: ServiciosTablaComponent },

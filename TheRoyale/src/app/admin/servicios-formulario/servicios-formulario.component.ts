@@ -62,20 +62,21 @@ export class ServiciosFormularioComponent implements OnInit {
       return;
     }
 
-    const servicio = this.servicioService.obtenerPorId(Number(parametroId));
-    if (!servicio) {
-      this.router.navigate(['/admin/servicios']);
-      return;
-    }
-
-    this.id = servicio.id;
-    this.formulario.patchValue({
-      nombre: servicio.nombre,
-      descripcion: servicio.descripcion,
-      precio: servicio.precio,
-      imagenUrl: servicio.imagenUrl,
-      caracteristicasTexto: servicio.caracteristicas.join('\n'),
-      galeriaUrlsTexto: servicio.galeriaUrls.join('\n')
+    this.servicioService.obtenerPorId(Number(parametroId)).subscribe({
+      next: (servicio) => {
+        this.id = servicio.id;
+        this.formulario.patchValue({
+          nombre: servicio.nombre,
+          descripcion: servicio.descripcion,
+          precio: servicio.precio,
+          imagenUrl: servicio.imagenUrl,
+          caracteristicasTexto: (servicio.caracteristicas || []).join('\n'),
+          galeriaUrlsTexto: (servicio.galeriaUrls || []).join('\n')
+        });
+      },
+      error: () => {
+        this.router.navigate(['/admin/servicios']);
+      }
     });
   }
 
@@ -95,16 +96,21 @@ export class ServiciosFormularioComponent implements OnInit {
       galeriaUrls: this.lineasAArray(valores.galeriaUrlsTexto)
     };
 
-    try {
-      if (this.id === null) {
-        this.servicioService.crear(datos);
-      } else {
-        const servicio: Servicio = { id: this.id, ...datos };
-        this.servicioService.actualizar(servicio);
-      }
-      this.router.navigate(['/admin/servicios']);
-    } catch (ex) {
-      this.error = (ex as Error).message;
+    if (this.id === null) {
+      this.servicioService.crear(datos).subscribe({
+        next: () => this.router.navigate(['/admin/servicios']),
+        error: (ex) => {
+          this.error = ex.error?.message || ex.message || 'Error creating service';
+        }
+      });
+    } else {
+      const servicio: Servicio = { id: this.id, ...datos };
+      this.servicioService.actualizar(this.id, servicio).subscribe({
+        next: () => this.router.navigate(['/admin/servicios']),
+        error: (ex) => {
+          this.error = ex.error?.message || ex.message || 'Error updating service';
+        }
+      });
     }
   }
 

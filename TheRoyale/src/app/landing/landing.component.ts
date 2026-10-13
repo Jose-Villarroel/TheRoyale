@@ -54,8 +54,8 @@ export class LandingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.tiposHabitacion = this.tipoHabitacionService.obtenerTodos();
-    this.servicios = this.servicioService.obtenerTodos();
+    this.tipoHabitacionService.obtenerTodos().subscribe(tipos => this.tiposHabitacion = tipos);
+    this.servicioService.obtenerTodos().subscribe(servicios => this.servicios = servicios);
   }
 
   // ===== Formulario de reserva: por ahora solo redirige (login no existe todavía en Angular) =====

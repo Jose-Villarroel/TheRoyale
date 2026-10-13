@@ -42,18 +42,25 @@ export class ServiciosListaComponent implements OnInit {
     if (!confirm('Delete this service?')) {
       return;
     }
-    try {
-      this.servicioService.eliminar(servicio.id);
-      this.error = null;
-      this.cargarServicios();
-    } catch (ex) {
-      this.error = (ex as Error).message;
-    }
+    this.servicioService.eliminar(servicio.id).subscribe({
+      next: () => {
+        this.error = null;
+        this.cargarServicios();
+      },
+      error: (err) => {
+        this.error = err.error?.message || err.message || 'Error deleting service';
+      }
+    });
   }
 
-  // El servicio devuelve siempre el mismo array (y lo muta); se copia para que el
-  // input() de la grilla reciba una referencia nueva y se vuelva a pintar.
   private cargarServicios(): void {
-    this.servicios = [...this.servicioService.obtenerTodos()];
+    this.servicioService.obtenerTodos().subscribe({
+      next: (servicios) => {
+        this.servicios = servicios;
+      },
+      error: (err) => {
+        this.error = err.error?.message || err.message || 'Error loading services';
+      }
+    });
   }
 }

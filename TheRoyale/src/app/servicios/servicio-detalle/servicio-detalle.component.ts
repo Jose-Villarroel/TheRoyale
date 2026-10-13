@@ -38,6 +38,13 @@ export class ServicioDetalleComponent implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.servicio = this.servicioService.obtenerPorId(id) ?? null;
+    this.servicioService.obtenerPorId(id).subscribe({
+      next: (servicio) => {
+        this.servicio = servicio;
+      },
+      error: () => {
+        this.servicio = null;
+      }
+    });
   }
 }
