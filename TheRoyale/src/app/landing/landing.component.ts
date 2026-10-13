@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CabeceraComponent } from '../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../shared/pie-pagina/pie-pagina.component';
@@ -41,26 +42,42 @@ import { Servicio } from '../models/servicio.model';
 })
 export class LandingComponent implements OnInit {
 
-  // ===== Datos traídos de los servicios (base de datos quemada) =====
+  // ===== Datos traídos de la API REST del backend =====
   tiposHabitacion: TipoHabitacion[] = [];
   servicios: Servicio[] = [];
 
   // La cabecera pide abrirlo y el menú pide cerrarlo; el estado vive aquí por ser hermanos
   menuAbierto = false;
 
+  // Si el backend no responde se deja la sección vacía, pero el error queda en consola:
+  // sin rama de error un fallo de red se pierde como promesa rechazada y la página miente.
+  error = '';
+
   constructor(
     private tipoHabitacionService: TipoHabitacionService,
-    private servicioService: ServicioService
+    private servicioService: ServicioService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.tipoHabitacionService.obtenerTodos().subscribe(tipos => this.tiposHabitacion = tipos);
-    this.servicioService.obtenerTodos().subscribe(servicios => this.servicios = servicios);
+    this.tipoHabitacionService.obtenerTodos().subscribe({
+      next: tipos => this.tiposHabitacion = tipos,
+      error: err => this.manejarError(err)
+    });
+    this.servicioService.obtenerTodos().subscribe({
+      next: servicios => this.servicios = servicios,
+      error: err => this.manejarError(err)
+    });
   }
 
-  // ===== Formulario de reserva: por ahora solo redirige (login no existe todavía en Angular) =====
+  // ===== Formulario de reserva: por ahora solo redirige al login =====
   manejarFormularioReserva(evento: Event): void {
     evento.preventDefault();
-    window.location.href = '/login';
+    this.router.navigate(['/login']);
+  }
+
+  private manejarError(err: unknown): void {
+    this.error = 'No se pudieron cargar los datos del hotel. Intenta de nuevo más tarde.';
+    console.error('Error cargando los datos de la landing', err);
   }
 }

@@ -1,5 +1,6 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,7 @@ public class Habitacion {
     @Column(nullable = false, length = 20)
     private EstadoHabitacion estado;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "habitacion")
     @Builder.Default
     @ToString.Exclude

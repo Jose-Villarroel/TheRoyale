@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin, map, switchMap } from 'rxjs';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
@@ -41,29 +42,27 @@ export class RoomDetalleComponent implements OnInit {
   habitacionesDisponibles = 0;
   menuAbierto = false;
 
+  // Se encadena desde paramMap (no desde snapshot) para que la pagina reaccione si cambia el :id
+  // sin remontar el componente, y las dos peticiones se combinan con forkJoin en lugar de
+  // anidar subscribes: ambas dependen del mismo id y sus resultados se necesitan juntos.
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.tipoHabitacionService.obtenerPorId(id).subscribe({
-      next: (tipo) => {
+    this.route.paramMap.pipe(
+      map(params => Number(params.get('id'))),
+      switchMap(id => forkJoin({
+        tipo: this.tipoHabitacionService.obtenerPorId(id),
+        habitaciones: this.habitacionService.obtenerPorTipoHabitacionId(id)
+      }))
+    ).subscribe({
+      next: ({ tipo, habitaciones }) => {
         this.tipo = tipo;
+        this.habitaciones = habitaciones;
+        this.precioDesde = habitaciones.length > 0
+          ? Math.min(...habitaciones.map(h => h.precio))
+          : null;
+        this.habitacionesDisponibles = habitaciones.filter(h => h.estado === 'DISPONIBLE').length;
       },
       error: () => {
         this.router.navigate(['/']);
-      }
-    });
-
-    this.habitacionService.obtenerPorTipoHabitacionId(id).subscribe({
-      next: (habitaciones) => {
-        this.habitaciones = habitaciones;
-        this.precioDesde = this.habitaciones.length > 0
-          ? Math.min(...this.habitaciones.map(h => h.precio))
-          : null;
-        this.habitacionesDisponibles = this.habitaciones.filter(h => h.estado === 'DISPONIBLE').length;
-      },
-      error: () => {
-        this.habitaciones = [];
-        this.precioDesde = null;
-        this.habitacionesDisponibles = 0;
       }
     });
   }

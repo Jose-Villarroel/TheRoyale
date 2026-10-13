@@ -1,5 +1,7 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,11 +29,13 @@ public class Admin {
     private String email;
 
     @Column(nullable = false, length = 255)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     // ===== Relaciones muchos a muchos: qué administra cada admin =====
     // Cada una crea su propia tabla intermedia (join table) en la base de datos.
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "admin_tipo_habitacion",
@@ -42,6 +46,7 @@ public class Admin {
     @ToString.Exclude
     private List<TipoHabitacion> tiposHabitacionAdministrados = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "admin_habitacion",
@@ -52,6 +57,7 @@ public class Admin {
     @ToString.Exclude
     private List<Habitacion> habitacionesAdministradas = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "admin_servicio",
@@ -62,6 +68,7 @@ public class Admin {
     @ToString.Exclude
     private List<Servicio> serviciosAdministrados = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "admin_operador",

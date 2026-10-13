@@ -1,5 +1,7 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +29,7 @@ public class Operador {
     private String email;
 
     @Column(nullable = false, length = 255)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -34,11 +37,13 @@ public class Operador {
     private TipoOperador tipo;
 
     // ===== Lados inversos: consumos y pagos que este operador ha registrado =====
+    @JsonIgnore
     @OneToMany(mappedBy = "operador")
     @Builder.Default
     @ToString.Exclude
     private List<ItemConsumo> consumosRegistrados = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "operador")
     @Builder.Default
     @ToString.Exclude

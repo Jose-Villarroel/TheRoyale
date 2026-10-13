@@ -11,4 +11,8 @@ public interface InterfaceService {
     Servicio buscarPorId(Long id);
 
     Servicio buscarPorNombre(String nombre);
+
+    Servicio guardar(Servicio servicio);
+
+    void eliminar(Long id);
 }

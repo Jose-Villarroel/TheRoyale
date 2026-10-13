@@ -1,5 +1,7 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +36,7 @@ public class Cliente {
     private String email;
 
     @Column(nullable = false, length = 255)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(length = 20)
@@ -41,6 +44,7 @@ public class Cliente {
 
     private LocalDate fechaRegistro;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     @Builder.Default
     @ToString.Exclude

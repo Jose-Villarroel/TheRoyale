@@ -11,7 +11,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 // ===== Red de seguridad: los controllers capturan los errores de negocio esperados para
 // mostrarlos en su propio formulario; lo que se escape termina aquí en la página de error. =====
-@ControllerAdvice
+// Acotado al paquete Thymeleaf: los endpoints REST de api/ los atiende ApiExceptionHandler,
+// que responde JSON en lugar de la plantilla error.html.
+@ControllerAdvice(basePackages = "com.theroyale.backend.controller")
 public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)

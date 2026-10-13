@@ -1,5 +1,6 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,11 +36,13 @@ public class Cuenta {
     @Column(nullable = false)
     private LocalDateTime fechaCreacion;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<ItemConsumo> itemsConsumo = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cuenta", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
