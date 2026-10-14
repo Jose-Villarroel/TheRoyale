@@ -1,0 +1,7 @@
+<div class="tarjetas-admin-grid">
+  @for (habitacion of habitaciones(); track habitacion.id) {
+    <app-tarjeta-habitacion [habitacion]="habitacion" (eliminar)="eliminar.emit($event)"></app-tarjeta-habitacion>
+  } @empty {
+    <p class="parrafo-cuerpo">No rooms yet.</p>
+  }
+</div>

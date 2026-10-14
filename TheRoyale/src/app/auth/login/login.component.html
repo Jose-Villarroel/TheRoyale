@@ -2,6 +2,7 @@
   <div class="login-card">
     <h1 class="login-titulo">Sign In</h1>
     <p class="login-subtitulo">Welcome back to The Royale</p>
+    <p *ngIf="mensaje" class="login-exito">{{ mensaje }}</p>
     <p *ngIf="error" class="login-error">{{ error }}</p>
     <form (ngSubmit)="iniciarSesion()" class="login-form">
       <label>
@@ -16,6 +17,7 @@
         {{ cargando ? 'Signing in...' : 'Sign In' }}
       </button>
     </form>
+    <p class="login-alterno">Don't have an account? <a routerLink="/register">Sign Up</a></p>
     <a routerLink="/" class="login-volver">← Back to home</a>
   </div>
 </div>

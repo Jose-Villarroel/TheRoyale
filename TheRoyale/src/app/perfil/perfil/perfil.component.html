@@ -1,0 +1,114 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  eyebrow="Guest Profile"
+  titulo="My Profile"
+  [subtitulo]="cliente ? 'Manage the client profile for ' + cliente.nombre + ' ' + cliente.apellido + '.' : 'Manage your client profile.'">
+</app-hero-interior>
+
+@if (cliente) {
+  <section class="perfil-seccion contenedor">
+    <div class="perfil-grid">
+      <aside class="perfil-resumen">
+        <p class="eyebrow">Client Record</p>
+        <h2>{{ cliente.nombre }} {{ cliente.apellido }}</h2>
+        <dl class="perfil-datos">
+          <div>
+            <dt>ID</dt>
+            <dd>{{ cliente.id }}</dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd>{{ cliente.email }}</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd>{{ cliente.telefono || 'Not registered' }}</dd>
+          </div>
+          <div>
+            <dt>Registered</dt>
+            <dd>{{ cliente.fechaRegistro || 'Pending' }}</dd>
+          </div>
+        </dl>
+
+        <div class="perfil-acciones-secundarias">
+          <a routerLink="/reservations" class="enlace-subrayado">Reservations</a>
+          <button type="button" class="btn-eliminar" (click)="cerrarSesion()">Sign Out</button>
+        </div>
+      </aside>
+
+      <section class="perfil-panel">
+        @if (mensaje) {
+          <p class="perfil-alerta perfil-alerta-ok">{{ mensaje }}</p>
+        }
+        <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+        <div class="admin-encabezado perfil-encabezado-form">
+          <div>
+            <p class="eyebrow">Update</p>
+            <h2>Edit Profile</h2>
+          </div>
+        </div>
+
+        <form [formGroup]="perfilForm" (ngSubmit)="guardar()" class="formulario-admin perfil-formulario">
+          <div class="perfil-form-grid">
+            <label>
+              <span>First Name</span>
+              <input type="text" formControlName="nombre">
+              <app-campo-error [control]="perfilForm.get('nombre')"
+                [mensajes]="{ required: 'First name is required.', maxlength: 'Maximum 100 characters.' }">
+              </app-campo-error>
+            </label>
+            <label>
+              <span>Last Name</span>
+              <input type="text" formControlName="apellido">
+              <app-campo-error [control]="perfilForm.get('apellido')"
+                [mensajes]="{ required: 'Last name is required.', maxlength: 'Maximum 100 characters.' }">
+              </app-campo-error>
+            </label>
+          </div>
+
+          <label>
+            <span>Email</span>
+            <input type="email" formControlName="email">
+            <app-campo-error [control]="perfilForm.get('email')"
+              [mensajes]="{ required: 'Email is required.', email: 'Enter a valid email.', maxlength: 'Maximum 150 characters.' }">
+            </app-campo-error>
+          </label>
+
+          <label>
+            <span>Phone</span>
+            <input type="tel" formControlName="telefono" placeholder="+1 555 000 0000">
+            <app-campo-error [control]="perfilForm.get('telefono')"
+              [mensajes]="{ maxlength: 'Maximum 20 characters.' }">
+            </app-campo-error>
+          </label>
+
+          <label>
+            <span>New Password</span>
+            <input type="password" formControlName="password" placeholder="Leave blank to keep current password" autocomplete="new-password">
+          </label>
+
+          <div class="formulario-admin-botones">
+            <button type="submit" class="btn-dorado" [disabled]="perfilForm.invalid">Save Profile</button>
+            <button type="button" class="btn-contorno-oscuro" (click)="cancelar()">Cancel</button>
+          </div>
+        </form>
+
+        <div class="perfil-zona-peligro">
+          <div>
+            <p class="eyebrow">Delete</p>
+            <h3>Remove Client Profile</h3>
+            <p>This permanently deletes your account. Profiles with reservations cannot be deleted.</p>
+          </div>
+          <div>
+            <button type="button" class="btn-eliminar" (click)="eliminar()">Delete Profile</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+}
+
+<app-pie-pagina></app-pie-pagina>

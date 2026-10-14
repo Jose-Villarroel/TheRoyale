@@ -1696,7 +1696,8 @@ ul {
 }
 
 .formulario-admin input,
-.formulario-admin textarea {
+.formulario-admin textarea,
+.formulario-admin select {
   padding: 12px 14px;
   border: 1px solid var(--color-borde-claro);
   background: var(--color-off-blanco);
@@ -1714,7 +1715,8 @@ ul {
 }
 
 .formulario-admin input:focus,
-.formulario-admin textarea:focus {
+.formulario-admin textarea:focus,
+.formulario-admin select:focus {
   border-color: var(--color-dorado);
   background: var(--color-blanco);
 }
@@ -2639,3 +2641,186 @@ ul {
   color: var(--color-dorado);
 }
 
+
+/* ================================================================
+   PERFIL DE CLIENTE Y ESTADOS — portado de static/css/admin.css
+   ================================================================ */
+.acciones-hero-guest {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.perfil-seccion {
+  padding-top: clamp(48px, 8vh, 96px);
+  padding-bottom: clamp(72px, 12vh, 130px);
+}
+
+.perfil-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.75fr) minmax(320px, 1.25fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: start;
+}
+
+.perfil-resumen,
+.perfil-panel {
+  border: 1px solid var(--color-borde-claro);
+  background: var(--color-blanco);
+}
+
+.perfil-resumen {
+  padding: clamp(24px, 4vw, 38px);
+}
+
+.perfil-resumen h2,
+.perfil-panel h2,
+.perfil-zona-peligro h3 {
+  margin: 0;
+}
+
+.perfil-datos {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.perfil-datos div {
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(207, 207, 207, 0.65);
+}
+
+.perfil-datos dt {
+  margin-bottom: 4px;
+  color: var(--color-texto-etiqueta);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.perfil-datos dd {
+  margin: 0;
+  color: var(--color-oscuro);
+  overflow-wrap: anywhere;
+}
+
+.perfil-acciones-secundarias {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.perfil-panel {
+  padding: clamp(24px, 4vw, 42px);
+}
+
+.perfil-encabezado-form {
+  margin-bottom: 8px;
+}
+
+.perfil-formulario {
+  max-width: none;
+}
+
+.perfil-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.perfil-alerta-ok {
+  color: #2f6f48;
+  border-color: #b8dbc6;
+  background: #f0faf3;
+}
+
+.perfil-zona-peligro {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--color-borde-claro);
+}
+
+.perfil-zona-peligro p:last-child {
+  max-width: 520px;
+  margin-top: 10px;
+  color: var(--color-texto-etiqueta);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 840px) {
+  .perfil-grid,
+  .perfil-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .perfil-zona-peligro {
+    flex-direction: column;
+  }
+}
+
+/* Chip de estado (Habitación) */
+.chip-estado {
+  display: inline-block;
+  width: fit-content;
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+}
+
+.chip-estado[data-estado="DISPONIBLE"] { color: var(--color-dorado-hover); }
+.chip-estado[data-estado="OCUPADA"] { color: var(--color-texto-etiqueta); }
+.chip-estado[data-estado="MANTENIMIENTO"] { color: var(--admin-rojo); }
+.chip-estado[data-estado="DESHABILITADA"] { color: var(--color-texto-etiqueta); border-style: dashed; }
+
+/* Mensaje de éxito y enlace secundario de las pantallas de login/registro */
+.login-exito {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  font-size: 0.8rem;
+  color: #8fd1a6;
+  border: 1px solid rgba(143, 209, 166, 0.4);
+  background: rgba(47, 111, 72, 0.18);
+  text-align: center;
+}
+
+.login-alterno {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-texto-etiqueta);
+}
+
+.login-alterno a {
+  color: var(--color-dorado);
+}
+
+.login-form-fila {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.login-campo-error {
+  color: #ff6b6b;
+  font-size: 0.75rem;
+}
+
+.btn-enlace-sesion {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}

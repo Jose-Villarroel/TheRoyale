@@ -1,0 +1,71 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  [titulo]="id !== null ? 'Edit Client' : 'New Client'"
+  subtitulo="Contact details and credentials for a guest account.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+  <div class="formulario-admin-panel">
+    <form [formGroup]="clienteForm" (ngSubmit)="guardar()" class="formulario-admin">
+
+      <div class="perfil-form-grid">
+        <label>
+          <span>First Name</span>
+          <input type="text" formControlName="nombre">
+          <app-campo-error
+            [control]="clienteForm.get('nombre')"
+            [mensajes]="{ required: 'First name is required.', maxlength: 'Maximum 100 characters.' }">
+          </app-campo-error>
+        </label>
+
+        <label>
+          <span>Last Name</span>
+          <input type="text" formControlName="apellido">
+          <app-campo-error
+            [control]="clienteForm.get('apellido')"
+            [mensajes]="{ required: 'Last name is required.', maxlength: 'Maximum 100 characters.' }">
+          </app-campo-error>
+        </label>
+      </div>
+
+      <label>
+        <span>Email</span>
+        <input type="email" formControlName="email">
+        <app-campo-error
+          [control]="clienteForm.get('email')"
+          [mensajes]="{ required: 'Email is required.', email: 'Enter a valid email.', maxlength: 'Maximum 150 characters.' }">
+        </app-campo-error>
+      </label>
+
+      <label>
+        <span>Phone</span>
+        <input type="tel" formControlName="telefono" placeholder="+1 555 000 0000">
+        <app-campo-error
+          [control]="clienteForm.get('telefono')"
+          [mensajes]="{ maxlength: 'Maximum 20 characters.' }">
+        </app-campo-error>
+      </label>
+
+      <label>
+        <span>{{ id !== null ? 'New Password' : 'Password' }}</span>
+        <input type="password" formControlName="password" autocomplete="new-password"
+               [placeholder]="id !== null ? 'Leave blank to keep current password' : ''">
+        <app-campo-error
+          [control]="clienteForm.get('password')"
+          [mensajes]="{ required: 'Password is required.' }">
+        </app-campo-error>
+      </label>
+
+      <div class="formulario-admin-botones">
+        <button type="submit" class="btn-dorado" [disabled]="clienteForm.invalid">Save</button>
+        <a routerLink="/admin/clientes" class="btn-contorno-oscuro">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

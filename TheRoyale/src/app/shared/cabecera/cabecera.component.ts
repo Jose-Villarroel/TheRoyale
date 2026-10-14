@@ -1,5 +1,6 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, EventEmitter, HostListener, inject, Input, Output } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-cabecera',
@@ -8,6 +9,9 @@ import { RouterLink } from '@angular/router';
   templateUrl: './cabecera.component.html'
 })
 export class CabeceraComponent {
+  private router = inject(Router);
+  // Público para que la plantilla muestre Sign In / My Profile según haya sesión
+  authService = inject(AuthService);
 
   // El menú móvil es hermano de la cabecera, así que quien la usa decide cuándo abrirlo.
   @Output() abrirMenu = new EventEmitter<void>();
@@ -21,5 +25,10 @@ export class CabeceraComponent {
   @HostListener('window:scroll')
   alHacerScroll(): void {
     this.solida = (window.scrollY || 0) > 90;
+  }
+
+  cerrarSesion(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

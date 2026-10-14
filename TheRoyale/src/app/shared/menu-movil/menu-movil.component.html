@@ -13,7 +13,15 @@
     <a href="/contact" class="enlace-menu-movil" (click)="cerrar.emit()">Contact</a>
   </nav>
   <div class="menu-movil-pie">
-    <a href="/login">Sign In</a>
-    <a href="/login" class="btn-dorado">Book Now</a>
+    @if (authService.estaAutenticado) {
+      @if (authService.esCliente) {
+        <a routerLink="/profile" (click)="cerrar.emit()">My Profile</a>
+      }
+      <button type="button" class="btn-enlace-sesion" (click)="cerrarSesion()">Sign Out</button>
+    } @else {
+      <a routerLink="/login" (click)="cerrar.emit()">Sign In</a>
+      <a routerLink="/register" (click)="cerrar.emit()">Sign Up</a>
+    }
+    <a routerLink="/login" class="btn-dorado" (click)="cerrar.emit()">Book Now</a>
   </div>
 </div>

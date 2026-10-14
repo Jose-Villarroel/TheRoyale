@@ -1,0 +1,16 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  titulo="Rooms"
+  subtitulo="Every physical room at The Royale — its number, tier, nightly rate and current status.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-nav-admin></app-nav-admin>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+  <app-encabezado-habitaciones></app-encabezado-habitaciones>
+  <app-grid-habitaciones [habitaciones]="habitaciones" (eliminar)="eliminar($event)"></app-grid-habitaciones>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

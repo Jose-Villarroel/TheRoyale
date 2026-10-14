@@ -7,7 +7,15 @@
     </div>
     <div class="barra-utilitaria-derecha">
       <a href="/contact">+1 507 3165 232</a>
-      <a href="/login">Sign In</a>
+      @if (authService.estaAutenticado) {
+        @if (authService.esCliente) {
+          <a routerLink="/profile">{{ authService.usuario?.nombre }} · My Profile</a>
+        }
+        <button type="button" class="btn-enlace-sesion" (click)="cerrarSesion()">Sign Out</button>
+      } @else {
+        <a routerLink="/login">Sign In</a>
+        <a routerLink="/register">Sign Up</a>
+      }
     </div>
   </div>
 
@@ -24,7 +32,7 @@
       <a href="/contact">Contact</a>
     </nav>
 
-    <a href="/login" class="btn-dorado btn-nav-reserva">Book Now</a>
+    <a routerLink="/login" class="btn-dorado btn-nav-reserva">Book Now</a>
 
     <button class="menu-toggle" aria-label="Abrir menú" (click)="abrirMenu.emit()">
       <span></span><span></span>

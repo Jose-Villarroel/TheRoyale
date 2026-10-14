@@ -1,0 +1,64 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  [titulo]="id !== null ? 'Edit Room' : 'New Room'"
+  subtitulo="Set the room number, the tier it belongs to, its nightly rate and its current status.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+  <div class="formulario-admin-panel">
+    <form [formGroup]="habitacionForm" (ngSubmit)="guardar()" class="formulario-admin">
+
+      <label>
+        <span>Room Number</span>
+        <input type="text" formControlName="numero" placeholder="101">
+        <app-campo-error
+          [control]="habitacionForm.get('numero')"
+          [mensajes]="{ required: 'Room number is required.', maxlength: 'Maximum 10 characters.' }">
+        </app-campo-error>
+      </label>
+
+      <label>
+        <span>Room Type</span>
+        <select formControlName="tipoHabitacion" [compareWith]="compararTipos">
+          <option [ngValue]="null" disabled>Select a room type</option>
+          @for (tipo of tipos; track tipo.id) {
+            <option [ngValue]="tipo">{{ tipo.nombre }}</option>
+          }
+        </select>
+        <app-campo-error
+          [control]="habitacionForm.get('tipoHabitacion')"
+          [mensajes]="{ required: 'Room type is required.' }">
+        </app-campo-error>
+      </label>
+
+      <label>
+        <span>Price per Night (USD)</span>
+        <input type="number" formControlName="precio" min="0" step="0.01">
+        <app-campo-error
+          [control]="habitacionForm.get('precio')"
+          [mensajes]="{ required: 'Price is required.', min: 'Price cannot be negative.' }">
+        </app-campo-error>
+      </label>
+
+      <label>
+        <span>Status</span>
+        <select formControlName="estado">
+          @for (estado of estados; track estado) {
+            <option [ngValue]="estado">{{ estado }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="formulario-admin-botones">
+        <button type="submit" class="btn-dorado" [disabled]="habitacionForm.invalid">Save</button>
+        <a routerLink="/admin/habitaciones" class="btn-contorno-oscuro">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

@@ -1,0 +1,16 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  titulo="Clients"
+  subtitulo="Registered guests of The Royale — manage their contact details and accounts.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-nav-admin></app-nav-admin>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+  <app-encabezado-clientes></app-encabezado-clientes>
+  <app-grid-clientes [clientes]="clientes" (eliminar)="eliminar($event)"></app-grid-clientes>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

@@ -1,0 +1,17 @@
+<article class="tarjeta-admin-item">
+  <div class="tarjeta-admin-imagen-wrap">
+    <img [src]="habitacion().tipoHabitacion.imagenUrl || '/images/hotel.webp'" [alt]="habitacion().tipoHabitacion.nombre">
+  </div>
+  <div class="tarjeta-admin-info-wrap">
+    <div class="tarjeta-admin-encabezado">
+      <h3>Room {{ habitacion().numero }}</h3>
+      <span class="tarjeta-admin-precio">{{ habitacion().precio | currency:'USD' }} / night</span>
+    </div>
+    <p class="tarjeta-admin-descripcion">{{ habitacion().tipoHabitacion.nombre }}</p>
+    <span class="chip-estado" [attr.data-estado]="habitacion().estado">{{ habitacion().estado }}</span>
+    <div class="tarjeta-admin-acciones">
+      <a [routerLink]="['/admin/habitaciones', habitacion().id, 'editar']" class="enlace-subrayado">Edit</a>
+      <button type="button" class="btn-eliminar" (click)="eliminar.emit(habitacion())">Delete</button>
+    </div>
+  </div>
+</article>

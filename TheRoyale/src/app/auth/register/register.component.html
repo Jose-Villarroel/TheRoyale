@@ -1,0 +1,60 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1 class="login-titulo">Sign Up</h1>
+    <p class="login-subtitulo">Create your account</p>
+    @if (error) {
+      <p class="login-error">{{ error }}</p>
+    }
+    <form [formGroup]="registroForm" (ngSubmit)="registrar()" class="login-form">
+      <div class="login-form-fila">
+        <label>
+          <span>First Name</span>
+          <input type="text" formControlName="nombre" autocomplete="given-name">
+          @if (mostrarError('nombre')) {
+            <small class="login-campo-error">First name is required.</small>
+          }
+        </label>
+        <label>
+          <span>Last Name</span>
+          <input type="text" formControlName="apellido" autocomplete="family-name">
+          @if (mostrarError('apellido')) {
+            <small class="login-campo-error">Last name is required.</small>
+          }
+        </label>
+      </div>
+      <label>
+        <span>Email</span>
+        <input type="email" formControlName="email" autocomplete="email">
+        @if (mostrarError('email')) {
+          <small class="login-campo-error">Enter a valid email.</small>
+        }
+      </label>
+      <label>
+        <span>Phone (optional)</span>
+        <input type="tel" formControlName="telefono" autocomplete="tel" placeholder="+1 555 000 0000">
+        @if (mostrarError('telefono')) {
+          <small class="login-campo-error">Maximum 20 characters.</small>
+        }
+      </label>
+      <label>
+        <span>Password</span>
+        <input type="password" formControlName="password" autocomplete="new-password">
+        @if (mostrarError('password')) {
+          <small class="login-campo-error">Password is required.</small>
+        }
+      </label>
+      <label>
+        <span>Confirm Password</span>
+        <input type="password" formControlName="confirmPassword" autocomplete="new-password">
+        @if (registroForm.hasError('passwordNoCoincide') && registroForm.get('confirmPassword')?.touched) {
+          <small class="login-campo-error">Passwords do not match.</small>
+        }
+      </label>
+      <button type="submit" class="btn-dorado" [disabled]="cargando">
+        {{ cargando ? 'Creating account...' : 'Create Account' }}
+      </button>
+    </form>
+    <p class="login-alterno">Already have an account? <a routerLink="/login">Sign In</a></p>
+    <a routerLink="/" class="login-volver">← Back to home</a>
+  </div>
+</div>

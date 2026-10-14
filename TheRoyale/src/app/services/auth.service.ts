@@ -38,6 +38,15 @@ export class AuthService {
     );
   }
 
+  // Tras editar el perfil se refrescan nombre/email guardados, si no la cabecera mostraría los viejos
+  actualizarUsuario(datos: Pick<LoginResponse, 'nombre' | 'apellido' | 'email'>): void {
+    if (!this._usuario) {
+      return;
+    }
+    this._usuario = { ...this._usuario, ...datos };
+    localStorage.setItem('theroyale_usuario', JSON.stringify(this._usuario));
+  }
+
   logout(): void {
     this._usuario = null;
     localStorage.removeItem('theroyale_usuario');
@@ -49,5 +58,9 @@ export class AuthService {
 
   get estaAutenticado(): boolean {
     return this._usuario !== null;
+  }
+
+  get esCliente(): boolean {
+    return this._usuario?.tipo === 'CLIENTE';
   }
 }
