@@ -58,7 +58,7 @@ export class PerfilComponent implements OnInit {
     this.clienteService.obtenerPorId(usuario.id).subscribe({
       next: (cliente) => this.mostrarCliente(cliente),
       error: () => {
-        // La cuenta guardada en localStorage ya no existe en la base: se cierra la sesión
+        // La cuenta ya no existe en la base: se cierra la sesión
         this.authService.logout();
         this.router.navigate(['/login']);
       }

@@ -21,20 +21,12 @@ export class AuthService {
   private readonly url = `${environment.apiUrl}/auth`;
   private _usuario: LoginResponse | null = null;
 
-  constructor(private http: HttpClient) {
-    // Recupera sesión de localStorage si existe
-    const guardado = localStorage.getItem('theroyale_usuario');
-    if (guardado) {
-      try { this._usuario = JSON.parse(guardado); } catch { this._usuario = null; }
-    }
-  }
+  // El usuario vive solo en memoria: al recargar la página hay que volver a iniciar sesión
+  constructor(private http: HttpClient) {}
 
   login(credenciales: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.url}/login`, credenciales).pipe(
-      tap(usuario => {
-        this._usuario = usuario;
-        localStorage.setItem('theroyale_usuario', JSON.stringify(usuario));
-      })
+      tap(usuario => this._usuario = usuario)
     );
   }
 
@@ -44,12 +36,10 @@ export class AuthService {
       return;
     }
     this._usuario = { ...this._usuario, ...datos };
-    localStorage.setItem('theroyale_usuario', JSON.stringify(this._usuario));
   }
 
   logout(): void {
     this._usuario = null;
-    localStorage.removeItem('theroyale_usuario');
   }
 
   get usuario(): LoginResponse | null {
