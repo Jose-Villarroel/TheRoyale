@@ -7,6 +7,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.util.Map;
 
@@ -41,6 +42,12 @@ public class ApiExceptionHandler {
     public ResponseEntity<Map<String, Object>> manejarParametrosInvalidos(Exception ex) {
         return respuesta(HttpStatus.BAD_REQUEST,
                 "Faltan datos o alguno de los valores enviados no es valido.");
+    }
+
+     @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> manejarCuerpoInvalido(HttpMessageNotReadableException ex) {
+        return respuesta(HttpStatus.BAD_REQUEST,
+                "The request body is missing or has an invalid format (dates must be yyyy-MM-dd).");
     }
 
     private ResponseEntity<Map<String, Object>> respuesta(HttpStatus estado, String mensaje) {

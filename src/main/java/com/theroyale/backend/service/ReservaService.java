@@ -12,6 +12,14 @@ import com.theroyale.backend.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.theroyale.backend.dto.CrearReservaRequest;
+import com.theroyale.backend.model.Cliente;
+import com.theroyale.backend.model.TipoHabitacion;
+import com.theroyale.backend.repository.ClienteRepository;
+import com.theroyale.backend.repository.HabitacionRepository;
+import com.theroyale.backend.repository.TipoHabitacionRepository;
+
+import java.math.BigDecimal;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +39,24 @@ public class ReservaService {
 
     @Autowired
     private CuentaRepository cuentaRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private TipoHabitacionRepository tipoHabitacionRepository;
+
+    @Autowired
+    private HabitacionRepository habitacionRepository;
+
+      // Habitaciones que no se pueden usar sin importar las fechas
+    private static final List<EstadoHabitacion> ESTADOS_HABITACION_NO_UTILIZABLES =
+            List.of(EstadoHabitacion.MANTENIMIENTO, EstadoHabitacion.DESHABILITADA);
+
+    // Reservas que ocupan la habitación en su rango de fechas (CANCELADA y FINALIZADA no)
+    private static final List<EstadoReserva> ESTADOS_RESERVA_BLOQUEANTES =
+            List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA, EstadoReserva.EN_CURSO);
+
 
     public List<Reserva> listar(EstadoReserva estado) {
         return estado == null
@@ -63,6 +89,35 @@ public class ReservaService {
 
     public List<Reserva> salidasDeHoy() {
         return reservaRepository.findByFechaFinAndEstado(LocalDate.now(), EstadoReserva.EN_CURSO);
+    }
+
+  // ===== Crea una reserva y le asigna automáticamente una habitación libre del tipo pedido =====
+    @Transactional
+    public Reserva crear(CrearReservaRequest solicitud) {
+        validarSolicitud(solicitud);
+
+        Cliente cliente = clienteRepository.findById(solicitud.clienteId())
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Cliente no encontrado: " + solicitud.clienteId()));
+
+        TipoHabitacion tipo = tipoHabitacionRepository.findById(solicitud.tipoHabitacionId())
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Tipo de habitación no encontrado: " + solicitud.tipoHabitacionId()));
+
+        Habitacion habitacion = buscarHabitacionDisponible(tipo, solicitud.fechaInicio(), solicitud.fechaFin());
+
+        Reserva reserva = Reserva.builder()
+                .cliente(cliente)
+                .habitacion(habitacion)
+                .fechaInicio(solicitud.fechaInicio())
+                .fechaFin(solicitud.fechaFin())
+                .estado(EstadoReserva.PENDIENTE)
+                .cantidadPersonas(solicitud.cantidadPersonas())
+                .precioNocheAcordado(BigDecimal.valueOf(habitacion.getPrecio()))
+                .fechaCreacion(LocalDateTime.now())
+                .build();
+
+        return reservaRepository.save(reserva);
     }
 
     @Transactional
@@ -133,6 +188,39 @@ public class ReservaService {
         reserva.getHabitacion().setEstado(EstadoHabitacion.DISPONIBLE);
         reserva.setEstado(EstadoReserva.FINALIZADA);
         return reservaRepository.save(reserva);
+    }
+
+ // Toma la primera habitación libre (ordenadas por número); si no hay ninguna, no se puede reservar
+    private Habitacion buscarHabitacionDisponible(TipoHabitacion tipo, LocalDate inicio, LocalDate fin) {
+        List<Habitacion> disponibles = habitacionRepository.buscarDisponibles(
+                tipo.getId(), inicio, fin,
+                ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES);
+
+        if (disponibles.isEmpty()) {
+            throw new IllegalStateException("No " + tipo.getNombre() + " rooms are available from "
+                    + inicio + " to " + fin + ".");
+        }
+        return disponibles.get(0);
+    }
+
+    private void validarSolicitud(CrearReservaRequest solicitud) {
+        if (solicitud == null
+                || solicitud.clienteId() == null
+                || solicitud.tipoHabitacionId() == null
+                || solicitud.fechaInicio() == null
+                || solicitud.fechaFin() == null
+                || solicitud.cantidadPersonas() == null) {
+            throw new IllegalArgumentException("Some required data is missing to create the reservation.");
+        }
+        if (solicitud.cantidadPersonas() < 1) {
+            throw new IllegalArgumentException("The number of guests must be at least 1.");
+        }
+        if (solicitud.fechaInicio().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("The check-in date cannot be in the past.");
+        }
+        if (!solicitud.fechaFin().isAfter(solicitud.fechaInicio())) {
+            throw new IllegalArgumentException("The check-out date must be after the check-in date.");
+        }
     }
 
     private void abrirCuentaSiNoExiste(Reserva reserva) {
