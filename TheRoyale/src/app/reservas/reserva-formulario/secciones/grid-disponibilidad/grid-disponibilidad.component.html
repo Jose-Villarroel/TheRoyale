@@ -1,0 +1,11 @@
+<div class="tarjetas-disponibilidad-grid">
+  @for (tipo of disponibilidad(); track tipo.tipoHabitacionId) {
+    <app-tarjeta-disponibilidad
+      [disponibilidad]="tipo"
+      [seleccionada]="tipo.tipoHabitacionId === tipoSeleccionadoId()"
+      (elegir)="elegir.emit($event)">
+    </app-tarjeta-disponibilidad>
+  } @empty {
+    <p class="parrafo-cuerpo">No room types are configured yet.</p>
+  }
+</div>

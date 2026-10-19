@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.theroyale.backend.dto.CrearReservaRequest;
+import com.theroyale.backend.dto.DisponibilidadTipoResponse;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.repository.ClienteRepository;
@@ -20,6 +21,8 @@ import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -89,6 +92,29 @@ public class ReservaService {
 
     public List<Reserva> salidasDeHoy() {
         return reservaRepository.findByFechaFinAndEstado(LocalDate.now(), EstadoReserva.EN_CURSO);
+    }
+
+    // ===== Cuántas habitaciones quedan libres de cada tipo entre dos fechas =====
+    // Devuelve todos los tipos, incluidos los que estan agotados, para que el front los marque.
+    public List<DisponibilidadTipoResponse> consultarDisponibilidad(LocalDate inicio, LocalDate fin) {
+        validarRangoFechas(inicio, fin);
+
+        List<DisponibilidadTipoResponse> disponibilidad = new ArrayList<>();
+        for (TipoHabitacion tipo : tipoHabitacionRepository.findAll()) {
+            List<Habitacion> libres = habitacionRepository.buscarDisponibles(
+                    tipo.getId(), inicio, fin,
+                    ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES);
+
+            BigDecimal precioDesde = libres.stream()
+                    .map(habitacion -> BigDecimal.valueOf(habitacion.getPrecio()))
+                    .min(Comparator.naturalOrder())
+                    .orElse(null);
+
+            disponibilidad.add(new DisponibilidadTipoResponse(
+                    tipo.getId(), tipo.getNombre(), tipo.getDescripcion(), tipo.getImagenUrl(),
+                    libres.size(), precioDesde));
+        }
+        return disponibilidad;
     }
 
   // ===== Crea una reserva y le asigna automáticamente una habitación libre del tipo pedido =====
@@ -215,10 +241,18 @@ public class ReservaService {
         if (solicitud.cantidadPersonas() < 1) {
             throw new IllegalArgumentException("The number of guests must be at least 1.");
         }
-        if (solicitud.fechaInicio().isBefore(LocalDate.now())) {
+        validarRangoFechas(solicitud.fechaInicio(), solicitud.fechaFin());
+    }
+
+    // Las mismas reglas de fechas valen para crear una reserva y para consultar disponibilidad
+    private void validarRangoFechas(LocalDate inicio, LocalDate fin) {
+        if (inicio == null || fin == null) {
+            throw new IllegalArgumentException("Both the check-in and check-out dates are required.");
+        }
+        if (inicio.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("The check-in date cannot be in the past.");
         }
-        if (!solicitud.fechaFin().isAfter(solicitud.fechaInicio())) {
+        if (!fin.isAfter(inicio)) {
             throw new IllegalArgumentException("The check-out date must be after the check-in date.");
         }
     }

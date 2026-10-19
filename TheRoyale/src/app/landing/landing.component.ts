@@ -4,7 +4,7 @@ import { CabeceraComponent } from '../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../shared/pie-pagina/pie-pagina.component';
 import { HeroComponent } from './secciones/hero/hero.component';
-import { BuscadorReservaComponent } from './secciones/buscador-reserva/buscador-reserva.component';
+import { BusquedaReserva, BuscadorReservaComponent } from './secciones/buscador-reserva/buscador-reserva.component';
 import { SeccionHotelComponent } from './secciones/seccion-hotel/seccion-hotel.component';
 import { SeccionCitaComponent } from './secciones/seccion-cita/seccion-cita.component';
 import { CarruselHabitacionesComponent } from './secciones/carrusel-habitaciones/carrusel-habitaciones.component';
@@ -71,9 +71,16 @@ export class LandingComponent implements OnInit {
   }
 
   // ===== Formulario de reserva: por ahora solo redirige al login =====
-  manejarFormularioReserva(evento: Event): void {
-    evento.preventDefault();
-    this.router.navigate(['/login']);
+  // El buscador no reserva: lleva los criterios a /book, que es donde se confirma
+  manejarFormularioReserva(busqueda: BusquedaReserva): void {
+    this.router.navigate(['/book'], {
+      queryParams: {
+        fechaInicio: busqueda.fechaInicio || null,
+        fechaFin: busqueda.fechaFin || null,
+        huespedes: busqueda.huespedes,
+        tipoId: busqueda.tipoId
+      }
+    });
   }
 
   private manejarError(err: unknown): void {

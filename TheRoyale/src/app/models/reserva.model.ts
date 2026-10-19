@@ -14,3 +14,22 @@ export interface Reserva {
   precioNocheAcordado: number;
   fechaCreacion: string;
 }
+
+// Lo que espera CrearReservaRequest del backend: el cliente pide un TIPO, no una habitación
+export interface CrearReservaRequest {
+  clienteId: number;
+  tipoHabitacionId: number;
+  fechaInicio: string;
+  fechaFin: string;
+  cantidadPersonas: number;
+}
+
+// precioDesde es null cuando no queda ninguna habitación libre de ese tipo
+export interface DisponibilidadTipo {
+  tipoHabitacionId: number;
+  nombre: string;
+  descripcion: string;
+  imagenUrl: string;
+  habitacionesDisponibles: number;
+  precioDesde: number | null;
+}

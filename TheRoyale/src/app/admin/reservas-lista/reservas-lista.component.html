@@ -1,0 +1,31 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  titulo="Reservations"
+  subtitulo="Every reservation at The Royale — guest, assigned room, dates and current status.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-nav-admin></app-nav-admin>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+  <div class="admin-encabezado">
+    <p class="eyebrow">01 — {{ reservas.length }} {{ reservas.length === 1 ? 'reservation' : 'reservations' }}</p>
+    <a routerLink="/" class="enlace-subrayado">← Back to site</a>
+    <a routerLink="/book" class="btn-dorado">+ New Reservation</a>
+  </div>
+
+  <nav class="reservas-filtros" aria-label="Filter by status">
+    @for (filtro of filtros; track filtro.etiqueta) {
+      <button type="button"
+              class="btn-nav-admin"
+              [class.btn-nav-admin-activo]="estadoActivo === filtro.estado"
+              (click)="filtrar(filtro.estado)">{{ filtro.etiqueta }}</button>
+    }
+  </nav>
+
+  <app-grid-reservas [reservas]="reservas"></app-grid-reservas>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

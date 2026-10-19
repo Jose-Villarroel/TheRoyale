@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
@@ -18,7 +18,6 @@ import { Cliente } from '../../models/cliente.model';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,

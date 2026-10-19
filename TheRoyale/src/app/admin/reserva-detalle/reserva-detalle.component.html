@@ -1,0 +1,73 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  eyebrow="Reservation"
+  [titulo]="'Reservation #' + id"
+  subtitulo="The full record of this stay — guest, assigned room, dates and rate.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-nav-admin></app-nav-admin>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+  @if (reserva; as r) {
+    <div class="reserva-detalle-grid">
+      <figure class="reserva-detalle-imagen">
+        <img [src]="r.habitacion.tipoHabitacion.imagenUrl || '/images/hotel.webp'"
+             [alt]="r.habitacion.tipoHabitacion.nombre">
+        <figcaption>{{ r.habitacion.tipoHabitacion.nombre }}</figcaption>
+      </figure>
+
+      <div class="reserva-detalle-datos">
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Status</span>
+          <span class="chip-estado" [attr.data-estado]="r.estado">{{ r.estado }}</span>
+        </div>
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Guest</span>
+          <span class="reserva-dato-valor">{{ r.cliente.nombre }} {{ r.cliente.apellido }}</span>
+          <span class="reserva-dato-secundario">{{ r.cliente.email }}</span>
+        </div>
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Assigned room</span>
+          <span class="reserva-dato-valor">Room {{ r.habitacion.numero }}</span>
+          <span class="reserva-dato-secundario">{{ r.habitacion.tipoHabitacion.nombre }}</span>
+        </div>
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Check-in</span>
+          <span class="reserva-dato-valor">{{ r.fechaInicio | date:'fullDate' }}</span>
+        </div>
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Check-out</span>
+          <span class="reserva-dato-valor">{{ r.fechaFin | date:'fullDate' }}</span>
+        </div>
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Nights</span>
+          <span class="reserva-dato-valor">{{ noches }}</span>
+        </div>
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Guests</span>
+          <span class="reserva-dato-valor">{{ r.cantidadPersonas }}</span>
+        </div>
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Rate per night</span>
+          <span class="reserva-dato-valor">{{ r.precioNocheAcordado | currency:'USD' }}</span>
+        </div>
+        <div class="reserva-dato reserva-dato-destacado">
+          <span class="reserva-dato-etiqueta">Estimated total</span>
+          <span class="reserva-dato-valor">{{ totalEstimado | currency:'USD' }}</span>
+        </div>
+        <div class="reserva-dato">
+          <span class="reserva-dato-etiqueta">Created on</span>
+          <span class="reserva-dato-valor">{{ r.fechaCreacion | date:'medium' }}</span>
+        </div>
+
+        <a routerLink="/admin/reservas" class="enlace-subrayado reserva-detalle-volver">← All reservations</a>
+      </div>
+    </div>
+  }
+</main>
+
+<app-cta-interior texto="Every stay deserves a room chosen with care."></app-cta-interior>
+<app-pie-pagina></app-pie-pagina>

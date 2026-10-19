@@ -1,6 +1,10 @@
 <nav class="nav-admin" aria-label="Admin sections">
   <p class="eyebrow">Manage</p>
   <div class="nav-admin-botones">
+    <a routerLink="/admin/reservas"
+       routerLinkActive="btn-nav-admin-activo"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="btn-nav-admin">Reservations</a>
     <a routerLink="/admin/habitaciones"
        routerLinkActive="btn-nav-admin-activo"
        [routerLinkActiveOptions]="{ exact: true }"

@@ -1,16 +1,22 @@
 package com.theroyale.backend.api;
 
 import com.theroyale.backend.dto.CrearReservaRequest;
+import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 // ===== API REST consumida por reserva.service.ts del frontend Angular =====
 @RestController
@@ -20,6 +26,17 @@ public class ReservaRestController {
 
     @Autowired
     private ReservaService reservaService;
+
+    // ===== Todas las reservas; con ?estado= se filtra por estado =====
+    @GetMapping
+    public List<Reserva> listar(@RequestParam(required = false) EstadoReserva estado) {
+        return reservaService.listar(estado);
+    }
+
+    @GetMapping("/{id}")
+    public Reserva obtenerPorId(@PathVariable Long id) {
+        return reservaService.obtenerPorId(id);
+    }
 
     // ===== Crea una reserva: el sistema asigna una habitación libre del tipo pedido =====
     @PostMapping

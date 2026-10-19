@@ -1,0 +1,190 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  eyebrow="Reservation"
+  [titulo]="confirmada ? 'Reservation Confirmed' : 'Book Your Stay'"
+  [subtitulo]="confirmada
+    ? 'Thank you. Here are the details of your stay at The Royale.'
+    : 'Choose your dates, pick a room tier and we will assign the best available room of that tier.'">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+  @if (!confirmada) {
+  <form [formGroup]="reservaForm" (ngSubmit)="confirmar()">
+
+    <!-- ===== 01 Fechas ===== -->
+    <section class="reserva-paso">
+      <header class="reserva-paso-encabezado">
+        <span class="reserva-paso-numero">01</span>
+        <div>
+          <h2 class="reserva-paso-titulo">Your dates</h2>
+          <p class="reserva-paso-nota">Availability updates as soon as both dates are set.</p>
+        </div>
+      </header>
+
+      <div class="reserva-campos">
+        <label>
+          <span>Arrival</span>
+          <input type="date" formControlName="fechaInicio" [min]="hoy">
+        </label>
+        <label>
+          <span>Departure</span>
+          <input type="date" formControlName="fechaFin" [min]="minimaSalida">
+        </label>
+        <label>
+          <span>Guests</span>
+          <select formControlName="cantidadPersonas">
+            @for (n of [1, 2, 3, 4]; track n) {
+              <option [ngValue]="n">{{ n }} {{ n === 1 ? 'guest' : 'guests' }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <!-- ===== 02 Tipo de habitación ===== -->
+    <section class="reserva-paso">
+      <header class="reserva-paso-encabezado">
+        <span class="reserva-paso-numero">02</span>
+        <div>
+          <h2 class="reserva-paso-titulo">Your room</h2>
+          <p class="reserva-paso-nota">
+            @if (rangoValido) {
+              {{ noches }} {{ noches === 1 ? 'night' : 'nights' }} at The Royale.
+            } @else {
+              Select your arrival and departure dates first.
+            }
+          </p>
+        </div>
+      </header>
+
+      @if (!rangoValido) {
+        <p class="reserva-vacio">Availability will appear here once your dates are set.</p>
+      } @else if (consultando && disponibilidad.length === 0) {
+        <p class="reserva-vacio">Checking availability…</p>
+      } @else {
+        <app-grid-disponibilidad
+          [disponibilidad]="disponibilidad"
+          [tipoSeleccionadoId]="seleccionado?.tipoHabitacionId ?? null"
+          (elegir)="elegirTipo($event)">
+        </app-grid-disponibilidad>
+      }
+    </section>
+
+    <!-- ===== 03 Confirmación ===== -->
+    <section class="reserva-paso reserva-paso-ultimo">
+      <header class="reserva-paso-encabezado">
+        <span class="reserva-paso-numero">03</span>
+        <div>
+          <h2 class="reserva-paso-titulo">Confirm</h2>
+          <p class="reserva-paso-nota">Review the details before confirming.</p>
+        </div>
+      </header>
+
+      <div class="reserva-resumen">
+        <div class="reserva-resumen-fila">
+          <span>Arrival</span>
+          <strong>{{ reservaForm.value.fechaInicio ? (reservaForm.value.fechaInicio | date:'mediumDate') : '—' }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Departure</span>
+          <strong>{{ reservaForm.value.fechaFin ? (reservaForm.value.fechaFin | date:'mediumDate') : '—' }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Nights</span>
+          <strong>{{ noches || '—' }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Guests</span>
+          <strong>{{ reservaForm.value.cantidadPersonas }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Room type</span>
+          <strong>{{ seleccionado?.nombre || 'Not selected' }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Rate per night</span>
+          <strong>{{ seleccionado?.precioDesde ? (seleccionado?.precioDesde | currency:'USD') : '—' }}</strong>
+        </div>
+        <div class="reserva-resumen-fila reserva-resumen-total">
+          <span>Estimated total</span>
+          <strong>{{ totalEstimado ? (totalEstimado | currency:'USD') : '—' }}</strong>
+        </div>
+
+        <div class="reserva-resumen-acciones">
+          @if (authService.estaAutenticado) {
+            <button type="submit" class="btn-dorado" [disabled]="!puedeConfirmar">
+              {{ enviando ? 'Confirming…' : 'Confirm Reservation' }}
+            </button>
+          } @else {
+            <!-- Sin sesión no hay clienteId que enviar, pero la búsqueda ya hecha no se pierde -->
+            <a routerLink="/login"
+               [queryParams]="{ redirect: urlRetorno }"
+               class="btn-dorado">Sign In to Confirm</a>
+          }
+          <a routerLink="/" class="btn-contorno-oscuro">Cancel</a>
+        </div>
+        <p class="reserva-paso-nota">
+          @if (authService.estaAutenticado) {
+            Your reservation starts as Pending. A room of this type is assigned automatically.
+          } @else {
+            You will come back to this page with your dates and room still selected.
+          }
+        </p>
+      </div>
+    </section>
+  </form>
+  } @else {
+    <!-- ===== Confirmación: todo lo que el cliente necesita saber, sin ir a ningún listado ===== -->
+    <section class="reserva-confirmada">
+      <p class="eyebrow">Confirmed</p>
+      <h2 class="reserva-confirmada-titulo">Your stay is booked</h2>
+      <span class="linea-dorada-horizontal"></span>
+      <p class="parrafo-cuerpo">
+        Reservation <strong>#{{ confirmada!.id }}</strong> is registered under
+        {{ confirmada!.cliente.nombre }} {{ confirmada!.cliente.apellido }}.
+        We have assigned you a room of the tier you selected.
+      </p>
+
+      <div class="reserva-resumen">
+        <div class="reserva-resumen-fila">
+          <span>Status</span>
+          <strong><span class="chip-estado" [attr.data-estado]="confirmada!.estado">{{ confirmada!.estado }}</span></strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Assigned room</span>
+          <strong>Room {{ confirmada!.habitacion.numero }} · {{ confirmada!.habitacion.tipoHabitacion.nombre }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Check-in</span>
+          <strong>{{ confirmada!.fechaInicio | date:'fullDate' }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Check-out</span>
+          <strong>{{ confirmada!.fechaFin | date:'fullDate' }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Guests</span>
+          <strong>{{ confirmada!.cantidadPersonas }}</strong>
+        </div>
+        <div class="reserva-resumen-fila">
+          <span>Rate per night</span>
+          <strong>{{ confirmada!.precioNocheAcordado | currency:'USD' }}</strong>
+        </div>
+
+        <div class="reserva-resumen-acciones">
+          <a routerLink="/" class="btn-dorado">Back to Home</a>
+          <button type="button" class="btn-contorno-oscuro" (click)="reservarOtra()">Book Another Stay</button>
+        </div>
+        <p class="reserva-paso-nota">
+          Our front desk will confirm your reservation shortly.
+        </p>
+      </div>
+    </section>
+  }
+</main>
+
+<app-pie-pagina></app-pie-pagina>

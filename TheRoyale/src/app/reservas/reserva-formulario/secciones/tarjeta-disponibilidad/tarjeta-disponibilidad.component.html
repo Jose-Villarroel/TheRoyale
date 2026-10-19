@@ -1,0 +1,33 @@
+<button type="button"
+        class="tarjeta-disponibilidad"
+        [class.tarjeta-disponibilidad-seleccionada]="seleccionada()"
+        [class.tarjeta-disponibilidad-agotada]="agotada"
+        [disabled]="agotada"
+        [attr.aria-pressed]="seleccionada()"
+        (click)="seleccionar()">
+
+  <div class="tarjeta-admin-imagen-wrap">
+    <img [src]="disponibilidad().imagenUrl || '/images/hotel.webp'"
+         [alt]="disponibilidad().nombre">
+    @if (agotada) {
+      <span class="tarjeta-disponibilidad-sello">Fully booked</span>
+    } @else {
+      <span class="tarjeta-disponibilidad-sello">{{ disponibilidad().habitacionesDisponibles }} left</span>
+    }
+  </div>
+
+  <div class="tarjeta-admin-info-wrap">
+    <div class="tarjeta-admin-encabezado">
+      <h3>{{ disponibilidad().nombre }}</h3>
+      @if (disponibilidad().precioDesde !== null) {
+        <span class="tarjeta-disponibilidad-precio">
+          {{ disponibilidad().precioDesde | currency:'USD' }}<small>/ night</small>
+        </span>
+      }
+    </div>
+    <p class="tarjeta-admin-descripcion">{{ disponibilidad().descripcion }}</p>
+    <span class="tarjeta-disponibilidad-marca">
+      {{ seleccionada() ? 'Selected' : (agotada ? 'Not available' : 'Select this room') }}
+    </span>
+  </div>
+</button>

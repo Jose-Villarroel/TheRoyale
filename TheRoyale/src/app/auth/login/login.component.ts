@@ -17,12 +17,16 @@ export class LoginComponent implements OnInit {
   mensaje = '';
   cargando = false;
 
+  // Ruta a la que volver tras iniciar sesion (la pone authGuard o el boton de reservar)
+  private redirect: string | null = null;
+
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {}
 
   // Mismos avisos que mandaba el controlador Thymeleaf por query params (?mensaje=accountCreated...)
   ngOnInit(): void {
     const parametros = this.route.snapshot.queryParamMap;
     this.email = parametros.get('email') ?? '';
+    this.redirect = parametros.get('redirect');
     if (parametros.has('registered')) {
       this.mensaje = 'Account created. You can sign in now.';
     } else if (parametros.has('deleted')) {
@@ -35,8 +39,15 @@ export class LoginComponent implements OnInit {
     this.mensaje = '';
     this.cargando = true;
     this.authService.login({ email: this.email, password: this.password }).subscribe({
-      // El cliente aterriza en su perfil; el operador no tiene perfil de cliente y vuelve al inicio
-      next: (usuario) => this.router.navigate([usuario.tipo === 'CLIENTE' ? '/profile' : '/']),
+      next: (usuario) => {
+        // Si venia de una pagina protegida vuelve alli; si no, el cliente va a su perfil
+        // y el operador al inicio, que no tiene perfil de cliente.
+        if (this.redirect) {
+          this.router.navigateByUrl(this.redirect);
+          return;
+        }
+        this.router.navigate([usuario.tipo === 'CLIENTE' ? '/profile' : '/']);
+      },
       error: () => {
         this.error = 'Invalid credentials. Please try again.';
         this.cargando = false;

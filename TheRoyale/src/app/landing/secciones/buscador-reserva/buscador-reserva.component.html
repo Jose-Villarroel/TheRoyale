@@ -1,27 +1,28 @@
 <!-- ===== Formulario de reserva flotante ===== -->
 <section class="seccion-formulario">
-  <form class="formulario-reserva" appAparecer (ngSubmit)="buscar.emit($event)">
+  <form class="formulario-reserva" appAparecer (ngSubmit)="enviar()">
     <label>
       <span>Arrival</span>
-      <input type="date" name="llegada" required>
+      <input type="date" name="llegada" [(ngModel)]="fechaInicio" [min]="hoy" required>
     </label>
     <label>
       <span>Departure</span>
-      <input type="date" name="salida" required>
+      <input type="date" name="salida" [(ngModel)]="fechaFin" [min]="minimaSalida" required>
     </label>
     <label>
       <span>Guests</span>
-      <select name="huespedes">
-        <option>1 guest</option>
-        <option>2 guests</option>
-        <option>3 guests</option>
-        <option>4 guests</option>
+      <select name="huespedes" [(ngModel)]="huespedes">
+        <option [ngValue]="1">1 guest</option>
+        <option [ngValue]="2">2 guests</option>
+        <option [ngValue]="3">3 guests</option>
+        <option [ngValue]="4">4 guests</option>
       </select>
     </label>
     <label>
       <span>Room</span>
-      <select name="habitacion">
-        <option *ngFor="let tipo of tipos">{{ tipo.nombre }}</option>
+      <select name="habitacion" [(ngModel)]="tipoId">
+        <option [ngValue]="null">Any room</option>
+        <option *ngFor="let tipo of tipos" [ngValue]="tipo.id">{{ tipo.nombre }}</option>
       </select>
     </label>
     <button type="submit" class="btn-dorado">Check Availability</button>
