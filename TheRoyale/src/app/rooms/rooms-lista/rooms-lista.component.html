@@ -1,0 +1,38 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  eyebrow="02 — Accommodation"
+  titulo="Rooms & Suites"
+  subtitulo="Refined spaces for every kind of stay, from essential comfort to private-suite luxury.">
+</app-hero-interior>
+
+<main>
+  <section class="barra-vistas">
+    <div class="contenedor barra-vistas-contenido">
+      <span class="barra-vistas-label">Browse</span>
+      <span class="barra-vistas-count">{{ tipos.length }} room types available</span>
+    </div>
+  </section>
+
+  <section class="seccion-rooms-lista">
+    <div class="contenedor">
+      <div class="rooms-lista">
+        @for (tipo of tipos; track tipo.id) {
+          <article app-room-lista-item class="room-lista-item"
+                   [tipo]="tipo" [posicion]="$index + 1"
+                   [precioDesde]="preciosDesde[tipo.id] ?? null"
+                   [disponibles]="disponibles[tipo.id] ?? 0"></article>
+        }
+      </div>
+
+      @if (tipos.length === 0) {
+        <p class="rooms-vacio">No room types are available yet.</p>
+      }
+    </div>
+  </section>
+
+  <app-cta-interior texto="Ready to find your place above the city?"></app-cta-interior>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

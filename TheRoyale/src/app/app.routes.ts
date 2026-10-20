@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LandingComponent } from './landing/landing.component';
 import { TiposHabitacionListaComponent } from './admin/tipos-habitacion-lista/tipos-habitacion-lista.component';
 import { TiposHabitacionFormularioComponent } from './admin/tipos-habitacion-formulario/tipos-habitacion-formulario.component';
+import { RoomsListaComponent } from './rooms/rooms-lista/rooms-lista.component';
 import { RoomDetalleComponent } from './rooms/room-detalle/room-detalle.component';
 import { ServiciosListaComponent } from './admin/servicios-lista/servicios-lista.component';
 import { ServiciosFormularioComponent } from './admin/servicios-formulario/servicios-formulario.component';
@@ -28,6 +29,7 @@ export const routes: Routes = [
   // Consultar disponibilidad es público; la sesión solo hace falta para confirmar
   { path: 'book', component: ReservaFormularioComponent },
 
+  { path: 'rooms', component: RoomsListaComponent },
   { path: 'rooms/:id', component: RoomDetalleComponent },
   // Las rutas fijas van antes de 'services/:id' o se intentarian resolver como un id
   { path: 'services/table', component: ServiciosTablaComponent },
