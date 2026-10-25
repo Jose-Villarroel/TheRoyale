@@ -29,6 +29,7 @@ export class RegisterComponent {
     nombre: ['', [Validators.required, Validators.maxLength(100)]],
     apellido: ['', [Validators.required, Validators.maxLength(100)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
+    cedula: ['', [Validators.required, Validators.maxLength(20)]],
     telefono: ['', [Validators.maxLength(20)]],
     password: ['', [Validators.required]],
     confirmPassword: ['', [Validators.required]]

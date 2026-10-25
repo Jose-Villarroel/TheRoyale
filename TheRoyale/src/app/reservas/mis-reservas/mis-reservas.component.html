@@ -1,0 +1,49 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  titulo="My Reservations"
+  subtitulo="Your upcoming stays at The Royale, and everything that came before.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+  @if (mensaje) {
+    <p class="login-exito">{{ mensaje }}</p>
+  }
+
+  <div class="admin-encabezado">
+    <p class="eyebrow">{{ reservas.length }} {{ reservas.length === 1 ? 'reservation' : 'reservations' }}</p>
+    <a routerLink="/profile" class="enlace-subrayado">← My profile</a>
+    <a routerLink="/book" class="btn-dorado">+ New Reservation</a>
+  </div>
+
+  <nav class="reservas-filtros" aria-label="Active or past reservations">
+    <button type="button" class="btn-nav-admin"
+            [class.btn-nav-admin-activo]="verActivas"
+            (click)="cambiarPestana(true)">Active</button>
+    <button type="button" class="btn-nav-admin"
+            [class.btn-nav-admin-activo]="!verActivas"
+            (click)="cambiarPestana(false)">History</button>
+  </nav>
+
+  @if (cargando) {
+    <p class="parrafo-cuerpo">Loading your reservations…</p>
+  } @else {
+    <div class="tarjetas-admin-grid">
+      @for (reserva of reservas; track reserva.id) {
+        <app-tarjeta-mi-reserva
+          [reserva]="reserva"
+          (modificar)="modificar($event)"
+          (cancelar)="cancelar($event)">
+        </app-tarjeta-mi-reserva>
+      } @empty {
+        <p class="parrafo-cuerpo">
+          {{ verActivas ? 'You have no active reservations.' : 'No past reservations yet.' }}
+        </p>
+      }
+    </div>
+  }
+</main>
+
+<app-pie-pagina></app-pie-pagina>

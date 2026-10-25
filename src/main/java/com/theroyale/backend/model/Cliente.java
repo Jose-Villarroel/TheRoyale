@@ -39,6 +39,9 @@ public class Cliente {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @Column(nullable = false, unique = true, length = 20)
+    private String cedula;
+
     @Column(length = 20)
     private String telefono;
 
@@ -57,7 +60,7 @@ public class Cliente {
     @Override
     public String toString() {
         return "Cliente{id=" + id + ", nombre='" + nombre + "', apellido='" + apellido +
-                "', email='" + email + "', telefono='" + telefono +
+                "', email='" + email + "', cedula='" + cedula + "', telefono='" + telefono +
                 "', fechaRegistro=" + fechaRegistro + "}";
     }
 }

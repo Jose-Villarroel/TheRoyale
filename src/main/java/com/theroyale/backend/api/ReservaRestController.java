@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,8 +29,15 @@ public class ReservaRestController {
     private ReservaService reservaService;
 
     // ===== Todas las reservas; con ?estado= se filtra por estado =====
+    // Con ?clienteId= se devuelven solo las de ese cliente, y ?activas= las separa
+    // entre vigentes (true) e historial (false) para el portal del huesped.
     @GetMapping
-    public List<Reserva> listar(@RequestParam(required = false) EstadoReserva estado) {
+    public List<Reserva> listar(@RequestParam(required = false) EstadoReserva estado,
+                                @RequestParam(required = false) Long clienteId,
+                                @RequestParam(required = false) Boolean activas) {
+        if (clienteId != null) {
+            return reservaService.listarPorCliente(clienteId, activas);
+        }
         return reservaService.listar(estado);
     }
 
@@ -43,5 +51,34 @@ public class ReservaRestController {
     public ResponseEntity<Reserva> crear(@RequestBody CrearReservaRequest solicitud) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reservaService.crear(solicitud));
+    }
+
+    // ===== Reescribe la reserva con los datos nuevos, solo si hay disponibilidad =====
+    @PutMapping("/{id}")
+    public Reserva modificar(@PathVariable Long id, @RequestBody CrearReservaRequest solicitud) {
+        return reservaService.modificar(id, solicitud);
+    }
+
+    // ===== Transiciones del ciclo de vida, equivalentes a los POST de /operator =====
+    // Los errores de negocio (estado invalido, saldo pendiente, fechas) los traduce
+    // ApiExceptionHandler: IllegalState -> 409, IllegalArgument -> 400.
+    @PostMapping("/{id}/confirmar")
+    public Reserva confirmar(@PathVariable Long id) {
+        return reservaService.confirmar(id);
+    }
+
+    @PostMapping("/{id}/cancelar")
+    public Reserva cancelar(@PathVariable Long id) {
+        return reservaService.cancelar(id);
+    }
+
+    @PostMapping("/{id}/check-in")
+    public Reserva checkIn(@PathVariable Long id) {
+        return reservaService.hacerCheckIn(id);
+    }
+
+    @PostMapping("/{id}/check-out")
+    public Reserva checkOut(@PathVariable Long id) {
+        return reservaService.hacerCheckOut(id);
     }
 }

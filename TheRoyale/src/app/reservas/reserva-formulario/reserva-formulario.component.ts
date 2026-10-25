@@ -51,6 +51,8 @@ export class ReservaFormularioComponent implements OnInit {
   seleccionado: DisponibilidadTipo | null = null;
   // Tipo que venia en la url de la landing: solo una pista hasta que llegue la disponibilidad real
   private tipoPreferidoId: number | null = null;
+  // Con ?reservaId= la pagina edita esa reserva en vez de crear una nueva (AC18)
+  reservaIdEnEdicion: number | null = null;
   consultando = false;
   enviando = false;
   error: string | null = null;
@@ -141,7 +143,8 @@ export class ReservaFormularioComponent implements OnInit {
         fechaInicio: this.reservaForm.value.fechaInicio || null,
         fechaFin: this.reservaForm.value.fechaFin || null,
         huespedes: this.reservaForm.value.cantidadPersonas,
-        tipoId: this.seleccionado?.tipoHabitacionId ?? null
+        tipoId: this.seleccionado?.tipoHabitacionId ?? null,
+        reservaId: this.reservaIdEnEdicion
       }
     }).toString();
   }
@@ -156,14 +159,20 @@ export class ReservaFormularioComponent implements OnInit {
       return;
     }
 
-    this.enviando = true;
-    this.reservaService.crear({
+    const solicitud = {
       clienteId: cliente.id,
       tipoHabitacionId: this.seleccionado!.tipoHabitacionId,
       fechaInicio: this.reservaForm.value.fechaInicio,
       fechaFin: this.reservaForm.value.fechaFin,
       cantidadPersonas: Number(this.reservaForm.value.cantidadPersonas)
-    }).subscribe({
+    };
+
+    this.enviando = true;
+    const peticion = this.reservaIdEnEdicion
+      ? this.reservaService.modificar(this.reservaIdEnEdicion, solicitud)
+      : this.reservaService.crear(solicitud);
+
+    peticion.subscribe({
       next: (reserva) => {
         this.enviando = false;
         // No se navega a ningun listado: la confirmacion se muestra aqui mismo
@@ -173,7 +182,8 @@ export class ReservaFormularioComponent implements OnInit {
       error: (err) => {
         this.enviando = false;
         // 409 cuando otra reserva ocupó la última habitación mientras se llenaba el formulario
-        this.error = err.error?.message || err.message || 'Error creating reservation';
+        this.error = err.error?.message || err.message
+          || (this.reservaIdEnEdicion ? 'Error modifying reservation' : 'Error creating reservation');
         this.refrescarDisponibilidad();
       }
     });
@@ -182,6 +192,7 @@ export class ReservaFormularioComponent implements OnInit {
   reservarOtra(): void {
     this.confirmada = null;
     this.seleccionado = null;
+    this.reservaIdEnEdicion = null;
     this.reservaForm.reset({ fechaInicio: '', fechaFin: '', cantidadPersonas: 2 });
   }
 
@@ -206,6 +217,9 @@ export class ReservaFormularioComponent implements OnInit {
 
     const tipoId = params.get('tipoId');
     this.tipoPreferidoId = tipoId ? Number(tipoId) : null;
+
+    const reservaId = params.get('reservaId');
+    this.reservaIdEnEdicion = reservaId ? Number(reservaId) : null;
   }
 
   private aTexto(fecha: Date): string {

@@ -8,4 +8,6 @@ import com.theroyale.backend.model.ItemConsumo;
 public interface ItemConsumoRepository extends JpaRepository<ItemConsumo, Long> {
 
     boolean existsByServicioId(Long servicioId);
+
+    boolean existsByOperadorId(Long operadorId);
 }

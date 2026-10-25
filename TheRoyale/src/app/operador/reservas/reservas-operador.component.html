@@ -1,0 +1,60 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  titulo="Operations"
+  subtitulo="Every reservation at The Royale — check guests in and out, manage their account and settle payments.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-nav-operador></app-nav-operador>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+  <div class="admin-encabezado">
+    <p class="eyebrow">{{ reservas.length }} {{ reservas.length === 1 ? 'reservation' : 'reservations' }}</p>
+  </div>
+
+  <nav class="reservas-filtros" aria-label="Filter by status">
+    @for (filtro of filtros; track filtro.etiqueta) {
+      <button type="button"
+              class="btn-nav-admin"
+              [class.btn-nav-admin-activo]="estadoActivo === filtro.estado"
+              (click)="filtrar(filtro.estado)">{{ filtro.etiqueta }}</button>
+    }
+  </nav>
+
+  <table class="tabla-servicios">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Guest</th>
+        <th>Room</th>
+        <th>Check-in</th>
+        <th>Check-out</th>
+        <th>Guests</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (reserva of reservas; track reserva.id) {
+        <tr>
+          <td>{{ reserva.id }}</td>
+          <td>{{ reserva.cliente.nombre }} {{ reserva.cliente.apellido }}</td>
+          <td>{{ reserva.habitacion.numero }} · {{ reserva.habitacion.tipoHabitacion.nombre }}</td>
+          <td>{{ reserva.fechaInicio | date:'mediumDate' }}</td>
+          <td>{{ reserva.fechaFin | date:'mediumDate' }}</td>
+          <td>{{ reserva.cantidadPersonas }}</td>
+          <td><span class="chip-estado" [attr.data-estado]="reserva.estado">{{ reserva.estado }}</span></td>
+          <td>
+            <a [routerLink]="['/operator/reservas', reserva.id]" class="enlace-subrayado">Manage</a>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="8">No reservations for this filter.</td></tr>
+      }
+    </tbody>
+  </table>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

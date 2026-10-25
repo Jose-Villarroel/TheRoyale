@@ -60,11 +60,27 @@ public class ReservaService {
     private static final List<EstadoReserva> ESTADOS_RESERVA_BLOQUEANTES =
             List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA, EstadoReserva.EN_CURSO);
 
+    // Lo que el cliente ve como "reservas activas" frente a su historial
+    private static final List<EstadoReserva> ESTADOS_ACTIVOS =
+            List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA, EstadoReserva.EN_CURSO);
+
+    private static final List<EstadoReserva> ESTADOS_HISTORIAL =
+            List.of(EstadoReserva.FINALIZADA, EstadoReserva.CANCELADA);
+
 
     public List<Reserva> listar(EstadoReserva estado) {
         return estado == null
                 ? reservaRepository.findAllByOrderByFechaInicioDesc()
                 : reservaRepository.findByEstadoOrderByFechaInicioDesc(estado);
+    }
+
+    // activas = true -> reservas vigentes (AC16); false -> historial (AC17); null -> todas las del cliente
+    public List<Reserva> listarPorCliente(Long clienteId, Boolean activas) {
+        if (activas == null) {
+            return reservaRepository.findByClienteIdOrderByFechaInicioDesc(clienteId);
+        }
+        return reservaRepository.findByClienteIdAndEstadoInOrderByFechaInicioDesc(
+                clienteId, activas ? ESTADOS_ACTIVOS : ESTADOS_HISTORIAL);
     }
 
     public Reserva obtenerPorId(Long id) {
@@ -103,7 +119,7 @@ public class ReservaService {
         for (TipoHabitacion tipo : tipoHabitacionRepository.findAll()) {
             List<Habitacion> libres = habitacionRepository.buscarDisponibles(
                     tipo.getId(), inicio, fin,
-                    ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES);
+                    ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES, null);
 
             BigDecimal precioDesde = libres.stream()
                     .map(habitacion -> BigDecimal.valueOf(habitacion.getPrecio()))
@@ -130,7 +146,7 @@ public class ReservaService {
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Tipo de habitación no encontrado: " + solicitud.tipoHabitacionId()));
 
-        Habitacion habitacion = buscarHabitacionDisponible(tipo, solicitud.fechaInicio(), solicitud.fechaFin());
+        Habitacion habitacion = buscarHabitacionDisponible(tipo, solicitud.fechaInicio(), solicitud.fechaFin(), null);
 
         Reserva reserva = Reserva.builder()
                 .cliente(cliente)
@@ -142,6 +158,38 @@ public class ReservaService {
                 .precioNocheAcordado(BigDecimal.valueOf(habitacion.getPrecio()))
                 .fechaCreacion(LocalDateTime.now())
                 .build();
+
+        return reservaRepository.save(reserva);
+    }
+
+    // ===== Cambia fechas, tipo de habitación y número de personas de una reserva ya creada =====
+    // La reserva se reescribe en vez de duplicarse: así conserva su cuenta y su historial.
+    // Solo se libera la habitación anterior si hay una libre con los datos nuevos; si no, queda intacta.
+    @Transactional
+    public Reserva modificar(Long id, CrearReservaRequest nuevos) {
+        Reserva reserva = obtenerPorId(id);
+        exigirEstado(reserva, "modify", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
+
+        if (nuevos == null || nuevos.tipoHabitacionId() == null || nuevos.cantidadPersonas() == null) {
+            throw new IllegalArgumentException("Some required data is missing to modify the reservation.");
+        }
+        if (nuevos.cantidadPersonas() < 1) {
+            throw new IllegalArgumentException("The number of guests must be at least 1.");
+        }
+        validarRangoFechas(nuevos.fechaInicio(), nuevos.fechaFin());
+
+        TipoHabitacion tipo = tipoHabitacionRepository.findById(nuevos.tipoHabitacionId())
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Tipo de habitación no encontrado: " + nuevos.tipoHabitacionId()));
+
+        // Se excluye esta misma reserva del cálculo: si no, sus propias fechas la bloquearían
+        Habitacion habitacion = buscarHabitacionDisponible(tipo, nuevos.fechaInicio(), nuevos.fechaFin(), id);
+
+        reserva.setHabitacion(habitacion);
+        reserva.setFechaInicio(nuevos.fechaInicio());
+        reserva.setFechaFin(nuevos.fechaFin());
+        reserva.setCantidadPersonas(nuevos.cantidadPersonas());
+        reserva.setPrecioNocheAcordado(BigDecimal.valueOf(habitacion.getPrecio()));
 
         return reservaRepository.save(reserva);
     }
@@ -163,6 +211,12 @@ public class ReservaService {
     public Reserva cancelar(Long id) {
         Reserva reserva = obtenerPorId(id);
         exigirEstado(reserva, "cancel", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
+
+        // Una estadia que ya empezo (o empieza hoy) se cierra con check-out, no se cancela
+        if (!reserva.getFechaInicio().isAfter(LocalDate.now())) {
+            throw new IllegalStateException("Cannot cancel: the arrival date (" + reserva.getFechaInicio()
+                    + ") is not after today.");
+        }
 
         Cuenta cuenta = cuentaRepository.findByReservaId(id).orElse(null);
         if (cuenta != null) {
@@ -217,10 +271,11 @@ public class ReservaService {
     }
 
  // Toma la primera habitación libre (ordenadas por número); si no hay ninguna, no se puede reservar
-    private Habitacion buscarHabitacionDisponible(TipoHabitacion tipo, LocalDate inicio, LocalDate fin) {
+    private Habitacion buscarHabitacionDisponible(TipoHabitacion tipo, LocalDate inicio, LocalDate fin,
+                                                  Long reservaIdExcluida) {
         List<Habitacion> disponibles = habitacionRepository.buscarDisponibles(
                 tipo.getId(), inicio, fin,
-                ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES);
+                ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES, reservaIdExcluida);
 
         if (disponibles.isEmpty()) {
             throw new IllegalStateException("No " + tipo.getNombre() + " rooms are available from "

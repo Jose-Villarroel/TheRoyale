@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     // JpaRepository provee: findAll(), findById(), save(), deleteById(), etc.
     Optional<Cliente> findByEmailIgnoreCase(String email);
+
+    Optional<Cliente> findByCedula(String cedula);
 }

@@ -3,10 +3,14 @@
 
 <app-hero-interior
   eyebrow="Reservation"
-  [titulo]="confirmada ? 'Reservation Confirmed' : 'Book Your Stay'"
+  [titulo]="confirmada
+    ? (reservaIdEnEdicion ? 'Reservation Updated' : 'Reservation Confirmed')
+    : (reservaIdEnEdicion ? 'Modify Your Stay' : 'Book Your Stay')"
   [subtitulo]="confirmada
     ? 'Thank you. Here are the details of your stay at The Royale.'
-    : 'Choose your dates, pick a room tier and we will assign the best available room of that tier.'">
+    : (reservaIdEnEdicion
+        ? 'Pick new dates or a different room tier. Your reservation only changes if a room is available.'
+        : 'Choose your dates, pick a room tier and we will assign the best available room of that tier.')">
 </app-hero-interior>
 
 <main class="contenedor seccion-admin-contenido">
@@ -117,7 +121,11 @@
         <div class="reserva-resumen-acciones">
           @if (authService.estaAutenticado) {
             <button type="submit" class="btn-dorado" [disabled]="!puedeConfirmar">
-              {{ enviando ? 'Confirming…' : 'Confirm Reservation' }}
+              @if (enviando) {
+                {{ reservaIdEnEdicion ? 'Updating…' : 'Confirming…' }}
+              } @else {
+                {{ reservaIdEnEdicion ? 'Update Reservation' : 'Confirm Reservation' }}
+              }
             </button>
           } @else {
             <!-- Sin sesión no hay clienteId que enviar, pero la búsqueda ya hecha no se pierde -->
@@ -140,8 +148,10 @@
   } @else {
     <!-- ===== Confirmación: todo lo que el cliente necesita saber, sin ir a ningún listado ===== -->
     <section class="reserva-confirmada">
-      <p class="eyebrow">Confirmed</p>
-      <h2 class="reserva-confirmada-titulo">Your stay is booked</h2>
+      <p class="eyebrow">{{ reservaIdEnEdicion ? 'Updated' : 'Confirmed' }}</p>
+      <h2 class="reserva-confirmada-titulo">
+        {{ reservaIdEnEdicion ? 'Your stay has been updated' : 'Your stay is booked' }}
+      </h2>
       <span class="linea-dorada-horizontal"></span>
       <p class="parrafo-cuerpo">
         Reservation <strong>#{{ confirmada!.id }}</strong> is registered under
@@ -176,7 +186,7 @@
         </div>
 
         <div class="reserva-resumen-acciones">
-          <a routerLink="/" class="btn-dorado">Back to Home</a>
+          <a routerLink="/my-reservations" class="btn-dorado">My Reservations</a>
           <button type="button" class="btn-contorno-oscuro" (click)="reservarOtra()">Book Another Stay</button>
         </div>
         <p class="reserva-paso-nota">

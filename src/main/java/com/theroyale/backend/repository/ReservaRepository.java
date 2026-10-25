@@ -19,6 +19,10 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     List<Reserva> findByEstadoOrderByFechaInicioDesc(EstadoReserva estado);
 
+    List<Reserva> findByClienteIdOrderByFechaInicioDesc(Long clienteId);
+
+    List<Reserva> findByClienteIdAndEstadoInOrderByFechaInicioDesc(Long clienteId, List<EstadoReserva> estados);
+
     List<Reserva> findByFechaInicioAndEstadoIn(LocalDate fechaInicio, List<EstadoReserva> estados);
 
     List<Reserva> findByFechaFinAndEstado(LocalDate fechaFin, EstadoReserva estado);

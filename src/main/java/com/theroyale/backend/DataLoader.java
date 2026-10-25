@@ -106,52 +106,52 @@ public class DataLoader implements CommandLineRunner {
     // ===== 10 clientes =====
     private void cargarClientes() {
         clienteRepository.save(Cliente.builder()
-                .nombre("Carlos").apellido("Mendoza").email("carlos.mendoza@email.com")
+                .nombre("Carlos").apellido("Mendoza").cedula("1020304050").email("carlos.mendoza@email.com")
                 .password("pass1234").telefono("+1-555-0101").fechaRegistro(LocalDate.of(2025, 1, 15))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Ana").apellido("García").email("ana.garcia@email.com")
+                .nombre("Ana").apellido("García").cedula("1020304051").email("ana.garcia@email.com")
                 .password("pass1234").telefono("+1-555-0102").fechaRegistro(LocalDate.of(2025, 2, 20))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Luis").apellido("Hernández").email("luis.hernandez@email.com")
+                .nombre("Luis").apellido("Hernández").cedula("1020304052").email("luis.hernandez@email.com")
                 .password("pass1234").telefono("+1-555-0103").fechaRegistro(LocalDate.of(2025, 3, 5))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Sofia").apellido("Torres").email("sofia.torres@email.com")
+                .nombre("Sofia").apellido("Torres").cedula("1020304053").email("sofia.torres@email.com")
                 .password("pass1234").telefono("+1-555-0104").fechaRegistro(LocalDate.of(2025, 3, 18))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Miguel").apellido("Ramírez").email("miguel.ramirez@email.com")
+                .nombre("Miguel").apellido("Ramírez").cedula("1020304054").email("miguel.ramirez@email.com")
                 .password("pass1234").telefono("+1-555-0105").fechaRegistro(LocalDate.of(2025, 4, 2))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Isabella").apellido("López").email("isabella.lopez@email.com")
+                .nombre("Isabella").apellido("López").cedula("1020304055").email("isabella.lopez@email.com")
                 .password("pass1234").telefono("+1-555-0106").fechaRegistro(LocalDate.of(2025, 4, 25))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Andrés").apellido("Martínez").email("andres.martinez@email.com")
+                .nombre("Andrés").apellido("Martínez").cedula("1020304056").email("andres.martinez@email.com")
                 .password("pass1234").telefono("+1-555-0107").fechaRegistro(LocalDate.of(2025, 5, 10))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Valentina").apellido("Rodríguez").email("valentina.rodriguez@email.com")
+                .nombre("Valentina").apellido("Rodríguez").cedula("1020304057").email("valentina.rodriguez@email.com")
                 .password("pass1234").telefono("+1-555-0108").fechaRegistro(LocalDate.of(2025, 6, 1))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Jorge").apellido("Sánchez").email("jorge.sanchez@email.com")
+                .nombre("Jorge").apellido("Sánchez").cedula("1020304058").email("jorge.sanchez@email.com")
                 .password("pass1234").telefono("+1-555-0109").fechaRegistro(LocalDate.of(2025, 7, 14))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Camila").apellido("Díaz").email("camila.diaz@email.com")
+                .nombre("Camila").apellido("Díaz").cedula("1020304059").email("camila.diaz@email.com")
                 .password("pass1234").telefono("+1-555-0110").fechaRegistro(LocalDate.of(2025, 8, 22))
                 .build());
     }

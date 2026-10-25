@@ -19,7 +19,8 @@ public class AutenticacionService {
     @Transactional
     public ResultadoRegistro registrarCliente(Cliente cliente, String confirmPassword) {
         if (cliente == null || estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) ||
-                estaVacio(cliente.getEmail()) || estaVacio(cliente.getPassword())) {
+                estaVacio(cliente.getEmail()) || estaVacio(cliente.getPassword()) ||
+                estaVacio(cliente.getCedula())) {
             return ResultadoRegistro.INCOMPLETO;
         }
 
@@ -29,12 +30,16 @@ public class AutenticacionService {
 
         String emailNormalizado = normalizarEmail(cliente.getEmail());
 
-        if (emailNormalizado.isBlank() || clienteRepository.findByEmailIgnoreCase(emailNormalizado).isPresent()) {
+        String cedulaNormalizada = cliente.getCedula().trim();
+
+        if (emailNormalizado.isBlank() || clienteRepository.findByEmailIgnoreCase(emailNormalizado).isPresent()
+                || clienteRepository.findByCedula(cedulaNormalizada).isPresent()) {
             return ResultadoRegistro.DUPLICADO;
         }
 
         cliente.setId(null);
         cliente.setEmail(emailNormalizado);
+        cliente.setCedula(cedulaNormalizada);
         cliente.setFechaRegistro(LocalDate.now());
         clienteRepository.save(cliente);
         return ResultadoRegistro.EXITO;

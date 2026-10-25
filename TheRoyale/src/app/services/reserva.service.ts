@@ -20,7 +20,37 @@ export class ReservaService {
     return this.http.get<Reserva>(`${this.url}/${id}`);
   }
 
+  // activas = true -> vigentes (AC16); false -> historial (AC17)
+  obtenerPorCliente(clienteId: number, activas: boolean): Observable<Reserva[]> {
+    const params = new HttpParams()
+      .set('clienteId', clienteId)
+      .set('activas', activas);
+    return this.http.get<Reserva[]>(this.url, { params });
+  }
+
   crear(solicitud: CrearReservaRequest): Observable<Reserva> {
     return this.http.post<Reserva>(this.url, solicitud);
+  }
+
+  // Reescribe la reserva: el backend solo la mueve si hay habitación libre con los datos nuevos
+  modificar(id: number, solicitud: CrearReservaRequest): Observable<Reserva> {
+    return this.http.put<Reserva>(`${this.url}/${id}`, solicitud);
+  }
+
+  // ===== Transiciones del ciclo de vida (409 si el estado o el saldo no lo permiten) =====
+  confirmar(id: number): Observable<Reserva> {
+    return this.http.post<Reserva>(`${this.url}/${id}/confirmar`, {});
+  }
+
+  cancelar(id: number): Observable<Reserva> {
+    return this.http.post<Reserva>(`${this.url}/${id}/cancelar`, {});
+  }
+
+  checkIn(id: number): Observable<Reserva> {
+    return this.http.post<Reserva>(`${this.url}/${id}/check-in`, {});
+  }
+
+  checkOut(id: number): Observable<Reserva> {
+    return this.http.post<Reserva>(`${this.url}/${id}/check-out`, {});
   }
 }

@@ -16,17 +16,22 @@ export interface LoginResponse {
   email: string;
 }
 
+const CLAVE_SESION = 'theroyale.usuario';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly url = `${environment.apiUrl}/auth`;
   private _usuario: LoginResponse | null = null;
 
-  // El usuario vive solo en memoria: al recargar la página hay que volver a iniciar sesión
-  constructor(private http: HttpClient) {}
+  // La sesión se guarda en sessionStorage: sin esto, recargar la página cerraba la sesión
+  // y cualquier recorrido de varios pasos (reservar, cobrar, hacer check-out) se perdía.
+  constructor(private http: HttpClient) {
+    this._usuario = this.leerSesion();
+  }
 
   login(credenciales: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.url}/login`, credenciales).pipe(
-      tap(usuario => this._usuario = usuario)
+      tap(usuario => this.guardarSesion(usuario))
     );
   }
 
@@ -35,11 +40,16 @@ export class AuthService {
     if (!this._usuario) {
       return;
     }
-    this._usuario = { ...this._usuario, ...datos };
+    this.guardarSesion({ ...this._usuario, ...datos });
   }
 
   logout(): void {
     this._usuario = null;
+    try {
+      sessionStorage.removeItem(CLAVE_SESION);
+    } catch {
+      // Almacenamiento bloqueado (ventana privada): basta con haberlo borrado de memoria
+    }
   }
 
   get usuario(): LoginResponse | null {
@@ -52,5 +62,27 @@ export class AuthService {
 
   get esCliente(): boolean {
     return this._usuario?.tipo === 'CLIENTE';
+  }
+
+  get esOperador(): boolean {
+    return this._usuario?.tipo === 'OPERADOR';
+  }
+
+  private guardarSesion(usuario: LoginResponse): void {
+    this._usuario = usuario;
+    try {
+      sessionStorage.setItem(CLAVE_SESION, JSON.stringify(usuario));
+    } catch {
+      // Si no se puede persistir, la sesión sigue viva en memoria hasta recargar
+    }
+  }
+
+  private leerSesion(): LoginResponse | null {
+    try {
+      const guardado = sessionStorage.getItem(CLAVE_SESION);
+      return guardado ? JSON.parse(guardado) as LoginResponse : null;
+    } catch {
+      return null;
+    }
   }
 }

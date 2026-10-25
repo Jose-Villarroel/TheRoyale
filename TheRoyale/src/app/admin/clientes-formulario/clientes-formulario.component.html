@@ -42,6 +42,16 @@
       </label>
 
       <label>
+        <span>ID Number</span>
+        <!-- La cédula identifica a la persona: el backend no la reescribe al actualizar -->
+        <input type="text" formControlName="cedula" [readonly]="id !== null">
+        <app-campo-error
+          [control]="clienteForm.get('cedula')"
+          [mensajes]="{ required: 'ID number is required.', maxlength: 'Maximum 20 characters.' }">
+        </app-campo-error>
+      </label>
+
+      <label>
         <span>Phone</span>
         <input type="tel" formControlName="telefono" placeholder="+1 555 000 0000">
         <app-campo-error

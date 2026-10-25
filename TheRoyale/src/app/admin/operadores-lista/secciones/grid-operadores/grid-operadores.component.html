@@ -1,0 +1,7 @@
+<div class="tarjetas-admin-grid">
+  @for (operador of operadores(); track operador.id) {
+    <app-tarjeta-operador [operador]="operador" (eliminar)="eliminar.emit($event)"></app-tarjeta-operador>
+  } @empty {
+    <p class="parrafo-cuerpo">No operators yet.</p>
+  }
+</div>

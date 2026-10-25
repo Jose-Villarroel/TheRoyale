@@ -200,6 +200,16 @@ ul {
   border-color: var(--color-dorado);
 }
 
+/* Las acciones que no navegan son <button>, pero deben leerse igual que el enlace */
+button.enlace-subrayado {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-borde-claro);
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 /* ===== Header: barra utilitaria + navegación ===== */
 .envoltorio-cabecera {
   position: fixed;
@@ -248,6 +258,7 @@ ul {
 .barra-utilitaria-izquierda {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .btn-admin-acceso {
@@ -1680,6 +1691,18 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 22px;
+}
+
+/* Campos que caben en una misma línea; en móvil se apilan */
+.formulario-admin-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 22px;
+}
+
+.formulario-admin-fila > label {
+  flex: 1 1 180px;
 }
 
 .formulario-admin label {

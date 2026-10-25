@@ -30,6 +30,13 @@
         }
       </label>
       <label>
+        <span>ID Number</span>
+        <input type="text" formControlName="cedula" autocomplete="off">
+        @if (mostrarError('cedula')) {
+          <small class="login-campo-error">ID number is required.</small>
+        }
+      </label>
+      <label>
         <span>Phone (optional)</span>
         <input type="tel" formControlName="telefono" autocomplete="tel" placeholder="+1 555 000 0000">
         @if (mostrarError('telefono')) {

@@ -18,7 +18,8 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
     // JpaRepository provee: findAll(), findById(), save(), deleteById(), etc.
     boolean existsByTipoHabitacionId(Long tipoHabitacionId);
 
-@Query("""
+    // reservaIdExcluida permite que una reserva no se bloquee a si misma al modificarla; null = no excluir nada
+    @Query("""
             SELECT h FROM Habitacion h
             WHERE h.tipoHabitacion.id = :tipoHabitacionId
               AND h.estado NOT IN :estadosNoUtilizables
@@ -28,6 +29,7 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
                       AND r.estado IN :estadosBloqueantes
                       AND r.fechaInicio < :fechaFin
                       AND r.fechaFin > :fechaInicio
+                      AND (:reservaIdExcluida IS NULL OR r.id <> :reservaIdExcluida)
               )
             ORDER BY h.numero
             """)
@@ -38,7 +40,8 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
             @Param("fechaInicio") LocalDate fechaInicio,
             @Param("fechaFin") LocalDate fechaFin,
             @Param("estadosNoUtilizables") Collection<EstadoHabitacion> estadosNoUtilizables,
-            @Param("estadosBloqueantes") Collection<EstadoReserva> estadosBloqueantes);
+            @Param("estadosBloqueantes") Collection<EstadoReserva> estadosBloqueantes,
+            @Param("reservaIdExcluida") Long reservaIdExcluida);
     List<Habitacion> findByTipoHabitacionIdOrderByNumeroAsc(Long tipoHabitacionId);
 
     Optional<Habitacion> findByNumero(String numero);

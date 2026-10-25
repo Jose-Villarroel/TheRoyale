@@ -19,13 +19,21 @@ import { HabitacionesListaComponent } from './admin/habitaciones-lista/habitacio
 import { HabitacionesFormularioComponent } from './admin/habitaciones-formulario/habitaciones-formulario.component';
 import { ClientesListaComponent } from './admin/clientes-lista/clientes-lista.component';
 import { ClientesFormularioComponent } from './admin/clientes-formulario/clientes-formulario.component';
+import { OperadoresListaComponent } from './admin/operadores-lista/operadores-lista.component';
+import { OperadoresFormularioComponent } from './admin/operadores-formulario/operadores-formulario.component';
+import { MisReservasComponent } from './reservas/mis-reservas/mis-reservas.component';
+import { LoginOperadorComponent } from './operador/login-operador/login-operador.component';
+import { ReservasOperadorComponent } from './operador/reservas/reservas-operador.component';
+import { ReservaDetalleOperadorComponent } from './operador/reserva-detalle/reserva-detalle-operador.component';
 import { authGuard } from './guards/auth.guard';
+import { operadorGuard } from './guards/operador.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: PerfilComponent, canActivate: [authGuard] },
+  { path: 'my-reservations', component: MisReservasComponent, canActivate: [authGuard] },
   // Consultar disponibilidad es público; la sesión solo hace falta para confirmar
   { path: 'book', component: ReservaFormularioComponent },
 
@@ -49,5 +57,16 @@ export const routes: Routes = [
   { path: 'admin/servicios/:id/editar', component: ServiciosFormularioComponent },
   { path: 'admin/clientes', component: ClientesListaComponent },
   { path: 'admin/clientes/nuevo', component: ClientesFormularioComponent },
-  { path: 'admin/clientes/:id/editar', component: ClientesFormularioComponent }
+  { path: 'admin/clientes/:id/editar', component: ClientesFormularioComponent },
+  { path: 'admin/operadores', component: OperadoresListaComponent },
+  { path: 'admin/operadores/nuevo', component: OperadoresFormularioComponent },
+  { path: 'admin/operadores/:id/editar', component: OperadoresFormularioComponent },
+
+  // ===== Portal del operador: entra por su propia puerta, no por el login de huéspedes =====
+  { path: 'operator/login', component: LoginOperadorComponent },
+  { path: 'operator/reservas', component: ReservasOperadorComponent, canActivate: [operadorGuard] },
+  { path: 'operator/reservas/:id', component: ReservaDetalleOperadorComponent, canActivate: [operadorGuard] },
+  { path: 'operator', redirectTo: 'operator/reservas', pathMatch: 'full' },
+
+  { path: '**', redirectTo: '' }
 ];

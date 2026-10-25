@@ -4,12 +4,17 @@
   <div class="barra-utilitaria">
     <div class="barra-utilitaria-izquierda">
       <a routerLink="/admin/tipos-habitacion" class="btn-admin-acceso">Admin</a>
+      <a routerLink="/operator/login" class="btn-admin-acceso">Operator</a>
     </div>
     <div class="barra-utilitaria-derecha">
       <a href="/contact">+1 507 3165 232</a>
       @if (authService.estaAutenticado) {
         @if (authService.esCliente) {
+          <a routerLink="/my-reservations">My Reservations</a>
           <a routerLink="/profile">{{ authService.usuario?.nombre }} · My Profile</a>
+        }
+        @if (authService.esOperador) {
+          <a routerLink="/operator/reservas">{{ authService.usuario?.nombre }} · Operations</a>
         }
         <button type="button" class="btn-enlace-sesion" (click)="cerrarSesion()">Sign Out</button>
       } @else {

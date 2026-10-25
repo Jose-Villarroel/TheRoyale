@@ -41,6 +41,7 @@ export class ClientesFormularioComponent implements OnInit {
     nombre: ['', [Validators.required, Validators.maxLength(100)]],
     apellido: ['', [Validators.required, Validators.maxLength(100)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
+    cedula: ['', [Validators.required, Validators.maxLength(20)]],
     telefono: ['', [Validators.maxLength(20)]],
     password: ['', [Validators.required]]
   });
@@ -62,6 +63,7 @@ export class ClientesFormularioComponent implements OnInit {
           nombre: cliente.nombre,
           apellido: cliente.apellido,
           email: cliente.email,
+          cedula: cliente.cedula,
           telefono: cliente.telefono ?? ''
         });
       },

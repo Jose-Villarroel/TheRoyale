@@ -1,5 +1,6 @@
 package com.theroyale.backend.service;
 
+import com.theroyale.backend.dto.CuentaResponse;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Cuenta;
 import com.theroyale.backend.model.EstadoCuenta;
@@ -36,12 +37,19 @@ public class CuentaService {
         return cuentaRepository.findByReservaId(reservaId);
     }
 
+    // El mapeo a DTO ocurre dentro de la transaccion: items, pagos y sus operadores son LAZY
+    public CuentaResponse obtenerRespuestaPorReserva(Long reservaId) {
+        return CuentaResponse.desde(cuentaRepository.findByReservaId(reservaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "La reserva " + reservaId + " no tiene cuenta asociada.")));
+    }
+
     public long contarAbiertas() {
         return cuentaRepository.countByEstado(EstadoCuenta.ABIERTA);
     }
 
     @Transactional
-    public Cuenta agregarConsumo(Long reservaId, Long servicioId, Integer cantidad, Long operadorId) {
+    public CuentaResponse agregarConsumo(Long reservaId, Long servicioId, Integer cantidad, Long operadorId) {
         Cuenta cuenta = obtenerCuentaAbierta(reservaId);
 
         if (cantidad == null || cantidad < 1) {
@@ -63,12 +71,12 @@ public class CuentaService {
                 .pagado(false)
                 .build());
 
-        return cuentaRepository.save(cuenta);
+        return CuentaResponse.desde(cuentaRepository.save(cuenta));
     }
 
     // Permite corregir un cargo equivocado, siempre que los pagos ya hechos sigan cubiertos por la cuenta
     @Transactional
-    public Cuenta eliminarConsumo(Long reservaId, Long itemId) {
+    public CuentaResponse eliminarConsumo(Long reservaId, Long itemId) {
         Cuenta cuenta = obtenerCuentaAbierta(reservaId);
 
         ItemConsumo item = cuenta.getItemsConsumo().stream()
@@ -84,11 +92,11 @@ public class CuentaService {
         }
 
         cuenta.getItemsConsumo().remove(item);
-        return cuentaRepository.save(cuenta);
+        return CuentaResponse.desde(cuentaRepository.save(cuenta));
     }
 
     @Transactional
-    public Cuenta registrarPago(Long reservaId, BigDecimal monto, String metodoPago, Long operadorId) {
+    public CuentaResponse registrarPago(Long reservaId, BigDecimal monto, String metodoPago, Long operadorId) {
         Cuenta cuenta = obtenerCuentaAbierta(reservaId);
 
         if (monto == null || monto.signum() <= 0) {
@@ -115,7 +123,7 @@ public class CuentaService {
             cuenta.getItemsConsumo().forEach(item -> item.setPagado(true));
         }
 
-        return cuentaRepository.save(cuenta);
+        return CuentaResponse.desde(cuentaRepository.save(cuenta));
     }
 
     // Services can only be charged to a confirmed or in-progress reservation

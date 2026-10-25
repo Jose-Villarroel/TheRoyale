@@ -181,19 +181,44 @@ La estructura del repositorio se organizará siguiendo una separación clara de 
 The-Royale/
 │
 ├── README.md
-├── docs/
-│   ├── uml/
-│   ├── database/
+├── pom.xml                     # Backend Spring Boot (Java 17, Maven)
+│
+├── docs/                       # Entregables de diseño
+│   ├── uml.md
+│   ├── diagrama_clases_hotel.puml
+│   ├── diagrama_er_hotel.puml
 │   └── mockups/
 │
-├── frontend/
+├── src/main/java/com/theroyale/backend/
+│   ├── model/                  # Entidades JPA
+│   ├── repository/             # Repositorios Spring Data
+│   ├── service/                # Reglas de negocio
+│   ├── api/                    # Controladores REST (/api/**) que consume la SPA
+│   ├── controller/             # Controladores MVC de las vistas Thymeleaf
+│   ├── dto/
+│   ├── errors/
+│   └── DataLoader.java         # Datos de prueba iniciales
 │
-├── backend/
+├── src/main/resources/
+│   ├── application.properties  # H2 en memoria
+│   ├── templates/              # Vistas Thymeleaf (frontend heredado)
+│   └── static/
 │
-├── database/
-│
-└── tests/
+└── TheRoyale/                  # SPA Angular 19 (standalone components)
+    └── src/app/
+        ├── landing/            # Página pública
+        ├── auth/               # Login y registro de clientes
+        ├── rooms/ · servicios/ # Catálogo público
+        ├── reservas/           # Reservar, mis reservas
+        ├── perfil/             # Datos del cliente
+        ├── operador/           # Portal de operaciones
+        ├── admin/              # Panel de administración
+        ├── services/ · models/ · guards/ · shared/
 ```
+
+El backend Spring Boot corre en el puerto 8080 y la SPA Angular en el 4200, consumiendo
+la API REST bajo `/api`. Las vistas Thymeleaf se conservan como respaldo del portal de
+operador y del panel de administración.
 
 La estructura puede evolucionar durante el desarrollo del proyecto según las necesidades técnicas de cada Sprint.
 
