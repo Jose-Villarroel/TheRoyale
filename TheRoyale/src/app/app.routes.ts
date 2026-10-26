@@ -27,6 +27,7 @@ import { ReservasOperadorComponent } from './operador/reservas/reservas-operador
 import { ReservaDetalleOperadorComponent } from './operador/reserva-detalle/reserva-detalle-operador.component';
 import { authGuard } from './guards/auth.guard';
 import { operadorGuard } from './guards/operador.guard';
+import { BuscarHabitacionComponent } from './operador/buscar-habitacion/buscar-habitacion.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -66,6 +67,7 @@ export const routes: Routes = [
   { path: 'operator/login', component: LoginOperadorComponent },
   { path: 'operator/reservas', component: ReservasOperadorComponent, canActivate: [operadorGuard] },
   { path: 'operator/reservas/:id', component: ReservaDetalleOperadorComponent, canActivate: [operadorGuard] },
+  { path: 'operator/buscar-habitacion', component: BuscarHabitacionComponent, canActivate: [operadorGuard] },
   { path: 'operator', redirectTo: 'operator/reservas', pathMatch: 'full' },
 
   { path: '**', redirectTo: '' }

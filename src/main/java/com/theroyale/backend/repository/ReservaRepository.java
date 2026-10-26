@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
@@ -28,4 +29,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByFechaFinAndEstado(LocalDate fechaFin, EstadoReserva estado);
 
     long countByEstado(EstadoReserva estado);
+
+    // Busca la reserva activa de una habitacion por su numero (para el portal del operador)
+    Optional<Reserva> findFirstByHabitacionNumeroAndEstadoIn(String numero, List<EstadoReserva> estados);
 }

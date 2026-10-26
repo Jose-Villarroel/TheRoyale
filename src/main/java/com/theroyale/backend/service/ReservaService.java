@@ -88,6 +88,16 @@ public class ReservaService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada: " + id));
     }
 
+    // Busca la reserva activa (CONFIRMADA o EN_CURSO) de una habitacion dado su numero.
+    // El operador ingresa el numero de la habitacion para localizar al huesped y agregar consumos.
+    public Reserva buscarActivaPorNumeroHabitacion(String numero) {
+        return reservaRepository
+                .findFirstByHabitacionNumeroAndEstadoIn(numero,
+                        List.of(EstadoReserva.CONFIRMADA, EstadoReserva.EN_CURSO))
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "No active reservation found for room " + numero));
+    }
+
     public long contarPorEstado(EstadoReserva estado) {
         return reservaRepository.countByEstado(estado);
     }

@@ -41,6 +41,14 @@ public class ReservaRestController {
         return reservaService.listar(estado);
     }
 
+    // ===== Buscar la reserva activa por numero de habitacion (portal operador) =====
+    // El operador ingresa el numero (ej. "701") y recibe la reserva + datos del huesped
+    // para confirmar que no haya equivocaciones antes de agregar consumos.
+    @GetMapping("/buscar-habitacion")
+    public Reserva buscarPorHabitacion(@RequestParam String numero) {
+        return reservaService.buscarActivaPorNumeroHabitacion(numero);
+    }
+
     @GetMapping("/{id}")
     public Reserva obtenerPorId(@PathVariable Long id) {
         return reservaService.obtenerPorId(id);

@@ -20,6 +20,13 @@ export class ReservaService {
     return this.http.get<Reserva>(`${this.url}/${id}`);
   }
 
+  // Busca la reserva activa (CONFIRMADA o EN_CURSO) por numero de habitacion.
+  // El backend devuelve 404 si no hay ninguna activa para ese numero.
+  buscarPorHabitacion(numero: string): Observable<Reserva> {
+    const params = new HttpParams().set('numero', numero);
+    return this.http.get<Reserva>(`${this.url}/buscar-habitacion`, { params });
+  }
+
   // activas = true -> vigentes (AC16); false -> historial (AC17)
   obtenerPorCliente(clienteId: number, activas: boolean): Observable<Reserva[]> {
     const params = new HttpParams()
