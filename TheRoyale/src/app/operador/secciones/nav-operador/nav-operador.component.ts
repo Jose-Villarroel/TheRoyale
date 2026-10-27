@@ -16,6 +16,6 @@ export class NavOperadorComponent {
 
   cerrarSesion(): void {
     this.authService.logout();
-    this.router.navigate(['/operator/login']);
+    this.router.navigate(['/login']);
   }
 }

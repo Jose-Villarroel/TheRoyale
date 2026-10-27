@@ -1,5 +1,6 @@
 package com.theroyale.backend;
 
+import com.theroyale.backend.model.Admin;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.Cuenta;
 import com.theroyale.backend.model.EstadoCuenta;
@@ -13,6 +14,7 @@ import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.model.TipoOperador;
+import com.theroyale.backend.repository.AdminRepository;
 import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
@@ -55,6 +57,9 @@ public class DataLoader implements CommandLineRunner {
     private OperadorRepository operadorRepository;
 
     @Autowired
+    private AdminRepository adminRepository;
+
+    @Autowired
     private ReservaRepository reservaRepository;
 
     @Autowired
@@ -67,7 +72,19 @@ public class DataLoader implements CommandLineRunner {
         cargarHabitaciones();
         cargarServicios();
         cargarOperadores();
+        cargarAdmins();
         cargarReservas();
+    }
+
+    // ===== 2 administradores: gestionan el catálogo y el personal, no la operación diaria =====
+    private void cargarAdmins() {
+        adminRepository.save(Admin.builder()
+                .nombre("Mono").email("mono@theroyale.com").password("admin123")
+                .build());
+
+        adminRepository.save(Admin.builder()
+                .nombre("Mati").email("mati@theroyale.com").password("admin123")
+                .build());
     }
 
     // ===== 5 tipos de habitación =====

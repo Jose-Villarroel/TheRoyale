@@ -2,9 +2,11 @@
 <div class="envoltorio-cabecera" [class.cabecera-solida]="solida || siempreSolida">
 
   <div class="barra-utilitaria">
+    <!-- Acceso al panel de gestión: solo para un admin con sesión y nunca en la landing -->
     <div class="barra-utilitaria-izquierda">
-      <a routerLink="/admin/tipos-habitacion" class="btn-admin-acceso">Admin</a>
-      <a routerLink="/operator/login" class="btn-admin-acceso">Operator</a>
+      @if (authService.esAdmin && mostrarAccesosStaff) {
+        <a routerLink="/admin/reservas" class="btn-admin-acceso">Admin</a>
+      }
     </div>
     <div class="barra-utilitaria-derecha">
       <a routerLink="/" fragment="contact">+1 507 3165 232</a>
@@ -15,6 +17,9 @@
         }
         @if (authService.esOperador) {
           <a routerLink="/operator/reservas">{{ authService.usuario?.nombre }} · Operations</a>
+        }
+        @if (authService.esAdmin) {
+          <a routerLink="/admin/reservas">{{ authService.usuario?.nombre }} · Admin</a>
         }
         <button type="button" class="btn-enlace-sesion" (click)="cerrarSesion()">Sign Out</button>
       } @else {

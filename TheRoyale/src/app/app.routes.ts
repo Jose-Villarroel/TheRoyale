@@ -22,11 +22,11 @@ import { ClientesFormularioComponent } from './admin/clientes-formulario/cliente
 import { OperadoresListaComponent } from './admin/operadores-lista/operadores-lista.component';
 import { OperadoresFormularioComponent } from './admin/operadores-formulario/operadores-formulario.component';
 import { MisReservasComponent } from './reservas/mis-reservas/mis-reservas.component';
-import { LoginOperadorComponent } from './operador/login-operador/login-operador.component';
 import { ReservasOperadorComponent } from './operador/reservas/reservas-operador.component';
 import { ReservaDetalleOperadorComponent } from './operador/reserva-detalle/reserva-detalle-operador.component';
 import { clienteGuard } from './guards/cliente.guard';
 import { operadorGuard } from './guards/operador.guard';
+import { adminGuard } from './guards/admin.guard';
 import { BuscarHabitacionComponent } from './operador/buscar-habitacion/buscar-habitacion.component';
 
 export const routes: Routes = [
@@ -44,28 +44,26 @@ export const routes: Routes = [
   { path: 'services/table', component: ServiciosTablaComponent },
   { path: 'services/cards', component: ServiciosTarjetasComponent },
   { path: 'services/:id', component: ServicioDetalleComponent },
-  // Ver todas las reservas es gestión, no algo que el cliente necesite desde el sitio.
-  // No hay login de administrador: el personal del hotel (operador) es quien administra.
-  { path: 'admin/reservas', component: ReservasListaComponent, canActivate: [operadorGuard] },
-  { path: 'admin/reservas/:id', component: ReservaDetalleComponent, canActivate: [operadorGuard] },
-  { path: 'admin/habitaciones', component: HabitacionesListaComponent, canActivate: [operadorGuard] },
-  { path: 'admin/habitaciones/nuevo', component: HabitacionesFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/habitaciones/:id/editar', component: HabitacionesFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/tipos-habitacion', component: TiposHabitacionListaComponent, canActivate: [operadorGuard] },
-  { path: 'admin/tipos-habitacion/nuevo', component: TiposHabitacionFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/tipos-habitacion/:id/editar', component: TiposHabitacionFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/servicios', component: ServiciosListaComponent, canActivate: [operadorGuard] },
-  { path: 'admin/servicios/nuevo', component: ServiciosFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/servicios/:id/editar', component: ServiciosFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/clientes', component: ClientesListaComponent, canActivate: [operadorGuard] },
-  { path: 'admin/clientes/nuevo', component: ClientesFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/clientes/:id/editar', component: ClientesFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/operadores', component: OperadoresListaComponent, canActivate: [operadorGuard] },
-  { path: 'admin/operadores/nuevo', component: OperadoresFormularioComponent, canActivate: [operadorGuard] },
-  { path: 'admin/operadores/:id/editar', component: OperadoresFormularioComponent, canActivate: [operadorGuard] },
+  // ===== Panel de administración: solo administradores (un operador no entra) =====
+  { path: 'admin/reservas', component: ReservasListaComponent, canActivate: [adminGuard] },
+  { path: 'admin/reservas/:id', component: ReservaDetalleComponent, canActivate: [adminGuard] },
+  { path: 'admin/habitaciones', component: HabitacionesListaComponent, canActivate: [adminGuard] },
+  { path: 'admin/habitaciones/nuevo', component: HabitacionesFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/habitaciones/:id/editar', component: HabitacionesFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/tipos-habitacion', component: TiposHabitacionListaComponent, canActivate: [adminGuard] },
+  { path: 'admin/tipos-habitacion/nuevo', component: TiposHabitacionFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/tipos-habitacion/:id/editar', component: TiposHabitacionFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/servicios', component: ServiciosListaComponent, canActivate: [adminGuard] },
+  { path: 'admin/servicios/nuevo', component: ServiciosFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/servicios/:id/editar', component: ServiciosFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/clientes', component: ClientesListaComponent, canActivate: [adminGuard] },
+  { path: 'admin/clientes/nuevo', component: ClientesFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/clientes/:id/editar', component: ClientesFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/operadores', component: OperadoresListaComponent, canActivate: [adminGuard] },
+  { path: 'admin/operadores/nuevo', component: OperadoresFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/operadores/:id/editar', component: OperadoresFormularioComponent, canActivate: [adminGuard] },
 
-  // ===== Portal del operador: entra por su propia puerta, no por el login de huéspedes =====
-  { path: 'operator/login', component: LoginOperadorComponent },
+  // ===== Portal del operador: solo operadores (un admin no entra). Todos inician sesión en /login =====
   { path: 'operator/reservas', component: ReservasOperadorComponent, canActivate: [operadorGuard] },
   { path: 'operator/reservas/:id', component: ReservaDetalleOperadorComponent, canActivate: [operadorGuard] },
   { path: 'operator/buscar-habitacion', component: BuscarHabitacionComponent, canActivate: [operadorGuard] },

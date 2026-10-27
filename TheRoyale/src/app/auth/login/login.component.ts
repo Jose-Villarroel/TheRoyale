@@ -40,13 +40,18 @@ export class LoginComponent implements OnInit {
     this.cargando = true;
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (usuario) => {
-        // Si venia de una pagina protegida vuelve alli; si no, el cliente va a su perfil
-        // y el operador a su portal de operaciones (no tiene perfil de cliente).
+        // Si venia de una pagina protegida vuelve alli; si no, cada rol entra a su propio panel:
+        // el cliente a su perfil, el operador a operaciones y el admin a gestión.
         if (this.redirect) {
           this.router.navigateByUrl(this.redirect);
           return;
         }
-        this.router.navigate([usuario.tipo === 'CLIENTE' ? '/profile' : '/operator/reservas']);
+        const destinos: Record<string, string> = {
+          CLIENTE: '/profile',
+          OPERADOR: '/operator/reservas',
+          ADMIN: '/admin/reservas'
+        };
+        this.router.navigate([destinos[usuario.tipo] ?? '/']);
       },
       error: () => {
         this.error = 'Invalid credentials. Please try again.';

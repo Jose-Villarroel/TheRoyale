@@ -5,7 +5,6 @@
     <button id="menuCerrar" aria-label="Cerrar menú" (click)="cerrar.emit()">&times;</button>
   </div>
   <nav class="menu-movil-nav">
-    <a routerLink="/admin/tipos-habitacion" class="enlace-menu-movil" (click)="cerrar.emit()">Admin</a>
     <a routerLink="/" fragment="rooms" class="enlace-menu-movil" (click)="cerrar.emit()">Rooms</a>
     <a routerLink="/" fragment="services" class="enlace-menu-movil" (click)="cerrar.emit()">Services</a>
     <a routerLink="/" fragment="experiences" class="enlace-menu-movil" (click)="cerrar.emit()">Experiences</a>
@@ -19,6 +18,9 @@
       }
       @if (authService.esOperador) {
         <a routerLink="/operator/reservas" (click)="cerrar.emit()">Operations</a>
+      }
+      @if (authService.esAdmin && mostrarAccesosStaff) {
+        <a routerLink="/admin/reservas" (click)="cerrar.emit()">Admin</a>
       }
       <button type="button" class="btn-enlace-sesion" (click)="cerrarSesion()">Sign Out</button>
     } @else {

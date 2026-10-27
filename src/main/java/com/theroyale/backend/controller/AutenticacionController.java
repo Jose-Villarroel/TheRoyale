@@ -50,8 +50,11 @@ public class AutenticacionController {
         Optional<LoginResponse> sesion = autenticacionService.login(email, password);
 
         if (sesion.isPresent()) {
-            // Huéspedes van a su portal de reservas; el personal, al panel del operador
+            // Cada rol va a su propio panel: huésped a sus reservas, operador a operaciones, admin a gestión
             LoginResponse usuario = sesion.get();
+            if (AutenticacionService.TIPO_ADMIN.equals(usuario.tipo())) {
+                return "redirect:/admin";
+            }
             return AutenticacionService.TIPO_OPERADOR.equals(usuario.tipo())
                     ? "redirect:/operator?operadorId=" + usuario.id()
                     : "redirect:/reservations?clienteId=" + usuario.id();

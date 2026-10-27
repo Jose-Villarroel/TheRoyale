@@ -19,6 +19,9 @@ export class CabeceraComponent {
   // Páginas interiores sin hero oscuro detrás: cabecera sólida desde el inicio (como layout.html)
   @Input() siempreSolida = false;
 
+  // La landing es la cara pública del hotel: ahí no se muestra el botón Admin ni siquiera a un admin
+  @Input() mostrarAccesosStaff = true;
+
   // Cabecera sólida una vez que se bajan 90px, igual que antes pero con binding en vez de classList
   solida = false;
 

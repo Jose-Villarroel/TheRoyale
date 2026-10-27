@@ -68,6 +68,11 @@ export class AuthService {
     return this._usuario?.tipo === 'OPERADOR';
   }
 
+  // Admin y operador son roles separados: el admin gestiona el catálogo, no la operación diaria
+  get esAdmin(): boolean {
+    return this._usuario?.tipo === 'ADMIN';
+  }
+
   private guardarSesion(usuario: LoginResponse): void {
     this._usuario = usuario;
     try {

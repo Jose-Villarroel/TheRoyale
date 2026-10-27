@@ -12,6 +12,9 @@ import java.util.Optional;
 public interface AdminRepository extends JpaRepository<Admin, Long> {
     Optional<Admin> findByEmail(String email);
 
+    // Login: el email se compara sin importar mayúsculas, igual que el de los clientes
+    Optional<Admin> findByEmailIgnoreCase(String email);
+
     // Usadas para desvincular una entidad de las tablas intermedias admin_* antes de borrarla
     List<Admin> findByHabitacionesAdministradasId(Long habitacionId);
 

@@ -1,5 +1,5 @@
-<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
-<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+<app-cabecera [mostrarAccesosStaff]="false" (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [mostrarAccesosStaff]="false" [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
 
 <main>
   <app-hero></app-hero>
