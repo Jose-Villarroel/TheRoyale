@@ -38,15 +38,13 @@ public class TipoHabitacionRestController {
 
     @PostMapping
     public ResponseEntity<TipoHabitacion> crear(@RequestBody TipoHabitacion tipoHabitacion) {
-        tipoHabitacion.setId(null);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(tipoHabitacionService.guardar(tipoHabitacion));
+                .body(tipoHabitacionService.crear(tipoHabitacion));
     }
 
     @PutMapping("/{id}")
     public TipoHabitacion actualizar(@PathVariable Long id, @RequestBody TipoHabitacion tipoHabitacion) {
-        tipoHabitacion.setId(id);
-        return tipoHabitacionService.guardar(tipoHabitacion);
+        return tipoHabitacionService.actualizar(id, tipoHabitacion);
     }
 
     @DeleteMapping("/{id}")

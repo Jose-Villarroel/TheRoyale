@@ -10,7 +10,7 @@
   <app-nav-admin></app-nav-admin>
   <app-alerta-error [mensaje]="error"></app-alerta-error>
   <app-encabezado-habitaciones></app-encabezado-habitaciones>
-  <app-grid-habitaciones [habitaciones]="habitaciones" (eliminar)="eliminar($event)"></app-grid-habitaciones>
+  <app-grid-habitaciones [habitaciones]="habitaciones" [imagenesPorTipo]="imagenesPorTipo" (eliminar)="eliminar($event)"></app-grid-habitaciones>
 </main>
 
 <app-pie-pagina></app-pie-pagina>

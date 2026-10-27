@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Habitacion } from '../models/habitacion.model';
+import { Habitacion, HabitacionRequest } from '../models/habitacion.model';
 import { environment } from '../../environments/environment';
 
+// Cliente HTTP del CRUD de habitaciones (/api/habitaciones), con filtro opcional por tipo.
 @Injectable({ providedIn: 'root' })
 export class HabitacionService {
   private readonly url = `${environment.apiUrl}/habitaciones`;
@@ -22,11 +23,11 @@ export class HabitacionService {
     return this.http.get<Habitacion>(`${this.url}/${id}`);
   }
 
-  crear(habitacion: Omit<Habitacion, 'id'>): Observable<Habitacion> {
+  crear(habitacion: HabitacionRequest): Observable<Habitacion> {
     return this.http.post<Habitacion>(this.url, habitacion);
   }
 
-  actualizar(id: number, habitacion: Habitacion): Observable<Habitacion> {
+  actualizar(id: number, habitacion: HabitacionRequest): Observable<Habitacion> {
     return this.http.put<Habitacion>(`${this.url}/${id}`, habitacion);
   }
 

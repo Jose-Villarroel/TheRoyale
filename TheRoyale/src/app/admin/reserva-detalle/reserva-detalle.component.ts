@@ -6,11 +6,14 @@ import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
 import { CtaInteriorComponent } from '../../shared/cta-interior/cta-interior.component';
-import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
 import { NavAdminComponent } from '../secciones/nav-admin/nav-admin.component';
 import { ReservaService } from '../../services/reserva.service';
 import { Reserva } from '../../models/reserva.model';
+import { noches } from '../../utils/fechas';
 
+// Detalle de solo lectura de una reserva en el panel admin: huésped, habitación, fechas y tarifa.
+// El id llega por la URL (/admin/reservas/:id).
 @Component({
   selector: 'app-reserva-detalle',
   standalone: true,
@@ -46,12 +49,7 @@ export class ReservaDetalleComponent implements OnInit {
   }
 
   get noches(): number {
-    if (!this.reserva) {
-      return 0;
-    }
-    const ms = new Date(`${this.reserva.fechaFin}T00:00:00`).getTime()
-             - new Date(`${this.reserva.fechaInicio}T00:00:00`).getTime();
-    return Math.round(ms / 86400000);
+    return this.reserva ? noches(this.reserva.fechaInicio, this.reserva.fechaFin) : 0;
   }
 
   get totalEstimado(): number {

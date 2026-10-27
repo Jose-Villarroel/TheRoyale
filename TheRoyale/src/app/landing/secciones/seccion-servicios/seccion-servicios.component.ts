@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { Servicio } from '../../../models/servicio.model';
 import { AparecerDirective } from '../../../shared/aparecer.directive';
 
+// Sección 03 de la landing ("Services"): tarjetas con los servicios del hotel.
+// Recibe la lista ya cargada por la landing; cada tarjeta enlaza a su detalle.
 @Component({
   selector: 'app-seccion-servicios',
   standalone: true,

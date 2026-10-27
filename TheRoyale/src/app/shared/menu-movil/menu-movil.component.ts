@@ -2,6 +2,8 @@ import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
+// Menú lateral para pantallas pequeñas; se abre desde la cabecera y avisa (cerrar) al salir.
+// Muestra enlaces distintos según haya sesión de huésped u operador.
 @Component({
   selector: 'app-menu-movil',
   standalone: true,

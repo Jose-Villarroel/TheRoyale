@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Servicio } from '../models/servicio.model';
 import { environment } from '../../environments/environment';
 
+// Cliente HTTP del CRUD de servicios del hotel (/api/servicios).
 @Injectable({ providedIn: 'root' })
 export class ServicioService {
   private readonly url = `${environment.apiUrl}/servicios`;

@@ -4,7 +4,7 @@ import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../../admin/secciones/alerta-error/alerta-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
 import { TarjetaMiReservaComponent } from './secciones/tarjeta-mi-reserva/tarjeta-mi-reserva.component';
 import { ReservaService } from '../../services/reserva.service';
 import { AuthService } from '../../services/auth.service';
@@ -55,7 +55,7 @@ export class MisReservasComponent implements OnInit {
         fechaInicio: reserva.fechaInicio,
         fechaFin: reserva.fechaFin,
         huespedes: reserva.cantidadPersonas,
-        tipoId: reserva.habitacion.tipoHabitacion.id
+        tipoId: reserva.tipoHabitacionId
       }
     });
   }
@@ -75,6 +75,12 @@ export class MisReservasComponent implements OnInit {
       // 409 si la llegada ya pasó o la cuenta tiene saldo pendiente
       error: (err) => this.error = err.error?.message || err.message || 'Error cancelling the reservation'
     });
+  }
+
+  // Botón "Sign Out" del hero, como en reservations.html
+  cerrarSesion(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   private cargar(): void {

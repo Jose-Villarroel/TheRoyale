@@ -44,6 +44,11 @@ export class ReservaService {
     return this.http.put<Reserva>(`${this.url}/${id}`, solicitud);
   }
 
+  // 409 si la reserva está EN_CURSO: con el huésped dentro no se borra
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
   // ===== Transiciones del ciclo de vida (409 si el estado o el saldo no lo permiten) =====
   confirmar(id: number): Observable<Reserva> {
     return this.http.post<Reserva>(`${this.url}/${id}/confirmar`, {});

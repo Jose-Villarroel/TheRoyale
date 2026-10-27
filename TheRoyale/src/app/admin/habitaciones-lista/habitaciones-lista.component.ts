@@ -3,11 +3,12 @@ import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
 import { NavAdminComponent } from '../secciones/nav-admin/nav-admin.component';
 import { EncabezadoHabitacionesComponent } from './secciones/encabezado-habitaciones/encabezado-habitaciones.component';
 import { GridHabitacionesComponent } from './secciones/grid-habitaciones/grid-habitaciones.component';
 import { HabitacionService } from '../../services/habitacion.service';
+import { TipoHabitacionService } from '../../services/tipo-habitacion.service';
 import { Habitacion } from '../../models/habitacion.model';
 
 // Página contenedora: trae los datos del servicio y maneja el borrado.
@@ -29,13 +30,21 @@ import { Habitacion } from '../../models/habitacion.model';
 })
 export class HabitacionesListaComponent implements OnInit {
   private habitacionService = inject(HabitacionService);
+  private tipoHabitacionService = inject(TipoHabitacionService);
 
   habitaciones: Habitacion[] = [];
+  // tipoHabitacionId -> imagenUrl, para la foto de cada tarjeta
+  imagenesPorTipo: Record<number, string> = {};
   error: string | null = null;
   menuAbierto = false;
 
   ngOnInit(): void {
     this.cargarHabitaciones();
+    this.tipoHabitacionService.obtenerTodos().subscribe({
+      next: (tipos) => {
+        this.imagenesPorTipo = Object.fromEntries(tipos.map((tipo) => [tipo.id, tipo.imagenUrl]));
+      }
+    });
   }
 
   eliminar(habitacion: Habitacion): void {

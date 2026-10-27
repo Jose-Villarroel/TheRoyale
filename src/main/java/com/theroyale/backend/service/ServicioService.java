@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// ===== Reglas del catálogo de servicios: nombre único, precio no negativo y borrado seguro =====
+// Un servicio ya cargado a alguna cuenta no se puede borrar, para no perder el historial de consumos.
 @Service
 @Transactional(readOnly = true)
 public class ServicioService implements InterfaceService {
@@ -80,6 +82,24 @@ public class ServicioService implements InterfaceService {
         reemplazar(existente.getCaracteristicas(), servicio.getCaracteristicas());
         reemplazar(existente.getGaleriaUrls(), servicio.getGaleriaUrls());
         return servicioRepository.save(existente);
+    }
+
+    @Override
+    @Transactional
+    public Servicio crear(Servicio servicio) {
+        if (servicio != null) {
+            servicio.setId(null);
+        }
+        return guardar(servicio);
+    }
+
+    @Override
+    @Transactional
+    public Servicio actualizar(Long id, Servicio servicio) {
+        if (servicio != null) {
+            servicio.setId(id);
+        }
+        return guardar(servicio);
     }
 
     @Override

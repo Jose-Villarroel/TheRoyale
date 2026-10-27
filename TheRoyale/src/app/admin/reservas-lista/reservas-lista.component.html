@@ -16,14 +16,7 @@
     <a routerLink="/book" class="btn-dorado">+ New Reservation</a>
   </div>
 
-  <nav class="reservas-filtros" aria-label="Filter by status">
-    @for (filtro of filtros; track filtro.etiqueta) {
-      <button type="button"
-              class="btn-nav-admin"
-              [class.btn-nav-admin-activo]="estadoActivo === filtro.estado"
-              (click)="filtrar(filtro.estado)">{{ filtro.etiqueta }}</button>
-    }
-  </nav>
+  <app-filtros-estado [estadoActivo]="estadoActivo" (filtrar)="filtrar($event)"></app-filtros-estado>
 
   <app-grid-reservas [reservas]="reservas"></app-grid-reservas>
 </main>

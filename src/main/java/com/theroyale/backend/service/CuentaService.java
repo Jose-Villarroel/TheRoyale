@@ -8,15 +8,16 @@ import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.ItemConsumo;
 import com.theroyale.backend.model.Operador;
 import com.theroyale.backend.model.Pago;
+import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.repository.CuentaRepository;
-import com.theroyale.backend.repository.ServicioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 // ===== Reglas de la cuenta de consumo de una reserva: servicios cargados, pagos y saldo =====
@@ -24,11 +25,14 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CuentaService {
 
+    // Únicos medios de pago que acepta el hotel; la vista del operador arma su selector con esta lista
+    public static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER");
+
     @Autowired
     private CuentaRepository cuentaRepository;
 
     @Autowired
-    private ServicioRepository servicioRepository;
+    private InterfaceService servicioService;
 
     @Autowired
     private OperadorService operadorService;
@@ -44,6 +48,10 @@ public class CuentaService {
                         "La reserva " + reservaId + " no tiene cuenta asociada.")));
     }
 
+    public List<String> listarMetodosPago() {
+        return METODOS_PAGO;
+    }
+
     public long contarAbiertas() {
         return cuentaRepository.countByEstado(EstadoCuenta.ABIERTA);
     }
@@ -56,8 +64,10 @@ public class CuentaService {
             throw new IllegalArgumentException("Quantity must be at least 1.");
         }
 
-        Servicio servicio = servicioRepository.findById(servicioId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Servicio no encontrado: " + servicioId));
+        if (servicioId == null) {
+            throw new IllegalArgumentException("Service is required.");
+        }
+        Servicio servicio = servicioService.buscarPorId(servicioId);
         Operador operador = operadorService.obtenerOPredeterminado(operadorId);
 
         // Se guarda el precio vigente como snapshot: si el servicio cambia de precio, el cargo no cambia
@@ -105,6 +115,11 @@ public class CuentaService {
         if (metodoPago == null || metodoPago.trim().isEmpty()) {
             throw new IllegalArgumentException("Payment method is required.");
         }
+        String metodo = metodoPago.trim().toUpperCase();
+        if (!METODOS_PAGO.contains(metodo)) {
+            throw new IllegalArgumentException("Invalid payment method: " + metodoPago
+                    + ". Allowed methods: " + String.join(", ", METODOS_PAGO) + ".");
+        }
         if (monto.compareTo(cuenta.getSaldo()) > 0) {
             throw new IllegalArgumentException("Payment (" + monto + ") exceeds the outstanding balance (" + cuenta.getSaldo() + ").");
         }
@@ -116,7 +131,7 @@ public class CuentaService {
                 .operador(operador)
                 .monto(monto)
                 .fecha(LocalDateTime.now())
-                .metodoPago(metodoPago.trim())
+                .metodoPago(metodo)
                 .build());
 
         if (cuenta.getSaldo().signum() == 0) {
@@ -124,6 +139,29 @@ public class CuentaService {
         }
 
         return CuentaResponse.desde(cuentaRepository.save(cuenta));
+    }
+
+    // ===== Operaciones que dispara el ciclo de vida de la reserva (ReservaService) =====
+    // La cuenta nace al confirmar o al hacer check-in, lo que ocurra primero.
+    @Transactional
+    public Cuenta abrirSiNoExiste(Reserva reserva) {
+        return cuentaRepository.findByReservaId(reserva.getId())
+                .orElseGet(() -> cuentaRepository.save(Cuenta.builder()
+                        .reserva(reserva)
+                        .estado(EstadoCuenta.ABIERTA)
+                        .fechaCreacion(LocalDateTime.now())
+                        .build()));
+    }
+
+    // Borra la cuenta con sus consumos y pagos (cascade ALL + orphanRemoval en Cuenta).
+    // Se hace flush para que el DELETE salga antes que el de la reserva, dueña de la FK reserva_id.
+    @Transactional
+    public void eliminarPorReserva(Reserva reserva) {
+        cuentaRepository.findByReservaId(reserva.getId()).ifPresent(cuenta -> {
+            reserva.setCuenta(null);
+            cuentaRepository.delete(cuenta);
+            cuentaRepository.flush();
+        });
     }
 
     // Services can only be charged to a confirmed or in-progress reservation

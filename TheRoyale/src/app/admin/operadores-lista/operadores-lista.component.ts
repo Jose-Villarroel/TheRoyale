@@ -3,7 +3,7 @@ import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
 import { NavAdminComponent } from '../secciones/nav-admin/nav-admin.component';
 import { EncabezadoOperadoresComponent } from './secciones/encabezado-operadores/encabezado-operadores.component';
 import { GridOperadoresComponent } from './secciones/grid-operadores/grid-operadores.component';

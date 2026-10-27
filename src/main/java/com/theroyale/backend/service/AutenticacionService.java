@@ -1,5 +1,6 @@
 package com.theroyale.backend.service;
 
+import com.theroyale.backend.dto.LoginResponse;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Optional;
 
+// ===== Registro e inicio de sesión de huéspedes y operadores =====
+// Concentra la decisión de "quién es" el usuario para que el login JSON (AutenticacionRestController)
+// y el formulario Thymeleaf (AutenticacionController) apliquen exactamente la misma regla.
 @Service
 @Transactional(readOnly = true)
 public class AutenticacionService {
 
+    public static final String TIPO_CLIENTE = "CLIENTE";
+    public static final String TIPO_OPERADOR = "OPERADOR";
+
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private OperadorService operadorService;
 
     @Transactional
     public ResultadoRegistro registrarCliente(Cliente cliente, String confirmPassword) {
@@ -53,6 +63,30 @@ public class AutenticacionService {
         }
 
         return cliente;
+    }
+
+    // ===== Login unificado: primero se busca un huésped y, si no, alguien del personal =====
+    // Vacío = credenciales inválidas para ambos.
+    public Optional<LoginResponse> login(String email, String password) {
+        Optional<Cliente> cliente = autenticar(email, password);
+        if (cliente.isPresent()) {
+            Cliente autenticado = cliente.get();
+            return Optional.of(new LoginResponse(
+                    TIPO_CLIENTE,
+                    autenticado.getId(),
+                    autenticado.getNombre(),
+                    autenticado.getApellido(),
+                    autenticado.getEmail()));
+        }
+
+        // Operador no tiene apellido; se manda vacío para no romper la interfaz del frontend.
+        return operadorService.autenticar(email, password)
+                .map(operador -> new LoginResponse(
+                        TIPO_OPERADOR,
+                        operador.getId(),
+                        operador.getNombre(),
+                        "",
+                        operador.getEmail()));
     }
 
     public Optional<Cliente> obtenerClienteAutenticado(Long clienteId) {

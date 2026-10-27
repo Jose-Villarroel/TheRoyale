@@ -1,10 +1,12 @@
 import { Component, HostListener } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AparecerDirective } from '../../../shared/aparecer.directive';
 
+// Hero de la landing: imagen a pantalla completa con efecto parallax y llamada a reservar.
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [AparecerDirective],
+  imports: [AparecerDirective, RouterLink],
   templateUrl: './hero.component.html'
 })
 export class HeroComponent {

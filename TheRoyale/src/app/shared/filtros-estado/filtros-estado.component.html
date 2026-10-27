@@ -1,0 +1,20 @@
+@if (variante() === 'operador') {
+  <!-- Pestañas del operador: un clic, la activa en oscuro (como operator/reservas.html) -->
+  <nav class="operador-filtros" aria-label="Filter by status">
+    @for (filtro of filtros; track filtro.etiqueta) {
+      <button type="button"
+              [class.es-activo]="estadoActivo() === filtro.estado"
+              [attr.aria-current]="estadoActivo() === filtro.estado ? 'page' : null"
+              (click)="filtrar.emit(filtro.estado)">{{ filtro.etiqueta }}</button>
+    }
+  </nav>
+} @else {
+  <nav class="reservas-filtros" aria-label="Filter by status">
+    @for (filtro of filtros; track filtro.etiqueta) {
+      <button type="button"
+              class="btn-nav-admin"
+              [class.btn-nav-admin-activo]="estadoActivo() === filtro.estado"
+              (click)="filtrar.emit(filtro.estado)">{{ filtro.etiqueta }}</button>
+    }
+  </nav>
+}

@@ -1,30 +1,31 @@
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ReservaService } from '../../services/reserva.service';
 import { Reserva } from '../../models/reserva.model';
-import { DatePipe } from '@angular/common';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../../admin/secciones/alerta-error/alerta-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
 import { NavOperadorComponent } from '../secciones/nav-operador/nav-operador.component';
+import { FormBuscarHabitacionComponent } from './secciones/form-buscar-habitacion/form-buscar-habitacion.component';
+import { TarjetaClienteEncontradoComponent } from './secciones/tarjeta-cliente-encontrado/tarjeta-cliente-encontrado.component';
 
 // El operador ingresa el numero de habitacion para localizar al huesped,
 // ver su informacion y confirmar que sea el correcto antes de gestionar servicios.
+// La página hace la búsqueda; el formulario y la tarjeta del huésped son secciones/.
 @Component({
   selector: 'app-buscar-habitacion',
   standalone: true,
   imports: [
-    FormsModule,
-    DatePipe,
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,
     HeroInteriorComponent,
     AlertaErrorComponent,
-    NavOperadorComponent
+    NavOperadorComponent,
+    FormBuscarHabitacionComponent,
+    TarjetaClienteEncontradoComponent
   ],
   templateUrl: './buscar-habitacion.component.html'
 })

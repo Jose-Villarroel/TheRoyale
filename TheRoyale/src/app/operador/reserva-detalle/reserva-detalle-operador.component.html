@@ -4,226 +4,77 @@
 <app-hero-interior
   eyebrow="Operations"
   [titulo]="'Reservation #' + id"
-  subtitulo="Guest details, stay account and the actions available at this point of the stay.">
+  [subtitulo]="subtituloHero">
 </app-hero-interior>
 
-<main class="contenedor seccion-admin-contenido">
+<main class="contenedor seccion-admin-contenido panel-operador">
   <app-nav-operador></app-nav-operador>
   <app-alerta-error [mensaje]="error"></app-alerta-error>
   @if (mensaje) {
-    <p class="login-exito">{{ mensaje }}</p>
+    <p class="perfil-alerta perfil-alerta-ok" role="status">{{ mensaje }}</p>
   }
 
-  <div class="admin-encabezado">
-    <a routerLink="/operator/reservas" class="enlace-subrayado">← All reservations</a>
-  </div>
-
   @if (reserva) {
-    <!-- ===== Huésped y estadía (AC22) ===== -->
-    <section class="seccion-detalle">
-      <h2 class="reserva-paso-titulo">Guest &amp; stay</h2>
-      <span class="linea-dorada-horizontal"></span>
-      <div class="reserva-resumen">
-        <div class="reserva-resumen-fila">
-          <span>Guest</span>
-          <strong>{{ reserva.cliente.nombre }} {{ reserva.cliente.apellido }}</strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>ID number</span>
-          <strong>{{ reserva.cliente.cedula }}</strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>Email</span>
-          <strong>{{ reserva.cliente.email }}</strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>Phone</span>
-          <strong>{{ reserva.cliente.telefono || 'Not registered' }}</strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>Room</span>
-          <strong>{{ reserva.habitacion.numero }} · {{ reserva.habitacion.tipoHabitacion.nombre }}</strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>Status</span>
-          <strong><span class="chip-estado" [attr.data-estado]="reserva.estado">{{ reserva.estado }}</span></strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>Check-in</span>
-          <strong>{{ reserva.fechaInicio | date:'fullDate' }}</strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>Check-out</span>
-          <strong>{{ reserva.fechaFin | date:'fullDate' }}</strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>Guests</span>
-          <strong>{{ reserva.cantidadPersonas }}</strong>
-        </div>
-        <div class="reserva-resumen-fila">
-          <span>Room total</span>
-          <strong>{{ totalEstadia | currency:'USD' }} ({{ noches }} × {{ reserva.precioNocheAcordado | currency:'USD' }})</strong>
-        </div>
-      </div>
+    <div class="operador-detalle">
 
-      <div class="reserva-resumen-acciones">
-        @if (puedeConfirmar) {
-          <button type="button" class="btn-dorado" (click)="confirmar()">Confirm</button>
+      <!-- ===== Columna izquierda: estadía y acciones, huésped y habitación (AC22) ===== -->
+      <aside class="operador-lateral">
+        <section app-tarjeta-estadia [reserva]="reserva" [noches]="noches" [totalEstadia]="totalEstadia">
+          <app-acciones-reserva
+            [puedeConfirmar]="puedeConfirmar"
+            [puedeCheckIn]="puedeCheckIn"
+            [puedeCheckOut]="puedeCheckOut"
+            [puedeCancelar]="puedeCancelar"
+            [puedeEliminar]="puedeEliminar"
+            (confirmar)="confirmar()"
+            (checkIn)="checkIn()"
+            (checkOut)="checkOut()"
+            (cancelar)="cancelar()"
+            (eliminar)="eliminar()">
+          </app-acciones-reserva>
+        </section>
+        <section app-tarjeta-huesped [reserva]="reserva"></section>
+        <section app-tarjeta-habitacion-asignada [reserva]="reserva"></section>
+      </aside>
+
+      <!-- ===== Columna derecha: cuenta de la estadía (AC23, AC24, AC25) ===== -->
+      <section class="operador-cuenta">
+        <app-cuenta-resumen
+          [cuenta]="cuenta"
+          [numeroHabitacion]="reserva.habitacionNumero"
+          [saldada]="cuentaSaldada">
+        </app-cuenta-resumen>
+
+        @if (cuenta) {
+          <app-tabla-consumos
+            [items]="cuenta.items"
+            [operable]="cuentaOperable"
+            (quitar)="eliminarConsumo($event)">
+          </app-tabla-consumos>
+
+          <app-tabla-pagos [pagos]="cuenta.pagos"></app-tabla-pagos>
+
+          @if (cuentaOperable) {
+            <div class="operador-formularios">
+              <app-form-consumo
+                [formulario]="consumoForm"
+                [servicios]="servicios"
+                (agregar)="agregarConsumo()">
+              </app-form-consumo>
+              <app-form-pago
+                [formulario]="pagoForm"
+                [metodosPago]="metodosPago"
+                [saldo]="cuenta.saldo"
+                (registrar)="registrarPago()"
+                (pagarSaldo)="pagarSaldoCompleto()">
+              </app-form-pago>
+            </div>
+          } @else {
+            <p class="reserva-paso-nota">This account is closed. No further charges or payments can be added.</p>
+          }
         }
-        @if (puedeCheckIn) {
-          <button type="button" class="btn-dorado" (click)="checkIn()">Check-in</button>
-        }
-        @if (puedeCheckOut) {
-          <button type="button" class="btn-dorado" (click)="checkOut()">Check-out</button>
-        }
-        @if (puedeCancelar) {
-          <button type="button" class="btn-contorno-oscuro" (click)="cancelar()">Cancel</button>
-        }
-      </div>
-      @if (puedeCheckOut) {
-        <p class="reserva-paso-nota">
-          Check-out requires the account balance to be zero. Settle any pending charges first.
-        </p>
-      }
-    </section>
-
-    <!-- ===== Cuenta de la estadía (AC23, AC24, AC25) ===== -->
-    <section class="seccion-detalle">
-      <h2 class="reserva-paso-titulo">Stay account</h2>
-      <span class="linea-dorada-horizontal"></span>
-
-      @if (!cuenta) {
-        <p class="parrafo-cuerpo">
-          This reservation has no account yet. It opens as soon as the reservation is confirmed.
-        </p>
-      } @else {
-        <div class="reserva-resumen">
-          <div class="reserva-resumen-fila">
-            <span>Account status</span>
-            <strong><span class="chip-estado" [attr.data-estado]="cuenta.estado">{{ cuenta.estado }}</span></strong>
-          </div>
-          <div class="reserva-resumen-fila">
-            <span>Charges</span>
-            <strong>{{ cuenta.totalConsumos | currency:'USD' }}</strong>
-          </div>
-          <div class="reserva-resumen-fila">
-            <span>Paid</span>
-            <strong>{{ cuenta.totalPagado | currency:'USD' }}</strong>
-          </div>
-          <div class="reserva-resumen-fila">
-            <span>Balance due</span>
-            <strong><strong>{{ cuenta.saldo | currency:'USD' }}</strong></strong>
-          </div>
-        </div>
-
-        <!-- Servicios consumidos durante la estadía (AC24) -->
-        <h3 class="reserva-paso-titulo">Services charged</h3>
-        <table class="tabla-servicios">
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Qty</th>
-              <th>Unit</th>
-              <th>Total</th>
-              <th>Added by</th>
-              <th>When</th>
-              <th>Paid</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of cuenta.items; track item.id) {
-              <tr>
-                <td>{{ item.servicioNombre }}</td>
-                <td>{{ item.cantidad }}</td>
-                <td>{{ item.precioUnitario | currency:'USD' }}</td>
-                <td>{{ item.total | currency:'USD' }}</td>
-                <td>{{ item.operadorNombre }}</td>
-                <td>{{ item.fechaHora | date:'short' }}</td>
-                <td>{{ item.pagado ? 'Yes' : 'No' }}</td>
-                <td>
-                  @if (cuentaOperable && !item.pagado) {
-                    <button type="button" class="btn-eliminar"
-                            (click)="eliminarConsumo(item.id)">Remove</button>
-                  }
-                </td>
-              </tr>
-            } @empty {
-              <tr><td colspan="8">No services charged to this stay yet.</td></tr>
-            }
-          </tbody>
-        </table>
-
-        @if (cuenta.pagos.length) {
-          <h3 class="reserva-paso-titulo">Payments</h3>
-          <table class="tabla-servicios">
-            <thead>
-              <tr>
-                <th>Amount</th>
-                <th>Method</th>
-                <th>Registered by</th>
-                <th>When</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (pago of cuenta.pagos; track pago.id) {
-                <tr>
-                  <td>{{ pago.monto | currency:'USD' }}</td>
-                  <td>{{ pago.metodoPago }}</td>
-                  <td>{{ pago.operadorNombre || '—' }}</td>
-                  <td>{{ pago.fecha | date:'short' }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-
-        @if (cuentaOperable) {
-          <!-- Agregar un servicio a la cuenta (AC23) -->
-          <h3 class="reserva-paso-titulo">Add a service</h3>
-          <form [formGroup]="consumoForm" (ngSubmit)="agregarConsumo()" class="formulario-admin-fila">
-            <label>
-              <span>Service</span>
-              <select formControlName="servicioId">
-                <option [ngValue]="null" disabled>Select a service…</option>
-                @for (servicio of servicios; track servicio.id) {
-                  <option [ngValue]="servicio.id">
-                    {{ servicio.nombre }} — {{ servicio.precio | currency:'USD' }}
-                  </option>
-                }
-              </select>
-            </label>
-            <label>
-              <span>Quantity</span>
-              <input type="number" formControlName="cantidad" min="1">
-            </label>
-            <button type="submit" class="btn-dorado" [disabled]="consumoForm.invalid">Add charge</button>
-          </form>
-
-          <!-- Registrar un pago; al saldar la cuenta, los cargos quedan pagados (AC25) -->
-          <h3 class="reserva-paso-titulo">Register a payment</h3>
-          <form [formGroup]="pagoForm" (ngSubmit)="registrarPago()" class="formulario-admin-fila">
-            <label>
-              <span>Amount</span>
-              <input type="number" formControlName="monto" min="0.01" step="0.01">
-            </label>
-            <label>
-              <span>Method</span>
-              <select formControlName="metodoPago">
-                @for (metodo of metodosPago; track metodo) {
-                  <option [value]="metodo">{{ metodo }}</option>
-                }
-              </select>
-            </label>
-            <button type="button" class="btn-contorno-oscuro" (click)="pagarSaldoCompleto()"
-                    [disabled]="cuenta.saldo <= 0">Pay full balance</button>
-            <button type="submit" class="btn-dorado" [disabled]="pagoForm.invalid">Register payment</button>
-          </form>
-        } @else {
-          <p class="reserva-paso-nota">This account is closed. No further charges or payments can be added.</p>
-        }
-      }
-    </section>
+      </section>
+    </div>
   }
 </main>
 

@@ -13,6 +13,8 @@ import java.util.List;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+// ===== Modelo: huésped registrado que hace reservas =====
+// email y cédula son únicos: identifican a la persona al iniciar sesión y al registrarse.
 @Entity
 @Table(name = "cliente")
 @Getter

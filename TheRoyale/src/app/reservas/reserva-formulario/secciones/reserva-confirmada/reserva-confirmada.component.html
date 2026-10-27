@@ -1,0 +1,47 @@
+<section class="reserva-confirmada">
+  <p class="eyebrow">{{ enEdicion() ? 'Updated' : 'Confirmed' }}</p>
+  <h2 class="reserva-confirmada-titulo">
+    {{ enEdicion() ? 'Your stay has been updated' : 'Your stay is booked' }}
+  </h2>
+  <span class="linea-dorada-horizontal"></span>
+  <p class="parrafo-cuerpo">
+    Reservation <strong>#{{ reserva().id }}</strong> is registered under
+    {{ reserva().clienteNombre }} {{ reserva().clienteApellido }}.
+    We have assigned you a room of the tier you selected.
+  </p>
+
+  <div class="reserva-resumen">
+    <div class="reserva-resumen-fila">
+      <span>Status</span>
+      <strong><span class="chip-estado" [attr.data-estado]="reserva().estado">{{ reserva().estado }}</span></strong>
+    </div>
+    <div class="reserva-resumen-fila">
+      <span>Assigned room</span>
+      <strong>Room {{ reserva().habitacionNumero }} · {{ reserva().tipoHabitacionNombre }}</strong>
+    </div>
+    <div class="reserva-resumen-fila">
+      <span>Check-in</span>
+      <strong>{{ reserva().fechaInicio | date:'fullDate' }}</strong>
+    </div>
+    <div class="reserva-resumen-fila">
+      <span>Check-out</span>
+      <strong>{{ reserva().fechaFin | date:'fullDate' }}</strong>
+    </div>
+    <div class="reserva-resumen-fila">
+      <span>Guests</span>
+      <strong>{{ reserva().cantidadPersonas }}</strong>
+    </div>
+    <div class="reserva-resumen-fila">
+      <span>Rate per night</span>
+      <strong>{{ reserva().precioNocheAcordado | currency:'USD' }}</strong>
+    </div>
+
+    <div class="reserva-resumen-acciones">
+      <a routerLink="/my-reservations" class="btn-dorado">My Reservations</a>
+      <button type="button" class="btn-contorno-oscuro" (click)="reservarOtra.emit()">Book Another Stay</button>
+    </div>
+    <p class="reserva-paso-nota">
+      Our front desk will confirm your reservation shortly.
+    </p>
+  </div>
+</section>

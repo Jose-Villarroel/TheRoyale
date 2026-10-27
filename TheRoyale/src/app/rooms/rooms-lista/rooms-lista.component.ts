@@ -43,7 +43,7 @@ export class RoomsListaComponent implements OnInit {
     }).subscribe(({ tipos, habitaciones }) => {
       this.tipos = tipos;
       for (const habitacion of habitaciones) {
-        const tipoId = habitacion.tipoHabitacion.id;
+        const tipoId = habitacion.tipoHabitacionId;
         const actual = this.preciosDesde[tipoId];
         this.preciosDesde[tipoId] = actual === undefined ? habitacion.precio : Math.min(actual, habitacion.precio);
         if (habitacion.estado === 'DISPONIBLE') {

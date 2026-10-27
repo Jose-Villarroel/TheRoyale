@@ -2,8 +2,14 @@
 <app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
 
 <app-hero-interior
+  eyebrow="Guest Area"
   titulo="My Reservations"
   subtitulo="Your upcoming stays at The Royale, and everything that came before.">
+  <!-- Mismos accesos que el hero de reservations.html en Thymeleaf -->
+  <div class="acciones-hero-guest">
+    <a routerLink="/profile" class="btn-dorado">My Profile</a>
+    <button type="button" class="btn-dorado" (click)="cerrarSesion()">Sign Out</button>
+  </div>
 </app-hero-interior>
 
 <main class="contenedor seccion-admin-contenido">

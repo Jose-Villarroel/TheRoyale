@@ -1,17 +1,17 @@
 <article class="tarjeta-admin-item">
   <div class="tarjeta-admin-imagen-wrap">
-    <img [src]="reserva().habitacion.tipoHabitacion.imagenUrl || '/images/hotel.webp'"
-         [alt]="reserva().habitacion.tipoHabitacion.nombre">
+    <img [src]="reserva().tipoHabitacionImagenUrl || '/images/hotel.webp'"
+         [alt]="reserva().tipoHabitacionNombre">
     <span class="tarjeta-reserva-numero">#{{ reserva().id }}</span>
   </div>
 
   <div class="tarjeta-admin-info-wrap">
     <div class="tarjeta-admin-encabezado">
-      <h3>{{ reserva().habitacion.tipoHabitacion.nombre }}</h3>
+      <h3>{{ reserva().tipoHabitacionNombre }}</h3>
       <span class="chip-estado" [attr.data-estado]="reserva().estado">{{ reserva().estado }}</span>
     </div>
 
-    <p class="tarjeta-admin-descripcion">Room {{ reserva().habitacion.numero }}</p>
+    <p class="tarjeta-admin-descripcion">Room {{ reserva().habitacionNumero }}</p>
 
     <p class="tarjeta-reserva-fechas">
       {{ reserva().fechaInicio | date:'mediumDate' }} → {{ reserva().fechaFin | date:'mediumDate' }}

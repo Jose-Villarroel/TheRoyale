@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+// ===== Acceso a datos del catálogo de servicios; el nombre es único y sirve de clave en las URLs =====
 @Repository
 public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     // JpaRepository provee: findAll(), findById(), save(), deleteById(), etc.

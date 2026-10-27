@@ -11,5 +11,6 @@ import { TarjetaHabitacionComponent } from '../tarjeta-habitacion/tarjeta-habita
 })
 export class GridHabitacionesComponent {
   habitaciones = input.required<Habitacion[]>();
+  imagenesPorTipo = input<Record<number, string>>({});
   eliminar = output<Habitacion>();
 }

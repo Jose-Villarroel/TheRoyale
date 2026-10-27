@@ -6,16 +6,19 @@
   </div>
   <nav class="menu-movil-nav">
     <a routerLink="/admin/tipos-habitacion" class="enlace-menu-movil" (click)="cerrar.emit()">Admin</a>
-    <a href="#rooms" class="enlace-menu-movil" (click)="cerrar.emit()">Rooms</a>
-    <a href="#services" class="enlace-menu-movil" (click)="cerrar.emit()">Services</a>
-    <a href="#experiences" class="enlace-menu-movil" (click)="cerrar.emit()">Experiences</a>
-    <a href="/about" class="enlace-menu-movil" (click)="cerrar.emit()">About</a>
-    <a href="/contact" class="enlace-menu-movil" (click)="cerrar.emit()">Contact</a>
+    <a routerLink="/" fragment="rooms" class="enlace-menu-movil" (click)="cerrar.emit()">Rooms</a>
+    <a routerLink="/" fragment="services" class="enlace-menu-movil" (click)="cerrar.emit()">Services</a>
+    <a routerLink="/" fragment="experiences" class="enlace-menu-movil" (click)="cerrar.emit()">Experiences</a>
+    <a routerLink="/" fragment="about" class="enlace-menu-movil" (click)="cerrar.emit()">About</a>
+    <a routerLink="/" fragment="contact" class="enlace-menu-movil" (click)="cerrar.emit()">Contact</a>
   </nav>
   <div class="menu-movil-pie">
     @if (authService.estaAutenticado) {
       @if (authService.esCliente) {
         <a routerLink="/profile" (click)="cerrar.emit()">My Profile</a>
+      }
+      @if (authService.esOperador) {
+        <a routerLink="/operator/reservas" (click)="cerrar.emit()">Operations</a>
       }
       <button type="button" class="btn-enlace-sesion" (click)="cerrarSesion()">Sign Out</button>
     } @else {

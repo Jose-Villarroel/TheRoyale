@@ -7,7 +7,6 @@ import com.theroyale.backend.model.EstadoHabitacion;
 import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.Reserva;
-import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,9 +15,7 @@ import com.theroyale.backend.dto.CrearReservaRequest;
 import com.theroyale.backend.dto.DisponibilidadTipoResponse;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.TipoHabitacion;
-import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
-import com.theroyale.backend.repository.TipoHabitacionRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,7 +29,9 @@ import java.util.Map;
 
 // ===== Ciclo de vida de una reserva gestionado por el operador =====
 // PENDIENTE -> CONFIRMADA (se abre la cuenta) -> EN_CURSO (check-in) -> FINALIZADA (check-out);
-// PENDIENTE / CONFIRMADA -> CANCELADA.
+// PENDIENTE / CONFIRMADA -> CANCELADA. Ver EstadoReserva para la equivalencia con el enunciado.
+// Para clientes, tipos de habitación y cuentas usa sus servicios (no sus repositorios), de modo que
+// las validaciones y los mensajes de "no encontrado" sean los mismos en toda la aplicación.
 @Service
 @Transactional(readOnly = true)
 public class ReservaService {
@@ -41,13 +40,13 @@ public class ReservaService {
     private ReservaRepository reservaRepository;
 
     @Autowired
-    private CuentaRepository cuentaRepository;
+    private CuentaService cuentaService;
 
     @Autowired
-    private ClienteRepository clienteRepository;
+    private ClienteService clienteService;
 
     @Autowired
-    private TipoHabitacionRepository tipoHabitacionRepository;
+    private TipoHabitacionService tipoHabitacionService;
 
     @Autowired
     private HabitacionRepository habitacionRepository;
@@ -126,7 +125,7 @@ public class ReservaService {
         validarRangoFechas(inicio, fin);
 
         List<DisponibilidadTipoResponse> disponibilidad = new ArrayList<>();
-        for (TipoHabitacion tipo : tipoHabitacionRepository.findAll()) {
+        for (TipoHabitacion tipo : tipoHabitacionService.listarTodos()) {
             List<Habitacion> libres = habitacionRepository.buscarDisponibles(
                     tipo.getId(), inicio, fin,
                     ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES, null);
@@ -148,13 +147,8 @@ public class ReservaService {
     public Reserva crear(CrearReservaRequest solicitud) {
         validarSolicitud(solicitud);
 
-        Cliente cliente = clienteRepository.findById(solicitud.clienteId())
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Cliente no encontrado: " + solicitud.clienteId()));
-
-        TipoHabitacion tipo = tipoHabitacionRepository.findById(solicitud.tipoHabitacionId())
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Tipo de habitación no encontrado: " + solicitud.tipoHabitacionId()));
+        Cliente cliente = clienteService.obtenerPorId(solicitud.clienteId());
+        TipoHabitacion tipo = tipoHabitacionService.obtenerPorId(solicitud.tipoHabitacionId());
 
         Habitacion habitacion = buscarHabitacionDisponible(tipo, solicitud.fechaInicio(), solicitud.fechaFin(), null);
 
@@ -188,9 +182,7 @@ public class ReservaService {
         }
         validarRangoFechas(nuevos.fechaInicio(), nuevos.fechaFin());
 
-        TipoHabitacion tipo = tipoHabitacionRepository.findById(nuevos.tipoHabitacionId())
-                .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "Tipo de habitación no encontrado: " + nuevos.tipoHabitacionId()));
+        TipoHabitacion tipo = tipoHabitacionService.obtenerPorId(nuevos.tipoHabitacionId());
 
         // Se excluye esta misma reserva del cálculo: si no, sus propias fechas la bloquearían
         Habitacion habitacion = buscarHabitacionDisponible(tipo, nuevos.fechaInicio(), nuevos.fechaFin(), id);
@@ -213,7 +205,7 @@ public class ReservaService {
         Reserva guardada = reservaRepository.save(reserva);
 
         // La cuenta nace con la reserva confirmada: desde aqui se le pueden cargar servicios
-        abrirCuentaSiNoExiste(guardada);
+        cuentaService.abrirSiNoExiste(guardada);
         return guardada;
     }
 
@@ -228,7 +220,7 @@ public class ReservaService {
                     + ") is not after today.");
         }
 
-        Cuenta cuenta = cuentaRepository.findByReservaId(id).orElse(null);
+        Cuenta cuenta = cuentaService.buscarPorReserva(id).orElse(null);
         if (cuenta != null) {
             if (cuenta.getSaldo().signum() != 0) {
                 throw new IllegalStateException("Cannot cancel: the account has an outstanding balance of "
@@ -259,7 +251,7 @@ public class ReservaService {
         reserva.setEstado(EstadoReserva.EN_CURSO);
         Reserva guardada = reservaRepository.save(reserva);
 
-        abrirCuentaSiNoExiste(guardada);
+        cuentaService.abrirSiNoExiste(guardada);
         return guardada;
     }
 
@@ -268,7 +260,7 @@ public class ReservaService {
         Reserva reserva = obtenerPorId(id);
         exigirEstado(reserva, "check out", EstadoReserva.EN_CURSO);
 
-        Cuenta cuenta = cuentaRepository.findByReservaId(id)
+        Cuenta cuenta = cuentaService.buscarPorReserva(id)
                 .orElseThrow(() -> new IllegalStateException("This reservation has no associated account."));
         if (cuenta.getSaldo().signum() != 0) {
             throw new IllegalStateException("Cannot check out: the account has an outstanding balance of " + cuenta.getSaldo() + ".");
@@ -280,7 +272,21 @@ public class ReservaService {
         return reservaRepository.save(reserva);
     }
 
- // Toma la primera habitación libre (ordenadas por número); si no hay ninguna, no se puede reservar
+    // ===== Borra una reserva junto con su cuenta (consumos y pagos incluidos) =====
+    // Una estadía EN_CURSO tiene al huésped en la habitación y una cuenta viva: se cierra con
+    // check-out, no se borra. Las demás (pendientes, confirmadas, canceladas o finalizadas) sí.
+    @Transactional
+    public void eliminar(Long id) {
+        Reserva reserva = obtenerPorId(id);
+        if (reserva.getEstado() == EstadoReserva.EN_CURSO) {
+            throw new IllegalStateException("Cannot delete a reservation that is in progress: check the guest out first.");
+        }
+
+        cuentaService.eliminarPorReserva(reserva);
+        reservaRepository.delete(reserva);
+    }
+
+    // Toma la primera habitación libre (ordenadas por número); si no hay ninguna, no se puede reservar
     private Habitacion buscarHabitacionDisponible(TipoHabitacion tipo, LocalDate inicio, LocalDate fin,
                                                   Long reservaIdExcluida) {
         List<Habitacion> disponibles = habitacionRepository.buscarDisponibles(
@@ -319,16 +325,6 @@ public class ReservaService {
         }
         if (!fin.isAfter(inicio)) {
             throw new IllegalArgumentException("The check-out date must be after the check-in date.");
-        }
-    }
-
-    private void abrirCuentaSiNoExiste(Reserva reserva) {
-        if (cuentaRepository.findByReservaId(reserva.getId()).isEmpty()) {
-            cuentaRepository.save(Cuenta.builder()
-                    .reserva(reserva)
-                    .estado(EstadoCuenta.ABIERTA)
-                    .fechaCreacion(LocalDateTime.now())
-                    .build());
         }
     }
 

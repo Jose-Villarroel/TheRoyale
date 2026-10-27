@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { DisponibilidadTipo } from '../models/reserva.model';
 import { environment } from '../../environments/environment';
 
+// Consulta cuántas habitaciones libres quedan por tipo entre dos fechas (paso 02 de la reserva).
 @Injectable({ providedIn: 'root' })
 export class DisponibilidadService {
   private readonly url = `${environment.apiUrl}/disponibilidad`;

@@ -38,16 +38,12 @@ public class ServicioRestController {
 
     @PostMapping
     public ResponseEntity<Servicio> crear(@RequestBody Servicio servicio) {
-        // El id lo asigna la base de datos: si el cliente manda uno se ignora, para que un POST
-        // nunca sobreescriba un servicio existente.
-        servicio.setId(null);
-        return ResponseEntity.status(HttpStatus.CREATED).body(servicioService.guardar(servicio));
+        return ResponseEntity.status(HttpStatus.CREATED).body(servicioService.crear(servicio));
     }
 
     @PutMapping("/{id}")
     public Servicio actualizar(@PathVariable Long id, @RequestBody Servicio servicio) {
-        servicio.setId(id);
-        return servicioService.guardar(servicio);
+        return servicioService.actualizar(id, servicio);
     }
 
     @DeleteMapping("/{id}")

@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+// ===== Reglas del CRUD de clientes: email y cédula únicos, contraseña opcional al editar =====
+// Un cliente con reservas no se puede borrar, para no dejar reservas sin titular.
 @Service
 @Transactional(readOnly = true)
 public class ClienteService {

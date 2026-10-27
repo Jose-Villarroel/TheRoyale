@@ -23,6 +23,8 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
+// ===== Modelo: servicio del hotel (spa, restaurante, etc.) que se puede cargar a la cuenta de una reserva =====
+// Características y galería son listas simples de texto (@ElementCollection), sin entidad propia.
 @Entity
 @Table(name = "servicio")
 @Getter

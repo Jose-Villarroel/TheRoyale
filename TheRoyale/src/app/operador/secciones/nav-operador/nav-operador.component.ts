@@ -2,6 +2,8 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
+// Barra de navegación del portal del operador: Reservations, Find Guest y cerrar sesión.
+// Muestra el nombre del operador autenticado (AuthService).
 @Component({
   selector: 'app-nav-operador',
   standalone: true,

@@ -1,0 +1,17 @@
+<div class="operador-tarjeta-cabecera">
+  <p class="eyebrow">Reservation</p>
+  <span class="chip-estado" [attr.data-estado]="reserva().estado">{{ reserva().estado }}</span>
+</div>
+<dl class="operador-datos">
+  <div><dt>Check-in</dt><dd>{{ reserva().fechaInicio | date:'fullDate' }}</dd></div>
+  <div><dt>Check-out</dt><dd>{{ reserva().fechaFin | date:'fullDate' }}</dd></div>
+  <div><dt>Nights</dt><dd>{{ noches() }}</dd></div>
+  <div><dt>Guests</dt><dd>{{ reserva().cantidadPersonas }}</dd></div>
+  <div>
+    <dt>Room total</dt>
+    <dd>{{ totalEstadia() | currency:'USD' }} ({{ noches() }} × {{ reserva().precioNocheAcordado | currency:'USD' }})</dd>
+  </div>
+</dl>
+
+<!-- Aquí entra app-acciones-reserva -->
+<ng-content></ng-content>

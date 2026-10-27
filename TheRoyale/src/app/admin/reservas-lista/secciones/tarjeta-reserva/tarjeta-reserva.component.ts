@@ -2,6 +2,7 @@ import { Component, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Reserva } from '../../../../models/reserva.model';
+import { noches } from '../../../../utils/fechas';
 
 @Component({
   selector: 'app-tarjeta-reserva',
@@ -15,8 +16,6 @@ export class TarjetaReservaComponent {
   // El backend expone getNoches(), pero se recalcula por si la respuesta no lo trae
   get noches(): number {
     const r = this.reserva();
-    const ms = new Date(`${r.fechaFin}T00:00:00`).getTime()
-             - new Date(`${r.fechaInicio}T00:00:00`).getTime();
-    return Math.round(ms / 86400000);
+    return noches(r.fechaInicio, r.fechaFin);
   }
 }

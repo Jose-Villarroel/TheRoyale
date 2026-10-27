@@ -7,7 +7,7 @@
       <a routerLink="/operator/login" class="btn-admin-acceso">Operator</a>
     </div>
     <div class="barra-utilitaria-derecha">
-      <a href="/contact">+1 507 3165 232</a>
+      <a routerLink="/" fragment="contact">+1 507 3165 232</a>
       @if (authService.estaAutenticado) {
         @if (authService.esCliente) {
           <a routerLink="/my-reservations">My Reservations</a>
@@ -25,16 +25,16 @@
   </div>
 
   <header class="cabecera">
-    <a href="/" class="marca">
+    <a routerLink="/" class="marca">
       <img src="/images/logo-removebg-preview.png" alt="The Royale" class="marca-logo">
     </a>
 
     <nav class="nav-principal">
-      <a href="#rooms">Rooms</a>
-      <a href="#services">Services</a>
-      <a href="#experiences">Experiences</a>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
+      <a routerLink="/" fragment="rooms">Rooms</a>
+      <a routerLink="/" fragment="services">Services</a>
+      <a routerLink="/" fragment="experiences">Experiences</a>
+      <a routerLink="/" fragment="about">About</a>
+      <a routerLink="/" fragment="contact">Contact</a>
     </nav>
 
     <a routerLink="/book" class="btn-dorado btn-nav-reserva">Book Now</a>

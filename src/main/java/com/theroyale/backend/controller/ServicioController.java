@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+// ===== Catálogo público de servicios del hotel (Thymeleaf): tabla, tarjetas y detalle =====
+// El detalle se busca por nombre para que la URL sea legible (/services/Spa).
 @Controller
 public class ServicioController {
 

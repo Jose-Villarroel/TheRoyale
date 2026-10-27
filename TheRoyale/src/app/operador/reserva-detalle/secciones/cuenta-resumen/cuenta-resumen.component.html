@@ -1,0 +1,29 @@
+<div class="operador-cuenta-cabecera">
+  <div>
+    <p class="eyebrow">Room {{ numeroHabitacion() }} account</p>
+    <h2>Services &amp; Payments</h2>
+  </div>
+  @if (cuenta(); as cuenta) {
+    <span class="chip-estado" [attr.data-estado]="cuenta.estado">{{ cuenta.estado }}</span>
+  }
+</div>
+
+@if (cuenta(); as cuenta) {
+  <div class="operador-totales">
+    <div><span>Charges</span><strong>{{ cuenta.totalConsumos | currency:'USD' }}</strong></div>
+    <div><span>Paid</span><strong>{{ cuenta.totalPagado | currency:'USD' }}</strong></div>
+    <!-- Borde dorado = queda algo por cobrar; texto verde = cuenta al día -->
+    <div class="operador-saldo" [attr.data-saldo]="cuenta.saldo > 0 ? 'pendiente' : 'saldada'">
+      <span>{{ cuenta.saldo > 0 ? 'Balance due' : 'Settled' }}</span>
+      <strong>{{ cuenta.saldo | currency:'USD' }}</strong>
+    </div>
+  </div>
+  @if (saldada()) {
+    <p class="perfil-alerta perfil-alerta-ok" role="status">Account settled: every charge has been paid.</p>
+  }
+} @else {
+  <div class="operador-vacio-caja">
+    <strong>No account yet</strong>
+    <span>This reservation has no account yet. It opens as soon as the reservation is confirmed.</span>
+  </div>
+}

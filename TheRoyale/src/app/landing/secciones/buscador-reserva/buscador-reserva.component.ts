@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TipoHabitacion } from '../../../models/tipo-habitacion.model';
 import { AparecerDirective } from '../../../shared/aparecer.directive';
+import { diaSiguiente, hoyLocal } from '../../../utils/fechas';
 
 // Criterios que la landing pasa a /book como query params
 export interface BusquedaReserva {
@@ -24,7 +25,7 @@ export class BuscadorReservaComponent {
   @Output() buscar = new EventEmitter<BusquedaReserva>();
 
   // La llegada no puede ser anterior a hoy
-  readonly hoy = new Date().toISOString().slice(0, 10);
+  readonly hoy = hoyLocal();
 
   fechaInicio = '';
   fechaFin = '';
@@ -33,12 +34,7 @@ export class BuscadorReservaComponent {
 
   // La salida siempre cae al menos un día después de la llegada
   get minimaSalida(): string {
-    if (!this.fechaInicio) {
-      return this.hoy;
-    }
-    const siguiente = new Date(`${this.fechaInicio}T00:00:00`);
-    siguiente.setDate(siguiente.getDate() + 1);
-    return siguiente.toISOString().slice(0, 10);
+    return this.fechaInicio ? diaSiguiente(this.fechaInicio) : this.hoy;
   }
 
   enviar(): void {

@@ -1,3 +1,4 @@
+// Empleado de recepción que entra al portal del operador (/operator).
 export interface Operador {
   id: number;
   nombre: string;

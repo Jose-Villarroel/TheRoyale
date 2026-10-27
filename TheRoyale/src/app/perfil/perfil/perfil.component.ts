@@ -1,29 +1,33 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../../admin/secciones/alerta-error/alerta-error.component';
-import { CampoErrorComponent } from '../../admin/tipos-habitacion-formulario/secciones/campo-error/campo-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
+import { ResumenPerfilComponent } from './secciones/resumen-perfil/resumen-perfil.component';
+import { FormPerfilComponent } from './secciones/form-perfil/form-perfil.component';
+import { ZonaPeligroComponent } from './secciones/zona-peligro/zona-peligro.component';
 import { AuthService } from '../../services/auth.service';
 import { ClienteService } from '../../services/cliente.service';
 import { Cliente } from '../../models/cliente.model';
 
 // Equivale a profile.html: el cliente ve sus datos, los edita o borra su cuenta.
 // El id sale de la sesión (AuthService), no de la URL como en Thymeleaf (?clienteId=).
+// La página guarda el estado y llama al servicio; ficha, formulario y borrado son secciones/.
 @Component({
   selector: 'app-perfil',
   standalone: true,
   imports: [
-    ReactiveFormsModule,
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,
     HeroInteriorComponent,
     AlertaErrorComponent,
-    CampoErrorComponent
+    ResumenPerfilComponent,
+    FormPerfilComponent,
+    ZonaPeligroComponent
   ],
   templateUrl: './perfil.component.html'
 })

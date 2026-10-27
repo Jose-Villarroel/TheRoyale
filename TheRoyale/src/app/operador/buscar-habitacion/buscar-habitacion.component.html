@@ -7,114 +7,26 @@
   subtitulo="Enter a room number to locate the active reservation and confirm guest identity before adding services.">
 </app-hero-interior>
 
-<main class="contenedor seccion-admin-contenido">
+<main class="contenedor seccion-admin-contenido panel-operador">
   <app-nav-operador></app-nav-operador>
   <app-alerta-error [mensaje]="error"></app-alerta-error>
 
-  <!-- ===== Buscador ===== -->
-  <section class="reserva-paso">
-    <header class="reserva-paso-encabezado">
-      <span class="reserva-paso-numero">01</span>
-      <div>
-        <h2 class="reserva-paso-titulo">Room number</h2>
-        <p class="reserva-paso-nota">Only confirmed or in-progress reservations will be returned.</p>
-      </div>
-    </header>
+  <!-- ===== 01 Buscador ===== -->
+  <app-form-buscar-habitacion
+    [(numero)]="numeroHabitacion"
+    [buscando]="buscando"
+    [hayResultado]="!!reserva"
+    (buscar)="buscar()"
+    (limpiar)="limpiar()">
+  </app-form-buscar-habitacion>
 
-    <form class="buscar-habitacion-form" (ngSubmit)="buscar()">
-      <div class="buscar-habitacion-fila">
-        <input
-          type="text"
-          [(ngModel)]="numeroHabitacion"
-          name="numero"
-          placeholder="e.g. 701"
-          autocomplete="off"
-          class="buscar-habitacion-input"
-          [disabled]="buscando">
-        <button type="submit" class="btn-dorado" [disabled]="!numeroHabitacion.trim() || buscando">
-          {{ buscando ? 'Searching…' : 'Search' }}
-        </button>
-        @if (reserva) {
-          <button type="button" class="btn-contorno-oscuro" (click)="limpiar()">Clear</button>
-        }
-      </div>
-    </form>
-  </section>
-
-  <!-- ===== Resultado: info del huésped ===== -->
+  <!-- ===== 02 Resultado: identidad del huésped ===== -->
   @if (reserva) {
-    <section class="reserva-paso">
-      <header class="reserva-paso-encabezado">
-        <span class="reserva-paso-numero">02</span>
-        <div>
-          <h2 class="reserva-paso-titulo">Confirm guest identity</h2>
-          <p class="reserva-paso-nota">Make sure this is the correct guest before proceeding.</p>
-        </div>
-      </header>
-
-      <div class="buscar-habitacion-resultado">
-        <!-- Datos del huésped -->
-        <div class="buscar-habitacion-seccion">
-          <p class="eyebrow">Guest</p>
-          <div class="reserva-resumen">
-            <div class="reserva-resumen-fila">
-              <span>Full name</span>
-              <strong>{{ reserva.cliente.nombre }} {{ reserva.cliente.apellido }}</strong>
-            </div>
-            <div class="reserva-resumen-fila">
-              <span>Email</span>
-              <strong>{{ reserva.cliente.email }}</strong>
-            </div>
-            <div class="reserva-resumen-fila">
-              <span>Phone</span>
-              <strong>{{ reserva.cliente.telefono || '—' }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- Datos de la reserva -->
-        <div class="buscar-habitacion-seccion">
-          <p class="eyebrow">Reservation #{{ reserva.id }}</p>
-          <div class="reserva-resumen">
-            <div class="reserva-resumen-fila">
-              <span>Room</span>
-              <strong>{{ reserva.habitacion.numero }} — {{ reserva.habitacion.tipoHabitacion.nombre }}</strong>
-            </div>
-            <div class="reserva-resumen-fila">
-              <span>Check-in</span>
-              <strong>{{ reserva.fechaInicio | date:'mediumDate' }}</strong>
-            </div>
-            <div class="reserva-resumen-fila">
-              <span>Check-out</span>
-              <strong>{{ reserva.fechaFin | date:'mediumDate' }}</strong>
-            </div>
-            <div class="reserva-resumen-fila">
-              <span>Guests</span>
-              <strong>{{ reserva.cantidadPersonas }}</strong>
-            </div>
-            <div class="reserva-resumen-fila">
-              <span>Status</span>
-              <strong>
-                <span class="chip-estado" [attr.data-estado]="reserva.estado">{{ reserva.estado }}</span>
-              </strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- Acción -->
-        <div class="reserva-resumen-acciones">
-          <button type="button" class="btn-dorado" (click)="irAReserva()">
-            Manage Reservation →
-          </button>
-          <button type="button" class="btn-contorno-oscuro" (click)="limpiar()">
-            Search Another Room
-          </button>
-        </div>
-        <p class="reserva-paso-nota">
-          You will be taken to the reservation detail page to add services, register payments, and manage the stay.
-        </p>
-      </div>
-    </section>
+    <app-tarjeta-cliente-encontrado
+      [reserva]="reserva"
+      (gestionar)="irAReserva()"
+      (limpiar)="limpiar()">
+    </app-tarjeta-cliente-encontrado>
   }
 </main>
 

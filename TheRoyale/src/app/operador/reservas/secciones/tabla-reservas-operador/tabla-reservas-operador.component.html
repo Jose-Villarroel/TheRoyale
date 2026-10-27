@@ -1,0 +1,56 @@
+@if (reservas().length === 0) {
+  <!-- Estado vacío: dice qué pasa en vez de dejar una tabla sin filas -->
+  <div class="operador-vacio-caja">
+    <strong>No reservations here</strong>
+    <span>There are no reservations with this status right now.</span>
+  </div>
+} @else {
+  <div class="operador-tabla-wrap">
+    <table class="tabla-operador">
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th>Guest</th>
+          <th>Room</th>
+          <th>Stay</th>
+          <th>Status</th>
+          <th class="col-acciones">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (reserva of reservas(); track reserva.id) {
+          <tr>
+            <td class="col-num">{{ reserva.id }}</td>
+            <td>
+              <a [routerLink]="['/operator/reservas', reserva.id]" class="operador-celda-principal">
+                <strong>{{ reserva.clienteNombre }} {{ reserva.clienteApellido }}</strong>
+                <span>{{ reserva.clienteEmail }}</span>
+              </a>
+            </td>
+            <td>
+              <div class="operador-celda-principal">
+                <strong>{{ reserva.habitacionNumero }}</strong>
+                <span>{{ reserva.tipoHabitacionNombre }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="operador-celda-principal">
+                <strong>{{ reserva.fechaInicio | date:'mediumDate' }} → {{ reserva.fechaFin | date:'mediumDate' }}</strong>
+                <span>
+                  {{ noches(reserva) }} {{ noches(reserva) === 1 ? 'night' : 'nights' }} ·
+                  {{ reserva.cantidadPersonas }} {{ reserva.cantidadPersonas === 1 ? 'guest' : 'guests' }}
+                </span>
+              </div>
+            </td>
+            <td><span class="chip-estado" [attr.data-estado]="reserva.estado">{{ reserva.estado }}</span></td>
+            <td class="col-acciones">
+              <div class="operador-acciones">
+                <a [routerLink]="['/operator/reservas', reserva.id]" class="enlace-subrayado">Manage</a>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

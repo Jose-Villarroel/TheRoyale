@@ -6,5 +6,7 @@
     @if (subtitulo()) {
       <p class="hero-interior-subtexto">{{ subtitulo() }}</p>
     }
+    <!-- Contenido opcional bajo el subtítulo (ej. botones .acciones-hero-guest de mis reservas) -->
+    <ng-content></ng-content>
   </div>
 </header>

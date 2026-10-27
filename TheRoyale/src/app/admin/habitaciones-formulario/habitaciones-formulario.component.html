@@ -23,14 +23,14 @@
 
       <label>
         <span>Room Type</span>
-        <select formControlName="tipoHabitacion" [compareWith]="compararTipos">
+        <select formControlName="tipoHabitacionId">
           <option [ngValue]="null" disabled>Select a room type</option>
           @for (tipo of tipos; track tipo.id) {
-            <option [ngValue]="tipo">{{ tipo.nombre }}</option>
+            <option [ngValue]="tipo.id">{{ tipo.nombre }}</option>
           }
         </select>
         <app-campo-error
-          [control]="habitacionForm.get('tipoHabitacion')"
+          [control]="habitacionForm.get('tipoHabitacionId')"
           [mensajes]="{ required: 'Room type is required.' }">
         </app-campo-error>
       </label>

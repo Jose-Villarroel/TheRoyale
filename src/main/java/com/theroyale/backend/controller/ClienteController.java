@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+// ===== Panel de administración (Thymeleaf): CRUD de clientes (huéspedes) =====
+// Un mismo formulario sirve para crear y editar: el id vacío distingue el alta de la edición.
 @Controller
 @RequestMapping("/admin/clientes")
 public class ClienteController {

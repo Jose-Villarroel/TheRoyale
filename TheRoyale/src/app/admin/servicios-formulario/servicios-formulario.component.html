@@ -15,28 +15,25 @@
       <label>
         <span>Name</span>
         <input type="text" formControlName="nombre">
-        <small class="perfil-alerta perfil-alerta-error" *ngIf="nombre.invalid && nombre.touched">
-          <span *ngIf="nombre.errors?.['required']">Name is required.</span>
-          <span *ngIf="nombre.errors?.['minlength']">Name must have at least 3 characters.</span>
-        </small>
+        <app-campo-error [control]="nombre"
+          [mensajes]="{ required: 'Name is required.', minlength: 'Name must have at least 3 characters.' }">
+        </app-campo-error>
       </label>
 
       <label>
         <span>Description</span>
         <textarea formControlName="descripcion" rows="4"></textarea>
-        <small class="perfil-alerta perfil-alerta-error" *ngIf="descripcion.invalid && descripcion.touched">
-          <span *ngIf="descripcion.errors?.['required']">Description is required.</span>
-          <span *ngIf="descripcion.errors?.['minlength']">Description must have at least 10 characters.</span>
-        </small>
+        <app-campo-error [control]="descripcion"
+          [mensajes]="{ required: 'Description is required.', minlength: 'Description must have at least 10 characters.' }">
+        </app-campo-error>
       </label>
 
       <label>
         <span>Price (USD)</span>
         <input type="number" formControlName="precio" min="1" step="1">
-        <small class="perfil-alerta perfil-alerta-error" *ngIf="precio.invalid && precio.touched">
-          <span *ngIf="precio.errors?.['required']">Price is required.</span>
-          <span *ngIf="precio.errors?.['min']">Price must be greater than 0.</span>
-        </small>
+        <app-campo-error [control]="precio"
+          [mensajes]="{ required: 'Price is required.', min: 'Price must be greater than 0.' }">
+        </app-campo-error>
       </label>
 
       <div class="formulario-admin-imagen">

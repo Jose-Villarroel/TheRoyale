@@ -3,14 +3,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HabitacionService } from '../../services/habitacion.service';
 import { TipoHabitacionService } from '../../services/tipo-habitacion.service';
-import { EstadoHabitacion, Habitacion } from '../../models/habitacion.model';
+import { EstadoHabitacion, HabitacionRequest } from '../../models/habitacion.model';
 import { TipoHabitacion } from '../../models/tipo-habitacion.model';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
-import { CampoErrorComponent } from '../tipos-habitacion-formulario/secciones/campo-error/campo-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
+import { CampoErrorComponent } from '../../shared/campo-error/campo-error.component';
 
 @Component({
   selector: 'app-habitaciones-formulario',
@@ -46,13 +46,10 @@ export class HabitacionesFormularioComponent implements OnInit {
   // Mismos límites que las columnas de Habitacion en el backend
   habitacionForm: FormGroup = this.fb.group({
     numero: ['', [Validators.required, Validators.maxLength(10)]],
-    tipoHabitacion: [null as TipoHabitacion | null, [Validators.required]],
+    tipoHabitacionId: [null as number | null, [Validators.required]],
     precio: [null as number | null, [Validators.required, Validators.min(0)]],
     estado: ['DISPONIBLE' as EstadoHabitacion, [Validators.required]]
   });
-
-  // El <select> compara por id: el tipo que trae la habitación no es la misma instancia que los de la lista
-  compararTipos = (a: TipoHabitacion | null, b: TipoHabitacion | null): boolean => a?.id === b?.id;
 
   ngOnInit(): void {
     this.tipoHabitacionService.obtenerTodos().subscribe({
@@ -70,7 +67,7 @@ export class HabitacionesFormularioComponent implements OnInit {
         this.id = habitacion.id;
         this.habitacionForm.patchValue({
           numero: habitacion.numero,
-          tipoHabitacion: habitacion.tipoHabitacion,
+          tipoHabitacionId: habitacion.tipoHabitacionId,
           precio: habitacion.precio,
           estado: habitacion.estado
         });
@@ -88,9 +85,9 @@ export class HabitacionesFormularioComponent implements OnInit {
     }
 
     const valores = this.habitacionForm.value;
-    const datos = {
+    const datos: HabitacionRequest = {
       numero: valores.numero.trim(),
-      tipoHabitacion: valores.tipoHabitacion,
+      tipoHabitacionId: Number(valores.tipoHabitacionId),
       precio: Number(valores.precio),
       estado: valores.estado
     };
@@ -103,8 +100,7 @@ export class HabitacionesFormularioComponent implements OnInit {
         }
       });
     } else {
-      const habitacion: Habitacion = { id: this.id, ...datos };
-      this.habitacionService.actualizar(this.id, habitacion).subscribe({
+      this.habitacionService.actualizar(this.id, datos).subscribe({
         next: () => this.router.navigate(['/admin/habitaciones']),
         error: (ex) => {
           this.error = ex.error?.message || ex.message || 'Error updating room';

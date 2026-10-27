@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Operador } from '../models/operador.model';
 import { environment } from '../../environments/environment';
 
+// Cliente HTTP del CRUD de operadores (/api/operadores) que usa el panel admin.
 @Injectable({ providedIn: 'root' })
 export class OperadorService {
   private readonly url = `${environment.apiUrl}/operadores`;

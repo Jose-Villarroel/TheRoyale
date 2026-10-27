@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+// ===== Acceso a datos de los tipos de habitación =====
 @Repository
 public interface TipoHabitacionRepository extends JpaRepository<TipoHabitacion, Long> {
     // JpaRepository provee: findAll(), findById(), save(), deleteById(), etc.

@@ -1,4 +1,4 @@
-package com.theroyale.backend.api;
+package com.theroyale.backend.dto;
 
 // ===== Respuesta que espera la interfaz LoginResponse de auth.service.ts =====
 // No corresponde a ninguna entidad: Cliente no tiene "tipo" y Operador no tiene "apellido".

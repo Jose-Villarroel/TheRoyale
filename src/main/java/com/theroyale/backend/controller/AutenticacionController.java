@@ -1,11 +1,10 @@
 package com.theroyale.backend.controller;
 
+import com.theroyale.backend.dto.LoginResponse;
 import com.theroyale.backend.model.Cliente;
-import com.theroyale.backend.model.Operador;
 import com.theroyale.backend.service.AutenticacionService;
 import com.theroyale.backend.service.AutenticacionService.ResultadoRegistro;
 import com.theroyale.backend.service.ClienteService;
-import com.theroyale.backend.service.OperadorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +16,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
 
+// ===== Vistas Thymeleaf de login, registro y perfil del huésped =====
+// La sesión no se guarda en servidor: el id del usuario viaja en la URL (?clienteId= / ?operadorId=).
 @Controller
 public class AutenticacionController {
 
@@ -25,9 +26,6 @@ public class AutenticacionController {
 
     @Autowired
     private ClienteService clienteService;
-
-    @Autowired
-    private OperadorService operadorService;
 
     @GetMapping("/login")
     public String mostrarLogin(@RequestParam(required = false) String email,
@@ -49,17 +47,14 @@ public class AutenticacionController {
 
     @PostMapping("/login")
     public String iniciarSesion(String email, String password, RedirectAttributes redirectAttributes) {
-        Optional<Cliente> clienteAutenticado = autenticacionService.autenticar(email, password);
+        Optional<LoginResponse> sesion = autenticacionService.login(email, password);
 
-        if (clienteAutenticado.isPresent()) {
-            return "redirect:/reservations?clienteId=" + clienteAutenticado.get().getId();
-        }
-
-        // Si no es un huesped, se prueba con el personal del hotel (operadores)
-        Optional<Operador> operadorAutenticado = operadorService.autenticar(email, password);
-
-        if (operadorAutenticado.isPresent()) {
-            return "redirect:/operator?operadorId=" + operadorAutenticado.get().getId();
+        if (sesion.isPresent()) {
+            // Huéspedes van a su portal de reservas; el personal, al panel del operador
+            LoginResponse usuario = sesion.get();
+            return AutenticacionService.TIPO_OPERADOR.equals(usuario.tipo())
+                    ? "redirect:/operator?operadorId=" + usuario.id()
+                    : "redirect:/reservations?clienteId=" + usuario.id();
         }
 
         redirectAttributes.addAttribute("error", "invalid");

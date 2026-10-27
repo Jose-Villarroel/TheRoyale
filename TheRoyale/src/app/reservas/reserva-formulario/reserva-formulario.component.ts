@@ -1,36 +1,40 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../../admin/secciones/alerta-error/alerta-error.component';
-import { GridDisponibilidadComponent } from './secciones/grid-disponibilidad/grid-disponibilidad.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
+import { PasoFechasComponent } from './secciones/paso-fechas/paso-fechas.component';
+import { PasoHabitacionComponent } from './secciones/paso-habitacion/paso-habitacion.component';
+import { ResumenReservaComponent } from './secciones/resumen-reserva/resumen-reserva.component';
+import { ReservaConfirmadaComponent } from './secciones/reserva-confirmada/reserva-confirmada.component';
 import { DisponibilidadService } from '../../services/disponibilidad.service';
 import { ReservaService } from '../../services/reserva.service';
 import { AuthService } from '../../services/auth.service';
 import { DisponibilidadTipo, Reserva } from '../../models/reserva.model';
+import { diaSiguiente, hoyLocal, noches } from '../../utils/fechas';
 
 // Reserva en tres pasos: fechas -> tipo de habitación -> confirmación.
 // La habitación concreta no se elige aquí: la asigna el backend al crear la reserva.
+// La página guarda el formulario y el estado; cada paso es un componente de secciones/.
 @Component({
   selector: 'app-reserva-formulario',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    RouterLink,
-    CurrencyPipe,
-    DatePipe,
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,
     HeroInteriorComponent,
     AlertaErrorComponent,
-    GridDisponibilidadComponent
+    PasoFechasComponent,
+    PasoHabitacionComponent,
+    ResumenReservaComponent,
+    ReservaConfirmadaComponent
   ],
   templateUrl: './reserva-formulario.component.html'
 })
@@ -43,7 +47,7 @@ export class ReservaFormularioComponent implements OnInit {
   authService = inject(AuthService);
 
   // Hoy en yyyy-MM-dd: tope inferior de los <input type="date">
-  readonly hoy = this.aTexto(new Date());
+  readonly hoy = hoyLocal();
 
   // Reserva recien creada: mientras exista, la pagina muestra la confirmacion en vez del formulario
   confirmada: Reserva | null = null;
@@ -111,12 +115,7 @@ export class ReservaFormularioComponent implements OnInit {
   // La salida nunca puede ser el mismo día que la llegada
   get minimaSalida(): string {
     const inicio = this.reservaForm.value.fechaInicio;
-    if (!inicio) {
-      return this.hoy;
-    }
-    const siguiente = new Date(`${inicio}T00:00:00`);
-    siguiente.setDate(siguiente.getDate() + 1);
-    return this.aTexto(siguiente);
+    return inicio ? diaSiguiente(inicio) : this.hoy;
   }
 
   get noches(): number {
@@ -124,8 +123,7 @@ export class ReservaFormularioComponent implements OnInit {
       return 0;
     }
     const { fechaInicio, fechaFin } = this.reservaForm.value;
-    const ms = new Date(`${fechaFin}T00:00:00`).getTime() - new Date(`${fechaInicio}T00:00:00`).getTime();
-    return Math.round(ms / 86400000);
+    return noches(fechaInicio, fechaFin);
   }
 
   get totalEstimado(): number {
@@ -154,8 +152,9 @@ export class ReservaFormularioComponent implements OnInit {
   }
 
   confirmar(): void {
+    // Solo un huésped reserva: el operador también tiene sesión, pero su id no es un clienteId
     const cliente = this.authService.usuario;
-    if (!this.puedeConfirmar || !cliente) {
+    if (!this.puedeConfirmar || !cliente || !this.authService.esCliente) {
       return;
     }
 
@@ -220,11 +219,5 @@ export class ReservaFormularioComponent implements OnInit {
 
     const reservaId = params.get('reservaId');
     this.reservaIdEnEdicion = reservaId ? Number(reservaId) : null;
-  }
-
-  private aTexto(fecha: Date): string {
-    const mes = `${fecha.getMonth() + 1}`.padStart(2, '0');
-    const dia = `${fecha.getDate()}`.padStart(2, '0');
-    return `${fecha.getFullYear()}-${mes}-${dia}`;
   }
 }

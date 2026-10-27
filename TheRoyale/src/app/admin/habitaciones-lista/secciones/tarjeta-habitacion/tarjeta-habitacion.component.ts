@@ -12,5 +12,7 @@ import { Habitacion } from '../../../../models/habitacion.model';
 })
 export class TarjetaHabitacionComponent {
   habitacion = input.required<Habitacion>();
+  // La habitación ya no trae su tipo completo: la imagen la resuelve el padre por tipoHabitacionId
+  imagenUrl = input<string | null>(null);
   eliminar = output<Habitacion>();
 }

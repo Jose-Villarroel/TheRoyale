@@ -1,0 +1,30 @@
+<section class="reserva-paso">
+  <header class="reserva-paso-encabezado">
+    <span class="reserva-paso-numero">01</span>
+    <div>
+      <h2 class="reserva-paso-titulo">Room number</h2>
+      <p class="reserva-paso-nota">Only confirmed or in-progress reservations will be returned.</p>
+    </div>
+  </header>
+
+  <form class="buscar-habitacion-form" (ngSubmit)="buscar.emit()">
+    <div class="buscar-habitacion-fila">
+      <input
+        type="text"
+        [ngModel]="numero()"
+        (ngModelChange)="numero.set($event)"
+        name="numero"
+        placeholder="e.g. 701"
+        autocomplete="off"
+        aria-label="Room number"
+        class="buscar-habitacion-input operador-input"
+        [disabled]="buscando()">
+      <button type="submit" class="btn-dorado" [disabled]="!numero().trim() || buscando()">
+        {{ buscando() ? 'Searching…' : 'Search' }}
+      </button>
+      @if (hayResultado()) {
+        <button type="button" class="btn-contorno-oscuro" (click)="limpiar.emit()">Clear</button>
+      }
+    </div>
+  </form>
+</section>

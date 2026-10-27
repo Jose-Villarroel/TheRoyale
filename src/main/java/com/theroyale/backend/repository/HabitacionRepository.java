@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+// ===== Acceso a datos de habitaciones físicas, incluida la consulta de disponibilidad por fechas =====
 @Repository
 public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
     // JpaRepository provee: findAll(), findById(), save(), deleteById(), etc.

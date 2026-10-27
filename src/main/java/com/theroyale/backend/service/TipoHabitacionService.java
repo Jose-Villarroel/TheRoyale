@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+// ===== Reglas de los tipos de habitación (categorías que reserva el huésped) =====
+// Un tipo con habitaciones asociadas no se puede borrar; su galería de imágenes se borra en cascada.
 @Service
 @Transactional(readOnly = true)
 public class TipoHabitacionService {
@@ -66,6 +68,23 @@ public class TipoHabitacionService {
         existente.setDescripcion(tipoHabitacion.getDescripcion());
         existente.setImagenUrl(tipoHabitacion.getImagenUrl());
         return tipoHabitacionRepository.save(existente);
+    }
+
+    // Alta: el id lo asigna la base; si el cliente manda uno se ignora para no sobreescribir otro tipo
+    @Transactional
+    public TipoHabitacion crear(TipoHabitacion tipoHabitacion) {
+        if (tipoHabitacion != null) {
+            tipoHabitacion.setId(null);
+        }
+        return guardar(tipoHabitacion);
+    }
+
+    @Transactional
+    public TipoHabitacion actualizar(Long id, TipoHabitacion tipoHabitacion) {
+        if (tipoHabitacion != null) {
+            tipoHabitacion.setId(id);
+        }
+        return guardar(tipoHabitacion);
     }
 
     @Transactional

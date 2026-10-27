@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Cliente } from '../models/cliente.model';
 import { environment } from '../../environments/environment';
 
+// Cliente HTTP del CRUD de clientes (/api/clientes): perfil del huésped y panel admin.
 @Injectable({ providedIn: 'root' })
 export class ClienteService {
   private readonly url = `${environment.apiUrl}/clientes`;

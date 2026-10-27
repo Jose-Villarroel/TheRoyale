@@ -1,14 +1,23 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { FormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../../admin/secciones/alerta-error/alerta-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
 import { NavOperadorComponent } from '../secciones/nav-operador/nav-operador.component';
+import { TarjetaEstadiaComponent } from './secciones/tarjeta-estadia/tarjeta-estadia.component';
+import { AccionesReservaComponent } from './secciones/acciones-reserva/acciones-reserva.component';
+import { TarjetaHuespedComponent } from './secciones/tarjeta-huesped/tarjeta-huesped.component';
+import { TarjetaHabitacionAsignadaComponent } from './secciones/tarjeta-habitacion-asignada/tarjeta-habitacion-asignada.component';
+import { CuentaResumenComponent } from './secciones/cuenta-resumen/cuenta-resumen.component';
+import { TablaConsumosComponent } from './secciones/tabla-consumos/tabla-consumos.component';
+import { TablaPagosComponent } from './secciones/tabla-pagos/tabla-pagos.component';
+import { FormConsumoComponent } from './secciones/form-consumo/form-consumo.component';
+import { FormPagoComponent } from './secciones/form-pago/form-pago.component';
 import { ReservaService } from '../../services/reserva.service';
 import { CuentaService } from '../../services/cuenta.service';
 import { ServicioService } from '../../services/servicio.service';
@@ -16,37 +25,47 @@ import { AuthService } from '../../services/auth.service';
 import { Reserva } from '../../models/reserva.model';
 import { Cuenta } from '../../models/cuenta.model';
 import { Servicio } from '../../models/servicio.model';
+import { noches, puedeCancelar } from '../../utils/fechas';
 
 // Pantalla central del Feature 07: datos del huésped y la habitación (AC22), cuenta de
 // consumos (AC23, AC24), pagos (AC25) y las transiciones del ciclo de vida de la reserva.
 // Equivale a operator/reserva-detalle.html, que sigue sirviendo a la versión Thymeleaf.
+// La página guarda el estado y llama a los servicios; cada bloque visual vive en secciones/.
 @Component({
   selector: 'app-reserva-detalle-operador',
   standalone: true,
   imports: [
-    CurrencyPipe,
-    DatePipe,
-    ReactiveFormsModule,
-    RouterLink,
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,
     HeroInteriorComponent,
     AlertaErrorComponent,
-    NavOperadorComponent
+    NavOperadorComponent,
+    TarjetaEstadiaComponent,
+    AccionesReservaComponent,
+    TarjetaHuespedComponent,
+    TarjetaHabitacionAsignadaComponent,
+    CuentaResumenComponent,
+    TablaConsumosComponent,
+    TablaPagosComponent,
+    FormConsumoComponent,
+    FormPagoComponent
   ],
+  providers: [DatePipe],
   templateUrl: './reserva-detalle-operador.component.html'
 })
 export class ReservaDetalleOperadorComponent implements OnInit {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private reservaService = inject(ReservaService);
   private cuentaService = inject(CuentaService);
   private servicioService = inject(ServicioService);
   private authService = inject(AuthService);
+  private datePipe = inject(DatePipe);
 
   // Los mismos métodos que acepta OperatorController en la versión Thymeleaf
-  readonly metodosPago = ['CASH', 'CARD', 'TRANSFER'];
+  readonly metodosPago = ['CASH', 'CARD', 'TRANSFER'] as const;
 
   id = Number(this.route.snapshot.paramMap.get('id'));
   reserva: Reserva | null = null;
@@ -72,13 +91,18 @@ export class ReservaDetalleOperadorComponent implements OnInit {
     this.servicioService.obtenerTodos().subscribe(servicios => this.servicios = servicios);
   }
 
-  get noches(): number {
+  // Como en Thymeleaf: "Huésped · Room 101 · llegada → salida"
+  get subtituloHero(): string {
     if (!this.reserva) {
-      return 0;
+      return 'Guest details, stay account and the actions available at this point of the stay.';
     }
-    const ms = new Date(this.reserva.fechaFin + 'T00:00:00').getTime()
-             - new Date(this.reserva.fechaInicio + 'T00:00:00').getTime();
-    return Math.round(ms / 86400000);
+    const r = this.reserva;
+    const fecha = (valor: string) => this.datePipe.transform(valor, 'mediumDate');
+    return `${r.clienteNombre} ${r.clienteApellido} · Room ${r.habitacionNumero} · ${fecha(r.fechaInicio)} → ${fecha(r.fechaFin)}`;
+  }
+
+  get noches(): number {
+    return this.reserva ? noches(this.reserva.fechaInicio, this.reserva.fechaFin) : 0;
   }
 
   get totalEstadia(): number {
@@ -90,17 +114,23 @@ export class ReservaDetalleOperadorComponent implements OnInit {
     return this.cuenta?.estado === 'ABIERTA';
   }
 
+  // Saldo en cero tras haber pagado algo: la cuenta quedó al día
+  get cuentaSaldada(): boolean {
+    return !!this.cuenta && this.cuenta.saldo === 0 && this.cuenta.pagos.length > 0;
+  }
+
   get puedeConfirmar(): boolean {
     return this.reserva?.estado === 'PENDIENTE';
   }
 
   // El backend solo deja cancelar si la llegada es posterior a hoy (AC22)
   get puedeCancelar(): boolean {
-    if (!this.reserva) {
-      return false;
-    }
-    const vigente = this.reserva.estado === 'PENDIENTE' || this.reserva.estado === 'CONFIRMADA';
-    return vigente && this.reserva.fechaInicio > new Date().toISOString().slice(0, 10);
+    return !!this.reserva && puedeCancelar(this.reserva);
+  }
+
+  // Con el huésped dentro (EN_CURSO) el backend responde 409
+  get puedeEliminar(): boolean {
+    return !!this.reserva && this.reserva.estado !== 'EN_CURSO';
   }
 
   get puedeCheckIn(): boolean {
@@ -129,6 +159,18 @@ export class ReservaDetalleOperadorComponent implements OnInit {
   checkOut(): void {
     this.ejecutarTransicion(this.reservaService.checkOut(this.id),
       'Check-out completed. The room is available again.');
+  }
+
+  eliminar(): void {
+    if (!confirm('Delete reservation #' + this.id + '? This action cannot be undone.')) {
+      return;
+    }
+
+    this.limpiarAvisos();
+    this.reservaService.eliminar(this.id).subscribe({
+      next: () => this.router.navigate(['/operator/reservas']),
+      error: (err) => this.error = this.mensajeDe(err, 'Error deleting the reservation')
+    });
   }
 
   agregarConsumo(): void {

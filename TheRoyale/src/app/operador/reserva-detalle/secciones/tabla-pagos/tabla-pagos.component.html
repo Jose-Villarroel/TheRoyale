@@ -1,0 +1,25 @@
+<h3 class="operador-subtitulo">Payments</h3>
+@if (pagos().length === 0) {
+  <div class="operador-vacio-caja">
+    <strong>No payments yet</strong>
+    <span>Payments are registered against the balance due.</span>
+  </div>
+} @else {
+  <div class="operador-tabla-wrap">
+    <table class="tabla-operador">
+      <thead>
+        <tr><th>When</th><th>Method</th><th>Registered by</th><th class="col-num">Amount</th></tr>
+      </thead>
+      <tbody>
+        @for (pago of pagos(); track pago.id) {
+          <tr>
+            <td>{{ pago.fecha | date:'short' }}</td>
+            <td>{{ pago.metodoPago }}</td>
+            <td>{{ pago.operadorNombre || '—' }}</td>
+            <td class="col-num">{{ pago.monto | currency:'USD' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

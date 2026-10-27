@@ -1,0 +1,51 @@
+<h3 class="operador-subtitulo">Services charged</h3>
+@if (items().length === 0) {
+  <div class="operador-vacio-caja">
+    <strong>Nothing charged yet</strong>
+    <span>No services charged to this stay yet.</span>
+  </div>
+} @else {
+  <div class="operador-tabla-wrap">
+    <table class="tabla-operador">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>When</th>
+          <th class="col-num">Qty</th>
+          <th class="col-num">Unit</th>
+          <th class="col-num">Total</th>
+          <th class="col-acciones"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items(); track item.id) {
+          <tr>
+            <td>
+              <div class="operador-celda-principal">
+                <strong>{{ item.servicioNombre }}</strong>
+                <span>Added by {{ item.operadorNombre }}</span>
+              </div>
+            </td>
+            <td>{{ item.fechaHora | date:'short' }}</td>
+            <td class="col-num">{{ item.cantidad }}</td>
+            <td class="col-num">{{ item.precioUnitario | currency:'USD' }}</td>
+            <td class="col-num">
+              <div class="operador-servicio-total">
+                <strong>{{ item.total | currency:'USD' }}</strong>
+                @if (item.pagado) {
+                  <span class="operador-pagado">Paid</span>
+                }
+              </div>
+            </td>
+            <td class="col-acciones">
+              @if (operable() && !item.pagado) {
+                <button type="button" class="operador-quitar" aria-label="Remove charge"
+                        (click)="quitar.emit(item.id)">Remove</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

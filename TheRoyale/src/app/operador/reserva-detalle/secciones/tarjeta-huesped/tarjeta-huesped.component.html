@@ -1,0 +1,10 @@
+<p class="eyebrow">Guest</p>
+<h2 class="operador-tarjeta-titulo">{{ reserva().clienteNombre }} {{ reserva().clienteApellido }}</h2>
+<dl class="operador-datos">
+  <div><dt>ID number</dt><dd>{{ reserva().clienteCedula || 'Not registered' }}</dd></div>
+  <div>
+    <dt>Email</dt>
+    <dd><a [href]="'mailto:' + reserva().clienteEmail" class="operador-enlace">{{ reserva().clienteEmail }}</a></dd>
+  </div>
+  <div><dt>Phone</dt><dd>{{ reserva().clienteTelefono || 'Not registered' }}</dd></div>
+</dl>

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ServicioService } from '../../services/servicio.service';
@@ -8,20 +7,24 @@ import { CabeceraComponent } from '../../shared/cabecera/cabecera.component';
 import { MenuMovilComponent } from '../../shared/menu-movil/menu-movil.component';
 import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component';
 import { HeroInteriorComponent } from '../../shared/hero-interior/hero-interior.component';
-import { AlertaErrorComponent } from '../secciones/alerta-error/alerta-error.component';
+import { AlertaErrorComponent } from '../../shared/alerta-error/alerta-error.component';
+import { CampoErrorComponent } from '../../shared/campo-error/campo-error.component';
+
+// Alta y edición de un servicio del hotel (spa, restaurante...) desde el panel admin.
+// Mismo patrón que los demás formularios: validación reactiva + app-campo-error.
 
 @Component({
   selector: 'app-servicios-formulario',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterLink,
     CabeceraComponent,
     MenuMovilComponent,
     PiePaginaComponent,
     HeroInteriorComponent,
-    AlertaErrorComponent
+    AlertaErrorComponent,
+    CampoErrorComponent
   ],
   templateUrl: './servicios-formulario.component.html'
 })

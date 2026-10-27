@@ -1,0 +1,13 @@
+<div class="operador-habitacion-imagen">
+  <img [src]="reserva().tipoHabitacionImagenUrl || '/images/hotel.webp'"
+       [alt]="reserva().tipoHabitacionNombre" loading="lazy">
+</div>
+<div class="operador-habitacion-cuerpo">
+  <p class="eyebrow">Assigned room</p>
+  <h2 class="operador-tarjeta-titulo">Room {{ reserva().habitacionNumero }}</h2>
+  <p class="operador-habitacion-tipo">{{ reserva().tipoHabitacionNombre }}</p>
+  <div class="operador-habitacion-pie">
+    <span class="operador-tenue">Agreed rate</span>
+    <span class="operador-numero">{{ reserva().precioNocheAcordado | currency:'USD' }} / night</span>
+  </div>
+</div>

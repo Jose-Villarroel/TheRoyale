@@ -1,0 +1,65 @@
+<header class="reserva-paso-encabezado">
+  <span class="reserva-paso-numero">03</span>
+  <div>
+    <h2 class="reserva-paso-titulo">Confirm</h2>
+    <p class="reserva-paso-nota">Review the details before confirming.</p>
+  </div>
+</header>
+
+<div class="reserva-resumen">
+  <div class="reserva-resumen-fila">
+    <span>Arrival</span>
+    <strong>{{ fechaInicio() ? (fechaInicio() | date:'mediumDate') : '—' }}</strong>
+  </div>
+  <div class="reserva-resumen-fila">
+    <span>Departure</span>
+    <strong>{{ fechaFin() ? (fechaFin() | date:'mediumDate') : '—' }}</strong>
+  </div>
+  <div class="reserva-resumen-fila">
+    <span>Nights</span>
+    <strong>{{ noches() || '—' }}</strong>
+  </div>
+  <div class="reserva-resumen-fila">
+    <span>Guests</span>
+    <strong>{{ cantidadPersonas() }}</strong>
+  </div>
+  <div class="reserva-resumen-fila">
+    <span>Room type</span>
+    <strong>{{ seleccionado()?.nombre || 'Not selected' }}</strong>
+  </div>
+  <div class="reserva-resumen-fila">
+    <span>Rate per night</span>
+    <strong>{{ seleccionado()?.precioDesde ? (seleccionado()?.precioDesde | currency:'USD') : '—' }}</strong>
+  </div>
+  <div class="reserva-resumen-fila reserva-resumen-total">
+    <span>Estimated total</span>
+    <strong>{{ totalEstimado() ? (totalEstimado() | currency:'USD') : '—' }}</strong>
+  </div>
+
+  <div class="reserva-resumen-acciones">
+    @if (esCliente()) {
+      <button type="submit" class="btn-dorado" [disabled]="!puedeConfirmar()">
+        @if (enviando()) {
+          {{ enEdicion() ? 'Updating…' : 'Confirming…' }}
+        } @else {
+          {{ enEdicion() ? 'Update Reservation' : 'Confirm Reservation' }}
+        }
+      </button>
+    } @else {
+      <!-- Sin sesión de huésped no hay clienteId que enviar, pero la búsqueda ya hecha no se pierde -->
+      <a routerLink="/login"
+         [queryParams]="{ redirect: urlRetorno() }"
+         class="btn-dorado">{{ esOperador() ? 'Sign In as Guest' : 'Sign In to Confirm' }}</a>
+    }
+    <a routerLink="/" class="btn-contorno-oscuro">Cancel</a>
+  </div>
+  <p class="reserva-paso-nota">
+    @if (esCliente()) {
+      Your reservation starts as Pending. A room of this type is assigned automatically.
+    } @else if (esOperador()) {
+      Staff accounts cannot book a stay. Sign in with a guest account to confirm this reservation.
+    } @else {
+      You will come back to this page with your dates and room still selected.
+    }
+  </p>
+</div>

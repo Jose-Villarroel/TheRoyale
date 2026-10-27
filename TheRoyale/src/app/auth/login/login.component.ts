@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
   mensaje = '';
   cargando = false;
 
-  // Ruta a la que volver tras iniciar sesion (la pone authGuard o el boton de reservar)
+  // Ruta a la que volver tras iniciar sesion (la pone clienteGuard o el boton de reservar)
   private redirect: string | null = null;
 
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {}
@@ -41,12 +41,12 @@ export class LoginComponent implements OnInit {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (usuario) => {
         // Si venia de una pagina protegida vuelve alli; si no, el cliente va a su perfil
-        // y el operador al inicio, que no tiene perfil de cliente.
+        // y el operador a su portal de operaciones (no tiene perfil de cliente).
         if (this.redirect) {
           this.router.navigateByUrl(this.redirect);
           return;
         }
-        this.router.navigate([usuario.tipo === 'CLIENTE' ? '/profile' : '/']);
+        this.router.navigate([usuario.tipo === 'CLIENTE' ? '/profile' : '/operator/reservas']);
       },
       error: () => {
         this.error = 'Invalid credentials. Please try again.';

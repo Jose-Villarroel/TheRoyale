@@ -1,0 +1,22 @@
+<div class="operador-acciones operador-acciones-columna">
+  @if (puedeConfirmar()) {
+    <button type="button" class="btn-dorado btn-bloque" (click)="confirmar.emit()">Confirm reservation</button>
+  }
+  @if (puedeCheckIn()) {
+    <button type="button" class="btn-dorado btn-bloque" (click)="checkIn.emit()">Check-in</button>
+  }
+  @if (puedeCheckOut()) {
+    <button type="button" class="btn-dorado btn-bloque" (click)="checkOut.emit()">Check-out</button>
+    <!-- El backend rechaza el check-out mientras quede saldo pendiente -->
+    <p class="reserva-paso-nota">
+      Check-out requires the account balance to be zero. Settle any pending charges first.
+    </p>
+  }
+  @if (puedeCancelar()) {
+    <button type="button" class="btn-contorno-oscuro btn-bloque" (click)="cancelar.emit()">Cancel reservation</button>
+  }
+  @if (puedeEliminar()) {
+    <button type="button" class="btn-eliminar" (click)="eliminar.emit()">Delete reservation</button>
+  }
+  <a routerLink="/operator/reservas" class="enlace-subrayado">← Back to reservations</a>
+</div>

@@ -1,0 +1,25 @@
+<header class="reserva-paso-encabezado">
+  <span class="reserva-paso-numero">02</span>
+  <div>
+    <h2 class="reserva-paso-titulo">Your room</h2>
+    <p class="reserva-paso-nota">
+      @if (rangoValido()) {
+        {{ noches() }} {{ noches() === 1 ? 'night' : 'nights' }} at The Royale.
+      } @else {
+        Select your arrival and departure dates first.
+      }
+    </p>
+  </div>
+</header>
+
+@if (!rangoValido()) {
+  <p class="reserva-vacio">Availability will appear here once your dates are set.</p>
+} @else if (consultando() && disponibilidad().length === 0) {
+  <p class="reserva-vacio">Checking availability…</p>
+} @else {
+  <app-grid-disponibilidad
+    [disponibilidad]="disponibilidad()"
+    [tipoSeleccionadoId]="tipoSeleccionadoId()"
+    (elegir)="elegir.emit($event)">
+  </app-grid-disponibilidad>
+}

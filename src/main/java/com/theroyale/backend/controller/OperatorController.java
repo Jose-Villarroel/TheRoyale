@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.function.Supplier;
 
 // ===== Panel del operario: habitaciones, reservas y cuenta de consumo de cada estadia =====
@@ -23,8 +22,6 @@ import java.util.function.Supplier;
 @Controller
 @RequestMapping("/operator")
 public class OperatorController {
-
-    private static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER");
 
     @Autowired
     private HabitacionService habitacionService;
@@ -105,7 +102,7 @@ public class OperatorController {
         model.addAttribute("reserva", reservaService.obtenerPorId(id));
         model.addAttribute("cuenta", cuentaService.buscarPorReserva(id).orElse(null));
         model.addAttribute("servicios", servicioService.listarServicios());
-        model.addAttribute("metodosPago", METODOS_PAGO);
+        model.addAttribute("metodosPago", cuentaService.listarMetodosPago());
         return "operator/reserva-detalle";
     }
 

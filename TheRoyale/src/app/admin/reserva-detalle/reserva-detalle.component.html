@@ -14,9 +14,9 @@
   @if (reserva; as r) {
     <div class="reserva-detalle-grid">
       <figure class="reserva-detalle-imagen">
-        <img [src]="r.habitacion.tipoHabitacion.imagenUrl || '/images/hotel.webp'"
-             [alt]="r.habitacion.tipoHabitacion.nombre">
-        <figcaption>{{ r.habitacion.tipoHabitacion.nombre }}</figcaption>
+        <img [src]="r.tipoHabitacionImagenUrl || '/images/hotel.webp'"
+             [alt]="r.tipoHabitacionNombre">
+        <figcaption>{{ r.tipoHabitacionNombre }}</figcaption>
       </figure>
 
       <div class="reserva-detalle-datos">
@@ -26,13 +26,13 @@
         </div>
         <div class="reserva-dato">
           <span class="reserva-dato-etiqueta">Guest</span>
-          <span class="reserva-dato-valor">{{ r.cliente.nombre }} {{ r.cliente.apellido }}</span>
-          <span class="reserva-dato-secundario">{{ r.cliente.email }}</span>
+          <span class="reserva-dato-valor">{{ r.clienteNombre }} {{ r.clienteApellido }}</span>
+          <span class="reserva-dato-secundario">{{ r.clienteEmail }}</span>
         </div>
         <div class="reserva-dato">
           <span class="reserva-dato-etiqueta">Assigned room</span>
-          <span class="reserva-dato-valor">Room {{ r.habitacion.numero }}</span>
-          <span class="reserva-dato-secundario">{{ r.habitacion.tipoHabitacion.nombre }}</span>
+          <span class="reserva-dato-valor">Room {{ r.habitacionNumero }}</span>
+          <span class="reserva-dato-secundario">{{ r.tipoHabitacionNombre }}</span>
         </div>
         <div class="reserva-dato">
           <span class="reserva-dato-etiqueta">Check-in</span>

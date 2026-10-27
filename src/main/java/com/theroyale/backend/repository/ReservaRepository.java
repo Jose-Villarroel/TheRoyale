@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+// ===== Acceso a datos de reservas: listados por estado, por cliente y llegadas/salidas del día =====
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 

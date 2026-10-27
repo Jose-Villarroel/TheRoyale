@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+// ===== Reglas del personal del hotel: login, CRUD y operador por defecto =====
+// Un operador con consumos o pagos registrados no se puede borrar, para conservar quién hizo cada cargo.
 @Service
 @Transactional(readOnly = true)
 public class OperadorService {
