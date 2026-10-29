@@ -12,7 +12,8 @@ public record HabitacionResponse(
         Double precio,
         EstadoHabitacion estado,
         Long tipoHabitacionId,
-        String tipoHabitacionNombre
+        String tipoHabitacionNombre,
+        boolean historico
 ) {
 
     public static HabitacionResponse from(Habitacion h) {
@@ -22,6 +23,7 @@ public record HabitacionResponse(
                 h.getPrecio(),
                 h.getEstado(),
                 h.getTipoHabitacion() == null ? null : h.getTipoHabitacion().getId(),
-                h.getTipoHabitacion() == null ? null : h.getTipoHabitacion().getNombre());
+                h.getTipoHabitacion() == null ? null : h.getTipoHabitacion().getNombre(),
+                h.isHistorico());
     }
 }

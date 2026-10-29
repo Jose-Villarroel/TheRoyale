@@ -8,6 +8,7 @@ public record HabitacionRequest(
         String numero,
         Double precio,
         EstadoHabitacion estado,
-        Long tipoHabitacionId
+        Long tipoHabitacionId,
+        Boolean historico
 ) {
 }

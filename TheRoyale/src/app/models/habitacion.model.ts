@@ -8,6 +8,7 @@ export interface Habitacion {
   estado: EstadoHabitacion;
   tipoHabitacionId: number;
   tipoHabitacionNombre: string;
+  historico: boolean;
 }
 
 // Cuerpo de POST/PUT: el tipo se referencia por id

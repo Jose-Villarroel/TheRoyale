@@ -183,17 +183,25 @@ public class DataLoader implements CommandLineRunner {
         TipoHabitacion presidential = tipoHabitacionRepository.findAll().get(4);
 
         // ----- Normal: piso 1-2, $120-$140 -----
-        guardarHabitacion("101", normal, 120.00, EstadoHabitacion.DISPONIBLE);
-        guardarHabitacion("102", normal, 120.00, EstadoHabitacion.OCUPADA);
-        guardarHabitacion("103", normal, 125.00, EstadoHabitacion.DISPONIBLE);
-        guardarHabitacion("104", normal, 125.00, EstadoHabitacion.DISPONIBLE);
-        guardarHabitacion("105", normal, 130.00, EstadoHabitacion.MANTENIMIENTO);
-        guardarHabitacion("106", normal, 130.00, EstadoHabitacion.DISPONIBLE);
-        guardarHabitacion("107", normal, 135.00, EstadoHabitacion.OCUPADA);
-        guardarHabitacion("108", normal, 135.00, EstadoHabitacion.DISPONIBLE);
-        guardarHabitacion("109", normal, 140.00, EstadoHabitacion.DISPONIBLE);
-        guardarHabitacion("110", normal, 140.00, EstadoHabitacion.DISPONIBLE);
+        guardarHabitacion("101", normal, 120.00, EstadoHabitacion.DISPONIBLE, true);
+        guardarHabitacion("102", normal, 120.00, EstadoHabitacion.OCUPADA, true);
+        guardarHabitacion("103", normal, 125.00, EstadoHabitacion.DISPONIBLE, true);
+        guardarHabitacion("104", normal, 125.00, EstadoHabitacion.DISPONIBLE, true);
+        guardarHabitacion("105", normal, 130.00, EstadoHabitacion.MANTENIMIENTO, true);
+        guardarHabitacion("106", normal, 130.00, EstadoHabitacion.DISPONIBLE, true);
+        guardarHabitacion("107", normal, 135.00, EstadoHabitacion.OCUPADA, true);
+        guardarHabitacion("108", normal, 135.00, EstadoHabitacion.DISPONIBLE, true);
+        guardarHabitacion("109", normal, 140.00, EstadoHabitacion.DISPONIBLE, true);
+        guardarHabitacion("110", normal, 140.00, EstadoHabitacion.DISPONIBLE, true);
 
+        guardarHabitacion("301", executive, 190.00, EstadoHabitacion.DISPONIBLE, true);
+        guardarHabitacion("501", vip, 280.00, EstadoHabitacion.DISPONIBLE, true);
+        guardarHabitacion("701", luxury, 350.00, EstadoHabitacion.OCUPADA, true);
+        guardarHabitacion("901", presidential, 800.00, EstadoHabitacion.OCUPADA, true);
+
+
+
+        /* 
         // ----- Executive: piso 3-4, $190-$220 -----
         guardarHabitacion("301", executive, 190.00, EstadoHabitacion.DISPONIBLE);
         guardarHabitacion("302", executive, 190.00, EstadoHabitacion.OCUPADA);
@@ -241,15 +249,17 @@ public class DataLoader implements CommandLineRunner {
         guardarHabitacion("908", presidential, 1100.00, EstadoHabitacion.DISPONIBLE);
         guardarHabitacion("909", presidential, 1150.00, EstadoHabitacion.OCUPADA);
         guardarHabitacion("910", presidential, 1200.00, EstadoHabitacion.DISPONIBLE);
+        */
     }
 
     // ===== Método de ayuda para no repetir el .builder() 50 veces =====
-    private void guardarHabitacion(String numero, TipoHabitacion tipo, double precio, EstadoHabitacion estado) {
+    private void guardarHabitacion(String numero, TipoHabitacion tipo, double precio, EstadoHabitacion estado, Boolean historico) {
         habitacionRepository.save(Habitacion.builder()
                 .numero(numero)
                 .tipoHabitacion(tipo)
                 .precio(precio)
                 .estado(estado)
+                .historico(historico)
                 .build());
     }
 
