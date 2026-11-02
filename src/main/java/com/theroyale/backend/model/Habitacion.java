@@ -39,9 +39,6 @@ public class Habitacion {
     @Column(nullable = false, length = 20)
     private EstadoHabitacion estado;
 
-    @Column(nullable = false)
-    private boolean historico;
-
     @JsonIgnore
     @OneToMany(mappedBy = "habitacion")
     @Builder.Default
@@ -52,8 +49,6 @@ public class Habitacion {
     public String toString() {
         // tipoHabitacion excluido intencionalmente (asociación -> evita recursión/lazy loading)
         return "Habitacion{id=" + id + ", numero='" + numero + "', precio=" + precio +
-                ", estado=" + estado + ", historico=" + historico +"}";
+                ", estado=" + estado + "}";
     }
-
-
 }
