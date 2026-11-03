@@ -24,6 +24,7 @@ import com.theroyale.backend.repository.ServicioRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +38,9 @@ import java.util.List;
 // Necesario porque ddl-auto=create-drop borra y recrea la base de datos en cada reinicio.
 // Nota: este es el único archivo del proyecto donde se accede directo a los Repository,
 // saltándose la capa de Service — es una excepción intencional solo para este propósito.
+// Solo corre en el perfil por defecto: las pruebas (perfil "test") preparan sus propios datos.
 @Component
+@Profile("default")
 @Transactional
 public class DataLoader implements CommandLineRunner {
 
