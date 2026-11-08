@@ -2,18 +2,18 @@
   <div class="login-card">
     <h1 class="login-titulo">Sign In</h1>
     <p class="login-subtitulo">Welcome back to The Royale</p>
-    <p *ngIf="mensaje" class="login-exito">{{ mensaje }}</p>
+    <p *ngIf="mensaje" id="login-exito" class="login-exito">{{ mensaje }}</p>
     <p *ngIf="error" class="login-error">{{ error }}</p>
     <form (ngSubmit)="iniciarSesion()" class="login-form">
       <label>
         <span>Email</span>
-        <input type="email" [(ngModel)]="email" name="email" required autocomplete="email">
+        <input type="email" id="login-email" [(ngModel)]="email" name="email" required autocomplete="email">
       </label>
       <label>
         <span>Password</span>
-        <input type="password" [(ngModel)]="password" name="password" required autocomplete="current-password">
+        <input type="password" id="login-password" [(ngModel)]="password" name="password" required autocomplete="current-password">
       </label>
-      <button type="submit" class="btn-dorado" [disabled]="cargando">
+      <button type="submit" id="login-enviar" class="btn-dorado" [disabled]="cargando">
         {{ cargando ? 'Signing in...' : 'Sign In' }}
       </button>
     </form>
