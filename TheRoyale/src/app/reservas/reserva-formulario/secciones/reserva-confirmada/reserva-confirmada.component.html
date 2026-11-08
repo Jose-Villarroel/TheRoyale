@@ -1,4 +1,4 @@
-<section class="reserva-confirmada">
+<section id="reserva-confirmada" class="reserva-confirmada">
   <p class="eyebrow">{{ enEdicion() ? 'Updated' : 'Confirmed' }}</p>
   <h2 class="reserva-confirmada-titulo">
     {{ enEdicion() ? 'Your stay has been updated' : 'Your stay is booked' }}
@@ -13,11 +13,11 @@
   <div class="reserva-resumen">
     <div class="reserva-resumen-fila">
       <span>Status</span>
-      <strong><span class="chip-estado" [attr.data-estado]="reserva().estado">{{ reserva().estado }}</span></strong>
+      <strong><span id="reserva-estado" class="chip-estado" [attr.data-estado]="reserva().estado">{{ reserva().estado }}</span></strong>
     </div>
     <div class="reserva-resumen-fila">
       <span>Assigned room</span>
-      <strong>Room {{ reserva().habitacionNumero }} · {{ reserva().tipoHabitacionNombre }}</strong>
+      <strong id="reserva-habitacion">Room {{ reserva().habitacionNumero }} · {{ reserva().tipoHabitacionNombre }}</strong>
     </div>
     <div class="reserva-resumen-fila">
       <span>Check-in</span>

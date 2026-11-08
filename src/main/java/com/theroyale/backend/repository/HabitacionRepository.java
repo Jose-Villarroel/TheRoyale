@@ -43,6 +43,15 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
             @Param("estadosNoUtilizables") Collection<EstadoHabitacion> estadosNoUtilizables,
             @Param("estadosBloqueantes") Collection<EstadoReserva> estadosBloqueantes,
             @Param("reservaIdExcluida") Long reservaIdExcluida);
+
+    default List<Habitacion> buscarDisponibles(
+            Long tipoHabitacionId,
+            LocalDate fechaInicio,
+            LocalDate fechaFin,
+            Collection<EstadoHabitacion> estadosNoUtilizables,
+            Collection<EstadoReserva> estadosBloqueantes) {
+        return buscarDisponibles(tipoHabitacionId, fechaInicio, fechaFin, estadosNoUtilizables, estadosBloqueantes, null);
+    }
     List<Habitacion> findByTipoHabitacionIdOrderByNumeroAsc(Long tipoHabitacionId);
 
     Optional<Habitacion> findByNumero(String numero);

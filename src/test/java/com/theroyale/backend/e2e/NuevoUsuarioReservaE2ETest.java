@@ -1,23 +1,34 @@
 package com.theroyale.backend.e2e;
 
+import com.theroyale.backend.model.EstadoHabitacion;
+import com.theroyale.backend.model.EstadoReserva;
+import com.theroyale.backend.model.Habitacion;
+import com.theroyale.backend.repository.HabitacionRepository;
+import com.theroyale.backend.repository.TipoHabitacionRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-// ===== Caso 1 (E2E): usuario nuevo que se registra y reserva =====
+// ===== Caso 1 (E2E): usuario nuevo que se registra y hace dos reservas que se cruzan =====
 // DEFINED_PORT levanta el backend completo (con su DataLoader) en el puerto 8080, el que usa el
 // frontend. Angular debe estar corriendo aparte en localhost:4200 y el backend normal apagado.
 // DirtiesContext cierra la aplicación al terminar para no dejar datos ni el puerto ocupado.
@@ -40,8 +51,29 @@ class NuevoUsuarioReservaE2ETest {
     private static final By LOGIN_EMAIL = By.id("login-email");
     private static final By LOGIN_PASSWORD = By.id("login-password");
     private static final By LOGIN_ENVIAR = By.id("login-enviar");
+    private static final By RESERVA_CONFIRMAR = By.id("reserva-confirmar");
+    private static final By RESERVA_CONFIRMADA = By.id("reserva-confirmada");
+    private static final By RESERVA_ESTADO = By.id("reserva-estado");
+    private static final By RESERVA_HABITACION = By.id("reserva-habitacion");
 
     private static final String PASSWORD = "Clave1234";
+
+    // Extrae el número de "Room 101 · Normal"
+    private static final Pattern NUMERO_HABITACION = Pattern.compile("Room\\s+(\\S+)");
+
+    // Mismas reglas que usa ReservaService para decidir qué habitaciones se pueden reservar.
+    // Si esas reglas cambian en el servicio, hay que cambiarlas también aquí.
+    private static final List<EstadoHabitacion> HABITACION_NO_UTILIZABLE =
+            List.of(EstadoHabitacion.MANTENIMIENTO, EstadoHabitacion.DESHABILITADA);
+    private static final List<EstadoReserva> RESERVA_BLOQUEANTE =
+            List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA, EstadoReserva.EN_CURSO);
+
+    // La prueba corre en el mismo proceso que el backend, así que puede consultar la base directamente
+    @Autowired
+    private HabitacionRepository habitacionRepository;
+
+    @Autowired
+    private TipoHabitacionRepository tipoHabitacionRepository;
 
     private WebDriver driver;
     private WebDriverWait wait;
@@ -60,11 +92,13 @@ class NuevoUsuarioReservaE2ETest {
     // ===== Cierra el navegador al terminar, pase o falle la prueba =====
     @AfterEach
     void tearDown() {
-        driver.quit();
+        if (driver != null) {
+            driver.quit();
+        }
     }
 
     @Test
-    void casoUno_usuarioNuevo_registroConCorreoInvalidoYLuegoValido() {
+    void casoUno_usuarioNuevo_registroYDosReservasQueSeCruzan() {
         // Datos únicos por ejecución: email y cédula son únicos en la base
         long sufijo = System.currentTimeMillis();
         String email = "qa." + sufijo + "@email.com";
@@ -85,7 +119,8 @@ class NuevoUsuarioReservaE2ETest {
         clic(REGISTRO_ENVIAR);
 
         // Se verifica el mensaje de error y que no pasó a la pantalla de login
-        assertThat(esperarVisible(REGISTRO_ERROR_EMAIL).getText()).isEqualTo("Enter a valid email.");
+        esperarVisible(REGISTRO_ERROR_EMAIL);
+        assertThat(texto(REGISTRO_ERROR_EMAIL)).isEqualTo("Enter a valid email.");
         assertThat(driver.getCurrentUrl()).endsWith("/register");
 
         // ===== Paso 3: corrige el correo y se registra =====
@@ -94,7 +129,8 @@ class NuevoUsuarioReservaE2ETest {
 
         // Tras registrarse lo manda al login con el aviso y el correo ya escrito
         wait.until(ExpectedConditions.urlContains("/login"));
-        assertThat(esperarVisible(LOGIN_EXITO).getText()).isEqualTo("Account created. You can sign in now.");
+        esperarVisible(LOGIN_EXITO);
+        assertThat(texto(LOGIN_EXITO)).isEqualTo("Account created. You can sign in now.");
         wait.until(ExpectedConditions.attributeToBe(LOGIN_EMAIL, "value", email));
 
         // ===== Paso 4: inicia sesión; un cliente entra a su perfil =====
@@ -102,7 +138,59 @@ class NuevoUsuarioReservaE2ETest {
         clic(LOGIN_ENVIAR);
         wait.until(ExpectedConditions.urlContains("/profile"));
 
-        // ===== Paso 5 en adelante (reservas): pendiente de los templates de /book =====
+        // ===== Paso 5: primera reserva para la semana siguiente =====
+        // El tipo se busca por nombre y no por id fijo: los ids los genera la base al arrancar
+        Long tipoId = tipoHabitacionRepository.findAll().stream()
+                .filter(tipo -> tipo.getNombre().equals("Normal"))
+                .findFirst().orElseThrow().getId();
+        LocalDate hoy = LocalDate.now();
+        LocalDate llegada1 = hoy.plusDays(7);
+        LocalDate salida1 = hoy.plusDays(10);
+        String habitacion1 = reservar(tipoId, "Normal", llegada1, salida1);
+
+        // ===== Paso 6: segunda reserva con fechas que se cruzan con la primera =====
+        LocalDate llegada2 = hoy.plusDays(8);
+        LocalDate salida2 = hoy.plusDays(11);
+        String habitacion2 = reservar(tipoId, "Normal", llegada2, salida2);
+
+        // Se creó la segunda reserva, pero con otra habitación distinta a la primera
+        assertThat(habitacion2).isNotEqualTo(habitacion1);
+
+        // ===== Paso 7: la primera habitación ya no está disponible en esas fechas =====
+        // En la ventana de la segunda reserva (que se cruza con la primera) ninguna de las dos queda libre
+        assertThat(numerosDisponibles(tipoId, llegada2, salida2)).doesNotContain(habitacion1, habitacion2);
+        // Y en las fechas de la primera reserva, la primera habitación tampoco
+        assertThat(numerosDisponibles(tipoId, llegada1, salida1)).doesNotContain(habitacion1);
+    }
+
+    // ===== Hace una reserva desde /book y devuelve el número de habitación asignado =====
+    // La URL ya trae fechas, huéspedes y tipo: Angular los lee y deja el formulario listo, así no se
+    // escribe en los campos de fecha (la parte más frágil de Selenium). La sesión del usuario sigue
+    // activa porque vive en sessionStorage, que se conserva al navegar dentro de la misma pestaña.
+    private String reservar(Long tipoId, String nombreTipo, LocalDate llegada, LocalDate salida) {
+        driver.get(FRONT + "/book?fechaInicio=" + llegada + "&fechaFin=" + salida
+                + "&huespedes=2&tipoId=" + tipoId);
+
+        // El botón se habilita solo cuando ya llegó la disponibilidad y el tipo quedó seleccionado
+        clic(RESERVA_CONFIRMAR);
+
+        // La confirmación aparece en la misma página, sin navegar a otro listado
+        esperarVisible(RESERVA_CONFIRMADA);
+        // Toda reserva nueva nace PENDIENTE: la estadía todavía no ha empezado
+        assertThat(texto(RESERVA_ESTADO)).isEqualTo("PENDIENTE");
+
+        String detalle = texto(RESERVA_HABITACION);
+        assertThat(detalle).contains(nombreTipo);
+        Matcher numero = NUMERO_HABITACION.matcher(detalle);
+        assertThat(numero.find()).as("No se encontró el número de habitación en: " + detalle).isTrue();
+        return numero.group(1);
+    }
+
+    // ===== Números de habitación libres de un tipo en un rango, según la base de datos =====
+    private List<String> numerosDisponibles(Long tipoId, LocalDate inicio, LocalDate fin) {
+        List<Habitacion> libres = habitacionRepository.buscarDisponibles(
+                tipoId, inicio, fin, HABITACION_NO_UTILIZABLE, RESERVA_BLOQUEANTE, null);
+        return libres.stream().map(Habitacion::getNumero).toList();
     }
 
     // ===== Métodos de ayuda: evitan repetir la espera en cada interacción =====
@@ -117,6 +205,16 @@ class NuevoUsuarioReservaE2ETest {
     }
 
     private void clic(By localizador) {
-        wait.until(ExpectedConditions.elementToBeClickable(localizador)).click();
+        WebElement elemento = wait.until(ExpectedConditions.elementToBeClickable(localizador));
+        try {
+            elemento.click();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", elemento);
+        }
+    }
+
+    // textContent devuelve el texto tal como está en el HTML, sin que el CSS lo altere (mayúsculas, etc.)
+    private String texto(By localizador) {
+        return esperarVisible(localizador).getAttribute("textContent").trim();
     }
 }

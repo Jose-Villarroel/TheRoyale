@@ -38,7 +38,7 @@
 
   <div class="reserva-resumen-acciones">
     @if (esCliente()) {
-      <button type="submit" class="btn-dorado" [disabled]="!puedeConfirmar()">
+      <button type="submit" id="reserva-confirmar" class="btn-dorado" [disabled]="!puedeConfirmar()">
         @if (enviando()) {
           {{ enEdicion() ? 'Updating…' : 'Confirming…' }}
         } @else {
