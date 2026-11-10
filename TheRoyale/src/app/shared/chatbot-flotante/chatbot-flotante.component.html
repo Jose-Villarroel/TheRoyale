@@ -1,0 +1,78 @@
+<!-- Botón Flotante del Concierge -->
+<div class="chatbot-flotante-wrapper">
+  
+  <button (click)="toggleChat()" class="btn-flotante-concierge" [class.abierto]="abierto" aria-label="Royale Concierge AI">
+    <span class="icono-flotante">✦</span>
+    <span class="etiqueta-flotante" *ngIf="!abierto">Royale Concierge AI</span>
+    <span class="icono-cerrar" *ngIf="abierto">✕</span>
+  </button>
+
+  <!-- Ventana de Chat Flotante -->
+  <div class="ventana-chat" *ngIf="abierto">
+    
+    <!-- Encabezado de la Ventana -->
+    <div class="chat-cabecera">
+      <div class="chat-avatar-royale">
+        <span>R</span>
+      </div>
+      <div class="chat-titulos">
+        <strong>The Royale AI Concierge</strong>
+        <small class="status-activo">● Available 24/7</small>
+      </div>
+      <button (click)="toggleChat()" class="btn-cerrar-mini" aria-label="Close chat">✕</button>
+    </div>
+
+    <!-- Cuerpo con los Mensajes -->
+    <div class="chat-cuerpo" #cuerpoChat>
+      <div *ngFor="let m of mensajes" class="mensaje-fila" [class.es-usuario]="m.remitente === 'usuario'">
+        
+        <div class="burbuja-mensaje" [class.burbuja-concierge]="m.remitente === 'concierge'">
+          <div class="mensaje-remitente-label" *ngIf="m.remitente === 'concierge'">Concierge</div>
+          <div class="mensaje-texto">{{ m.texto }}</div>
+          
+          <!-- Botón de acción embebido en el mensaje -->
+          <div *ngIf="m.enlaceAccion" class="mensaje-accion-caja">
+            <button (click)="navegarAccion(m.enlaceAccion)" class="btn-accion-chat">
+              {{ m.textoAccion || 'Explore' }} →
+            </button>
+          </div>
+
+          <!-- Sugerencias de respuesta rápida -->
+          <div *ngIf="m.sugerencias && m.sugerencias.length > 0" class="chat-sugerencias">
+            <button *ngFor="let sug of m.sugerencias" (click)="seleccionarSugerencia(sug)" class="chip-sugerencia">
+              {{ sug }}
+            </button>
+          </div>
+
+          <span class="mensaje-hora">{{ m.hora }}</span>
+        </div>
+
+      </div>
+
+      <!-- Indicador escribiendo... -->
+      <div *ngIf="cargandoRespuesta" class="mensaje-fila">
+        <div class="burbuja-mensaje burbuja-concierge escribiendo-burbuja">
+          <span class="punto-escribiendo"></span>
+          <span class="punto-escribiendo"></span>
+          <span class="punto-escribiendo"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie / Formulario de Envío -->
+    <div class="chat-pie">
+      <input type="text"
+             [(ngModel)]="textoInput"
+             (keyup.enter)="enviarTexto()"
+             placeholder="Ask about suites, fine dining, or itineraries..."
+             class="input-chat"
+             [disabled]="cargandoRespuesta"
+             autofocus />
+      <button (click)="enviarTexto()" [disabled]="!textoInput.trim() || cargandoRespuesta" class="btn-enviar-chat">
+        ➔
+      </button>
+    </div>
+
+  </div>
+
+</div>

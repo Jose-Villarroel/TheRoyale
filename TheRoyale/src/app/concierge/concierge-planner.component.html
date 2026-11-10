@@ -1,0 +1,130 @@
+<app-cabecera [siempreSolida]="true" (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  titulo="AI Concierge Itinerary"
+  subtitulo="Craft your personalized Manhattan visit combining The Royale's world-class amenities with exclusive New York experiences.">
+</app-hero-interior>
+
+<main class="seccion-planner">
+  <div class="contenedor">
+    
+    <!-- Formulario de Configuración del Itinerario -->
+    <div class="planner-tarjeta-configuracion">
+      <div class="config-cabecera">
+        <span class="badge-ia">✦ Powered by Royale AI</span>
+        <h2 class="config-titulo">Customize Your Bespoke Stay</h2>
+        <p class="config-sub">Select your travel parameters and let our artificial intelligence curate each morning, afternoon and evening.</p>
+      </div>
+
+      <div class="config-formulario-grid">
+        
+        <!-- Duración -->
+        <div class="campo-grupo">
+          <label>Stay Duration (Days)</label>
+          <div class="selector-dias-botones">
+            <button *ngFor="let d of [1, 2, 3, 4, 5]"
+                    type="button"
+                    (click)="dias = d"
+                    [class.activo]="dias === d"
+                    class="btn-dia-opcion">
+              {{ d }} {{ d === 1 ? 'Day' : 'Days' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Estilo de Viaje -->
+        <div class="campo-grupo">
+          <label for="estilo-viaje">Travel Theme & Atmosphere</label>
+          <select id="estilo-viaje" [(ngModel)]="estilo" class="select-elegante">
+            <option *ngFor="let est of estilosDisponibles" [value]="est">{{ est }}</option>
+          </select>
+        </div>
+
+        <!-- Acompañantes -->
+        <div class="campo-grupo">
+          <label for="acompanantes">Travel Party</label>
+          <select id="acompanantes" [(ngModel)]="acompanantes" class="select-elegante">
+            <option *ngFor="let ac of acompanantesDisponibles" [value]="ac">{{ ac }}</option>
+          </select>
+        </div>
+
+        <!-- Preferencias especiales -->
+        <div class="campo-grupo ancho-completo">
+          <label for="preferencias">Special Passions & Wishes</label>
+          <input id="preferencias" type="text" [(ngModel)]="preferencias"
+                 placeholder="e.g. Michelin dining, private thermal baths, rooftop jazz, vintage wine..."
+                 class="input-elegante" />
+        </div>
+
+      </div>
+
+      <div class="config-boton-accion">
+        <button (click)="generarPlan()" [disabled]="cargando" class="btn-dorado btn-grande">
+          {{ cargando ? '✦ Curating Your Itinerary with AI...' : '✦ Generate Bespoke Itinerary' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Resultados del Itinerario -->
+    <div *ngIf="itinerario" class="itinerario-resultado-seccion">
+      
+      <div class="resultado-cabecera">
+        <div>
+          <span class="eyebrow">Your Custom Program</span>
+          <h2 class="resultado-titulo">{{ itinerario.titulo }}</h2>
+          <p class="resultado-resumen">{{ itinerario.resumen }}</p>
+        </div>
+
+        <div class="resultado-acciones">
+          <button (click)="imprimir()" class="btn-imprimir">
+            🖨 Print / Save PDF
+          </button>
+          <a routerLink="/book" class="btn-dorado">
+            Book Accommodations →
+          </a>
+        </div>
+      </div>
+
+      <!-- Tarjetas por día (Timeline) -->
+      <div class="timeline-dias">
+        <div *ngFor="let dia of itinerario.dias" class="tarjeta-dia">
+          
+          <div class="dia-cabecera">
+            <div class="dia-numero-badge">Day 0{{ dia.numeroDia }}</div>
+            <h3 class="dia-titulo">{{ dia.tituloDia }}</h3>
+          </div>
+
+          <div class="momentos-grid">
+            
+            <div class="momento-bloque">
+              <span class="momento-etiqueta">🌅 Morning</span>
+              <p class="momento-descripcion">{{ dia.manana }}</p>
+            </div>
+
+            <div class="momento-bloque">
+              <span class="momento-etiqueta">☀️ Afternoon</span>
+              <p class="momento-descripcion">{{ dia.tarde }}</p>
+            </div>
+
+            <div class="momento-bloque">
+              <span class="momento-etiqueta">🌙 Evening</span>
+              <p class="momento-descripcion">{{ dia.noche }}</p>
+            </div>
+
+            <div class="momento-bloque momento-destacado-hotel">
+              <span class="momento-etiqueta-oro">✦ In-Hotel Experience</span>
+              <p class="momento-descripcion-oro">{{ dia.recomendacionHotel }}</p>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

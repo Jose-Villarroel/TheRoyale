@@ -25,6 +25,7 @@ import { OperadoresFormularioComponent } from './admin/operadores-formulario/ope
 import { MisReservasComponent } from './reservas/mis-reservas/mis-reservas.component';
 import { ReservasOperadorComponent } from './operador/reservas/reservas-operador.component';
 import { ReservaDetalleOperadorComponent } from './operador/reserva-detalle/reserva-detalle-operador.component';
+import { ConciergePlannerComponent } from './concierge/concierge-planner.component';
 import { clienteGuard } from './guards/cliente.guard';
 import { operadorGuard } from './guards/operador.guard';
 import { adminGuard } from './guards/admin.guard';
@@ -36,15 +37,16 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: PerfilComponent, canActivate: [clienteGuard] },
   { path: 'my-reservations', component: MisReservasComponent, canActivate: [clienteGuard] },
-  // Consultar disponibilidad es público; la sesión solo hace falta para confirmar
   { path: 'book', component: ReservaFormularioComponent },
 
   { path: 'rooms', component: RoomsListaComponent },
   { path: 'rooms/:id', component: RoomDetalleComponent },
-  // Las rutas fijas van antes de 'services/:id' o se intentarian resolver como un id
   { path: 'services/table', component: ServiciosTablaComponent },
   { path: 'services/cards', component: ServiciosTarjetasComponent },
   { path: 'services/:id', component: ServicioDetalleComponent },
+
+  // ===== Plan de Visita con IA (Concierge) =====
+  { path: 'concierge', component: ConciergePlannerComponent },
 
   // ===== Panel de administración: solo administradores =====
   { path: 'admin', redirectTo: 'admin/dashboard', pathMatch: 'full' },

@@ -5,7 +5,7 @@
     <!-- Acceso al panel de gestión: solo para un admin con sesión y nunca en la landing -->
     <div class="barra-utilitaria-izquierda">
       @if (authService.esAdmin && mostrarAccesosStaff) {
-        <a routerLink="/admin/reservas" class="btn-admin-acceso">Admin</a>
+        <a routerLink="/admin/dashboard" class="btn-admin-acceso">Admin</a>
       }
     </div>
     <div class="barra-utilitaria-derecha">
@@ -19,7 +19,7 @@
           <a routerLink="/operator/reservas">{{ authService.usuario?.nombre }} · Operations</a>
         }
         @if (authService.esAdmin) {
-          <a routerLink="/admin/reservas">{{ authService.usuario?.nombre }} · Admin</a>
+          <a routerLink="/admin/dashboard">{{ authService.usuario?.nombre }} · Admin</a>
         }
         <button type="button" class="btn-enlace-sesion" (click)="cerrarSesion()">Sign Out</button>
       } @else {
@@ -37,6 +37,7 @@
     <nav class="nav-principal">
       <a routerLink="/" fragment="rooms">Rooms</a>
       <a routerLink="/" fragment="services">Services</a>
+      <a routerLink="/concierge">AI Concierge</a>
       <a routerLink="/" fragment="experiences">Experiences</a>
       <a routerLink="/" fragment="about">About</a>
       <a routerLink="/" fragment="contact">Contact</a>
