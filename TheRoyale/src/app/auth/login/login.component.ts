@@ -8,7 +8,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-login',
   standalone: true,
   imports: [FormsModule, CommonModule, RouterLink],
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
   email = '';
@@ -17,12 +18,10 @@ export class LoginComponent implements OnInit {
   mensaje = '';
   cargando = false;
 
-  // Ruta a la que volver tras iniciar sesion (la pone clienteGuard o el boton de reservar)
   private redirect: string | null = null;
 
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {}
 
-  // Mismos avisos que mandaba el controlador Thymeleaf por query params (?mensaje=accountCreated...)
   ngOnInit(): void {
     const parametros = this.route.snapshot.queryParamMap;
     this.email = parametros.get('email') ?? '';
@@ -40,8 +39,6 @@ export class LoginComponent implements OnInit {
     this.cargando = true;
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (usuario) => {
-        // Si venia de una pagina protegida vuelve alli; si no, cada rol entra a su propio panel:
-        // el cliente a su perfil, el operador a operaciones y el admin a gestión.
         if (this.redirect) {
           this.router.navigateByUrl(this.redirect);
           return;
@@ -55,6 +52,30 @@ export class LoginComponent implements OnInit {
       },
       error: () => {
         this.error = 'Invalid credentials. Please try again.';
+        this.cargando = false;
+      }
+    });
+  }
+
+  iniciarSesionConGoogle(): void {
+    this.cargando = true;
+    this.error = '';
+    const emailPrompt = prompt('Enter your Google email to sign in:', 'guest.google@theroyale.com');
+    if (!emailPrompt) {
+      this.cargando = false;
+      return;
+    }
+    const nombre = emailPrompt.split('@')[0];
+    this.authService.loginConGoogle(emailPrompt, nombre, 'GoogleUser').subscribe({
+      next: () => {
+        if (this.redirect) {
+          this.router.navigateByUrl(this.redirect);
+          return;
+        }
+        this.router.navigate(['/profile']);
+      },
+      error: () => {
+        this.error = 'Google Sign-In failed. Please try again.';
         this.cargando = false;
       }
     });

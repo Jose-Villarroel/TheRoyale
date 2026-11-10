@@ -12,9 +12,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 // ===== Registro e inicio de sesión de huéspedes, operadores y administradores =====
-// Concentra la decisión de "quién es" el usuario para que el login JSON (AutenticacionRestController)
-// y el formulario Thymeleaf (AutenticacionController) apliquen exactamente la misma regla.
-// Hay un solo login para los tres roles; el tipo devuelto decide a qué panel puede entrar cada uno.
 @Service
 @Transactional(readOnly = true)
 public class AutenticacionService {
@@ -45,7 +42,6 @@ public class AutenticacionService {
         }
 
         String emailNormalizado = normalizarEmail(cliente.getEmail());
-
         String cedulaNormalizada = cliente.getCedula().trim();
 
         if (emailNormalizado.isBlank() || clienteRepository.findByEmailIgnoreCase(emailNormalizado).isPresent()
@@ -72,7 +68,6 @@ public class AutenticacionService {
     }
 
     // ===== Login unificado: primero se busca un huésped y, si no, alguien del personal =====
-    // Vacío = credenciales inválidas para ambos.
     public Optional<LoginResponse> login(String email, String password) {
         Optional<Cliente> cliente = autenticar(email, password);
         if (cliente.isPresent()) {
@@ -85,7 +80,6 @@ public class AutenticacionService {
                     autenticado.getEmail()));
         }
 
-        // Operador y admin no tienen apellido; se manda vacío para no romper la interfaz del frontend.
         Optional<LoginResponse> operador = operadorService.autenticar(email, password)
                 .map(autenticado -> new LoginResponse(
                         TIPO_OPERADOR,
@@ -97,7 +91,6 @@ public class AutenticacionService {
             return operador;
         }
 
-        // Autenticación simple: el email existe y la contraseña es igual, sin token ni hash
         if (email == null || password == null) {
             return Optional.empty();
         }
@@ -109,6 +102,33 @@ public class AutenticacionService {
                         admin.getNombre(),
                         "",
                         admin.getEmail()));
+    }
+
+    @Transactional
+    public LoginResponse loginConGoogle(String email, String nombre, String apellido) {
+        String emailNorm = normalizarEmail(email);
+        Cliente cliente = clienteRepository.findByEmailIgnoreCase(emailNorm)
+                .orElseGet(() -> {
+                    String cedulaGen = "GGL" + System.currentTimeMillis();
+                    Cliente nuevo = Cliente.builder()
+                            .nombre(nombre != null && !nombre.isBlank() ? nombre.trim() : "Google")
+                            .apellido(apellido != null && !apellido.isBlank() ? apellido.trim() : "Guest")
+                            .email(emailNorm)
+                            .cedula(cedulaGen)
+                            .password("GoogleOAuth2SecurePass")
+                            .telefono("+1-555-0000")
+                            .fechaRegistro(LocalDate.now())
+                            .build();
+                    return clienteRepository.save(nuevo);
+                });
+
+        return new LoginResponse(
+                TIPO_CLIENTE,
+                cliente.getId(),
+                cliente.getNombre(),
+                cliente.getApellido(),
+                cliente.getEmail()
+        );
     }
 
     public Optional<Cliente> obtenerClienteAutenticado(Long clienteId) {

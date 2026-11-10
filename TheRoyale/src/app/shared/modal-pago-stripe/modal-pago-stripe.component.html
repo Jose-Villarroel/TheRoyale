@@ -1,0 +1,69 @@
+<div class="stripe-modal-backdrop" *ngIf="visible">
+  <div class="stripe-modal-caja">
+    
+    <!-- Cabecera -->
+    <div class="stripe-cabecera">
+      <div class="stripe-marca">
+        <span class="stripe-badge-logo">stripe</span>
+        <span class="stripe-seguridad">🔒 256-Bit SSL Encrypted</span>
+      </div>
+      <button (click)="cerrarModal()" class="btn-cerrar-modal" [disabled]="procesando">✕</button>
+    </div>
+
+    <!-- Cuerpo: Pantalla de éxito -->
+    <div *ngIf="completado" class="stripe-exito-vista">
+      <div class="check-circulo">✓</div>
+      <h3>Payment Successful</h3>
+      <p class="exito-monto">{{ monto | currency:'USD' }} Paid via Stripe</p>
+      <small>Booking #{{ reservaId }} has been confirmed and paid in full.</small>
+    </div>
+
+    <!-- Cuerpo: Formulario de Pago -->
+    <div *ngIf="!completado" class="stripe-cuerpo">
+      <div class="resumen-cobro">
+        <span class="cobro-concepto">{{ descripcion }}</span>
+        <span class="cobro-monto">{{ monto | currency:'USD' }}</span>
+      </div>
+
+      <div *ngIf="error" class="alerta-error-stripe">
+        {{ error }}
+      </div>
+
+      <div class="stripe-campos">
+        <div class="campo-stripe">
+          <label for="stripe-nombre">Cardholder Name</label>
+          <input id="stripe-nombre" type="text" [(ngModel)]="titular" class="input-stripe" placeholder="Name on card" />
+        </div>
+
+        <div class="campo-stripe">
+          <label for="stripe-tarjeta">Card Information</label>
+          <div class="tarjeta-input-icono">
+            <input id="stripe-tarjeta" type="text" [(ngModel)]="numeroTarjeta" class="input-stripe" placeholder="Card number" />
+            <span class="icono-tarjeta">💳</span>
+          </div>
+        </div>
+
+        <div class="fila-dos-campos">
+          <div class="campo-stripe">
+            <label for="stripe-exp">Expires</label>
+            <input id="stripe-exp" type="text" [(ngModel)]="expiracion" class="input-stripe" placeholder="MM / YY" />
+          </div>
+          <div class="campo-stripe">
+            <label for="stripe-cvc">CVC</label>
+            <input id="stripe-cvc" type="text" [(ngModel)]="cvc" class="input-stripe" placeholder="CVC" />
+          </div>
+        </div>
+      </div>
+
+      <div class="stripe-pie-info">
+        <p>Your transaction is securely routed and tokenized by Stripe Payments Infrastructure.</p>
+      </div>
+
+      <button (click)="procesarPago()" [disabled]="procesando" class="btn-pagar-stripe">
+        <span *ngIf="!procesando">Pay {{ monto | currency:'USD' }}</span>
+        <span *ngIf="procesando" class="spinner-inline">Processing Secure Payment...</span>
+      </button>
+    </div>
+
+  </div>
+</div>

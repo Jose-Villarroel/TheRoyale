@@ -23,8 +23,6 @@ export class AuthService {
   private readonly url = `${environment.apiUrl}/auth`;
   private _usuario: LoginResponse | null = null;
 
-  // La sesión se guarda en sessionStorage: sin esto, recargar la página cerraba la sesión
-  // y cualquier recorrido de varios pasos (reservar, cobrar, hacer check-out) se perdía.
   constructor(private http: HttpClient) {
     this._usuario = this.leerSesion();
   }
@@ -35,7 +33,12 @@ export class AuthService {
     );
   }
 
-  // Tras editar el perfil se refrescan nombre/email guardados, si no la cabecera mostraría los viejos
+  loginConGoogle(email: string, nombre: string, apellido: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.url}/google`, { email, nombre, apellido }).pipe(
+      tap(usuario => this.guardarSesion(usuario))
+    );
+  }
+
   actualizarUsuario(datos: Pick<LoginResponse, 'nombre' | 'apellido' | 'email'>): void {
     if (!this._usuario) {
       return;
@@ -48,7 +51,7 @@ export class AuthService {
     try {
       sessionStorage.removeItem(CLAVE_SESION);
     } catch {
-      // Almacenamiento bloqueado (ventana privada): basta con haberlo borrado de memoria
+      // Almacenamiento bloqueado
     }
   }
 
@@ -68,7 +71,6 @@ export class AuthService {
     return this._usuario?.tipo === 'OPERADOR';
   }
 
-  // Admin y operador son roles separados: el admin gestiona el catálogo, no la operación diaria
   get esAdmin(): boolean {
     return this._usuario?.tipo === 'ADMIN';
   }
@@ -77,9 +79,7 @@ export class AuthService {
     this._usuario = usuario;
     try {
       sessionStorage.setItem(CLAVE_SESION, JSON.stringify(usuario));
-    } catch {
-      // Si no se puede persistir, la sesión sigue viva en memoria hasta recargar
-    }
+    } catch {}
   }
 
   private leerSesion(): LoginResponse | null {

@@ -26,7 +26,7 @@ import java.util.Optional;
 public class CuentaService {
 
     // Únicos medios de pago que acepta el hotel; la vista del operador arma su selector con esta lista
-    public static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER");
+    public static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER", "STRIPE");
 
     @Autowired
     private CuentaRepository cuentaRepository;
