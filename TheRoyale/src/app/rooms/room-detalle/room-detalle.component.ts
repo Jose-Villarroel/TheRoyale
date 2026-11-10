@@ -7,14 +7,14 @@ import { PiePaginaComponent } from '../../shared/pie-pagina/pie-pagina.component
 import { ImagenDetalleComponent } from '../../shared/imagen-detalle/imagen-detalle.component';
 import { InfoRoomComponent } from './secciones/info-room/info-room.component';
 import { DisponibilidadRoomComponent } from './secciones/disponibilidad-room/disponibilidad-room.component';
+import { Visor3dComponent } from './secciones/visor-3d/visor-3d.component';
+import { ResenasRoomComponent } from './secciones/resenas-room/resenas-room.component';
 import { CtaInteriorComponent } from '../../shared/cta-interior/cta-interior.component';
 import { TipoHabitacionService } from '../../services/tipo-habitacion.service';
 import { HabitacionService } from '../../services/habitacion.service';
 import { TipoHabitacion } from '../../models/tipo-habitacion.model';
 import { Habitacion } from '../../models/habitacion.model';
 
-// Página contenedora del detalle de un tipo de habitación (/rooms/:id).
-// Hace los mismos cálculos que RoomController.mostrarDetalleRoom y reparte los datos a las secciones.
 @Component({
   selector: 'app-room-detalle',
   standalone: true,
@@ -25,6 +25,8 @@ import { Habitacion } from '../../models/habitacion.model';
     ImagenDetalleComponent,
     InfoRoomComponent,
     DisponibilidadRoomComponent,
+    Visor3dComponent,
+    ResenasRoomComponent,
     CtaInteriorComponent
   ],
   templateUrl: './room-detalle.component.html'
@@ -37,33 +39,35 @@ export class RoomDetalleComponent implements OnInit {
 
   tipo: TipoHabitacion | null = null;
   habitaciones: Habitacion[] = [];
-  // null equivale al Optional vacío del backend: el tipo no tiene habitaciones con precio
   precioDesde: number | null = null;
   habitacionesDisponibles = 0;
   menuAbierto = false;
 
-  // Se encadena desde paramMap (no desde snapshot) para que la pagina reaccione si cambia el :id
-  // sin remontar el componente, y las dos peticiones se combinan con forkJoin en lugar de
-  // anidar subscribes: ambas dependen del mismo id y sus resultados se necesitan juntos.
   ngOnInit(): void {
     this.route.paramMap.pipe(
       map(params => Number(params.get('id'))),
-      switchMap(id => forkJoin({
-        tipo: this.tipoHabitacionService.obtenerPorId(id),
-        habitaciones: this.habitacionService.obtenerPorTipoHabitacionId(id)
-      }))
+      switchMap(id => {
+        if (!id || Number.isNaN(id)) {
+          this.router.navigate(['/rooms']);
+          return [];
+        }
+        return forkJoin({
+          tipo: this.tipoHabitacionService.obtenerPorId(id),
+          habitaciones: this.habitacionService.obtenerPorTipoHabitacionId(id)
+        });
+      })
     ).subscribe({
-      next: ({ tipo, habitaciones }) => {
+      next: ({ tipo, habitaciones }: { tipo: TipoHabitacion; habitaciones: Habitacion[] }) => {
         this.tipo = tipo;
         this.habitaciones = habitaciones;
-        this.precioDesde = habitaciones.length > 0
-          ? Math.min(...habitaciones.map(h => h.precio))
-          : null;
-        this.habitacionesDisponibles = habitaciones.filter(h => h.estado === 'DISPONIBLE').length;
+        this.habitacionesDisponibles = habitaciones.filter((h: Habitacion) => h.estado === 'DISPONIBLE').length;
+
+        const precios = habitaciones
+          .map((h: Habitacion) => h.precio)
+          .filter((p: number | null | undefined): p is number => p !== null && p !== undefined);
+        this.precioDesde = precios.length > 0 ? Math.min(...precios) : null;
       },
-      error: () => {
-        this.router.navigate(['/']);
-      }
+      error: () => this.router.navigate(['/rooms'])
     });
   }
 }

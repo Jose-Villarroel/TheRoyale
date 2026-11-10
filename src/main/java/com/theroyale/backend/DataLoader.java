@@ -9,6 +9,7 @@ import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.ItemConsumo;
 import com.theroyale.backend.model.Operador;
+import com.theroyale.backend.model.Resena;
 import com.theroyale.backend.model.Pago;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
@@ -19,6 +20,7 @@ import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.OperadorRepository;
+import com.theroyale.backend.repository.ResenaRepository;
 import com.theroyale.backend.repository.ReservaRepository;
 import com.theroyale.backend.repository.ServicioRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
@@ -68,6 +70,9 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private CuentaRepository cuentaRepository;
 
+    @Autowired
+    private ResenaRepository resenaRepository;
+
     @Override
     public void run(String... args) throws Exception {
         cargarTiposHabitacion();
@@ -77,6 +82,7 @@ public class DataLoader implements CommandLineRunner {
         cargarOperadores();
         cargarAdmins();
         cargarReservas();
+        cargarResenas();
     }
 
     // ===== 2 administradores: gestionan el catálogo y el personal, no la operación diaria =====
@@ -513,4 +519,38 @@ public class DataLoader implements CommandLineRunner {
                 .build());
         cuentaRepository.save(cuenta);
     }
+
+    private void cargarResenas() {
+        List<Cliente> clientes = clienteRepository.findAll();
+        List<TipoHabitacion> tipos = tipoHabitacionRepository.findAll();
+        if (clientes.isEmpty() || tipos.isEmpty()) return;
+
+        resenaRepository.save(Resena.builder()
+                .cliente(clientes.get(0))
+                .tipoHabitacion(tipos.get(0))
+                .estrellas(5)
+                .titulo("Exceptional comfort & skyline view")
+                .comentario("The attention to detail at The Royale is unmatched. The king-size bed, silence and room service were beyond expectations.")
+                .fecha(LocalDateTime.now().minusDays(3))
+                .build());
+
+        resenaRepository.save(Resena.builder()
+                .cliente(clientes.get(1))
+                .tipoHabitacion(tipos.get(0))
+                .estrellas(5)
+                .titulo("Perfect Manhattan retreat")
+                .comentario("Fabulous stay! Impeccable cleanliness and the marble bathroom was magnificent. Will definitely return.")
+                .fecha(LocalDateTime.now().minusDays(7))
+                .build());
+
+        resenaRepository.save(Resena.builder()
+                .cliente(clientes.get(2))
+                .tipoHabitacion(tipos.get(tipos.size() - 1))
+                .estrellas(5)
+                .titulo("Pure world-class luxury")
+                .comentario("The butler service and private terrace views in the Presidential Suite made our anniversary unforgettable.")
+                .fecha(LocalDateTime.now().minusDays(5))
+                .build());
+    }
 }
+

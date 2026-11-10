@@ -1,0 +1,63 @@
+<section class="seccion-visor-3d" [class.modo-fullscreen]="pantallaCompleta">
+  <div class="contenedor">
+    <div class="visor-cabecera">
+      <div>
+        <p class="eyebrow">Virtual Tour 360°</p>
+        <h2 class="visor-titulo">Interactive 3D Room Experience</h2>
+        <p class="visor-sub">Drag to explore the layout, architecture, and luxury finishes of {{ tipoNombre }}.</p>
+      </div>
+
+      <div class="visor-controles">
+        <button (click)="toggleAutoRotacion()" class="btn-control" [class.activo]="autoRotacion">
+          {{ autoRotacion ? '⏸ Pause Tour' : '▶ Auto-Rotate' }}
+        </button>
+        <button (click)="togglePantallaCompleta()" class="btn-control">
+          {{ pantallaCompleta ? '✕ Exit Fullscreen' : '⛶ Fullscreen' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Visor Interactivo 3D -->
+    <div class="visor-canvas-caja"
+         (mousedown)="onMouseDown($event)"
+         (mousemove)="onMouseMove($event)"
+         (mouseup)="onMouseUp()"
+         (mouseleave)="onMouseUp()">
+      
+      <!-- Fondo panorámico 3D rotativo -->
+      <div class="panorama-capa"
+           [style.backgroundPosition]="anguloX + '% ' + (50 + anguloY) + '%'">
+        <div class="overlay-gradiente-3d"></div>
+      </div>
+
+      <!-- Hotspots / Puntos de interés interactivos -->
+      <div class="hotspots-capa">
+        <div *ngFor="let p of puntosInteres"
+             class="hotspot-item"
+             [style.left.%]="(p.x + (anguloX * 0.15)) % 100"
+             [style.top.%]="p.y + (anguloY * 0.3)">
+          
+          <button (click)="seleccionarPunto(p.id)" class="hotspot-pin" [class.activo]="puntoActivo === p.id">
+            <span class="pin-pulso"></span>
+            <span class="pin-icono">✦</span>
+          </button>
+
+          <div *ngIf="puntoActivo === p.id" class="hotspot-tooltip">
+            <strong>{{ p.titulo }}</strong>
+            <p>{{ p.desc }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overlay instructivo -->
+      <div class="visor-instruccion">
+        <span>↔ Drag with mouse or swipe to rotate 360°</span>
+      </div>
+
+      <div class="watermark-royale">
+        The Royale 3D Tour · {{ tipoNombre }}
+      </div>
+    </div>
+
+  </div>
+</section>

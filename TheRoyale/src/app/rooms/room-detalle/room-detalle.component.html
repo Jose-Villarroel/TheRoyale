@@ -18,6 +18,12 @@
       <app-disponibilidad-room [habitaciones]="habitaciones"></app-disponibilidad-room>
     </section>
 
+    <!-- Recorrido Virtual 3D -->
+    <app-visor-3d [tipoNombre]="tipo.nombre" [imagenPanorama]="tipo.imagenUrl"></app-visor-3d>
+
+    <!-- Reseñas y Calificaciones -->
+    <app-resenas-room [tipoId]="tipo.id" [tipoNombre]="tipo.nombre"></app-resenas-room>
+
     <app-cta-interior></app-cta-interior>
   </main>
 }
