@@ -8,7 +8,6 @@ import { ImagenDetalleComponent } from '../../shared/imagen-detalle/imagen-detal
 import { InfoRoomComponent } from './secciones/info-room/info-room.component';
 import { DisponibilidadRoomComponent } from './secciones/disponibilidad-room/disponibilidad-room.component';
 import { Visor3dComponent } from './secciones/visor-3d/visor-3d.component';
-import { ResenasRoomComponent } from './secciones/resenas-room/resenas-room.component';
 import { CtaInteriorComponent } from '../../shared/cta-interior/cta-interior.component';
 import { TipoHabitacionService } from '../../services/tipo-habitacion.service';
 import { HabitacionService } from '../../services/habitacion.service';
@@ -26,7 +25,6 @@ import { Habitacion } from '../../models/habitacion.model';
     InfoRoomComponent,
     DisponibilidadRoomComponent,
     Visor3dComponent,
-    ResenasRoomComponent,
     CtaInteriorComponent
   ],
   templateUrl: './room-detalle.component.html'
