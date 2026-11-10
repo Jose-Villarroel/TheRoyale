@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface Vista3d {
@@ -76,6 +76,11 @@ export class Visor3dComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  get estiloFondo(): string {
+    const urlSegura = (this.imagenActual || '/images/suite-1.webp').replace(/ /g, '%20');
+    return `url('${urlSegura}')`;
+  }
+
   private sincronizarImagen(): void {
     const url = this.imagenPanorama && this.imagenPanorama.trim().length > 0
       ? this.imagenPanorama
@@ -129,6 +134,7 @@ export class Visor3dComponent implements OnInit, OnChanges, OnDestroy {
     this.startY = e.clientY;
   }
 
+  @HostListener('window:mouseup')
   onMouseUp(): void {
     this.arrastrando = false;
   }
@@ -152,8 +158,18 @@ export class Visor3dComponent implements OnInit, OnChanges, OnDestroy {
     this.startY = e.touches[0].clientY;
   }
 
+  @HostListener('window:touchend')
   onTouchEnd(): void {
     this.arrastrando = false;
+  }
+
+  onWheelZoom(e: WheelEvent): void {
+    e.preventDefault();
+    if (e.deltaY < 0) {
+      this.zoomIn();
+    } else {
+      this.zoomOut();
+    }
   }
 
   toggleAutoRotacion(): void {
@@ -161,11 +177,11 @@ export class Visor3dComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   zoomIn(): void {
-    this.zoomNivel = Math.min(1.4, Number((this.zoomNivel + 0.1).toFixed(2)));
+    this.zoomNivel = Math.min(1.4, Number((this.zoomNivel + 0.08).toFixed(2)));
   }
 
   zoomOut(): void {
-    this.zoomNivel = Math.max(0.85, Number((this.zoomNivel - 0.1).toFixed(2)));
+    this.zoomNivel = Math.max(0.85, Number((this.zoomNivel - 0.08).toFixed(2)));
   }
 
   reiniciarVista(): void {

@@ -41,14 +41,14 @@
          (mousedown)="onMouseDown($event)"
          (mousemove)="onMouseMove($event)"
          (mouseup)="onMouseUp()"
-         (mouseleave)="onMouseUp()"
+         (wheel)="onWheelZoom($event)"
          (touchstart)="onTouchStart($event)"
          (touchmove)="onTouchMove($event)"
          (touchend)="onTouchEnd()">
       
       <!-- Fondo panorámico 3D rotativo interactivo -->
       <div class="panorama-capa"
-           [style.backgroundImage]="'url(' + imagenActual + ')'"
+           [style.backgroundImage]="estiloFondo"
            [style.backgroundPosition]="anguloX + '% ' + (50 + anguloY) + '%'"
            [style.transform]="'scale(' + zoomNivel + ')'">
         <div class="overlay-gradiente-3d"></div>
