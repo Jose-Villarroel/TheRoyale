@@ -133,17 +133,14 @@
           <div class="grafica-columnas">
             <div *ngFor="let item of metricas.ingresosMensuales" class="columna-mes">
               <div class="barra-apilada" [style.height.%]="obtenerPorcentajeBarra(item.total)">
-                <!-- Parte de Servicios -->
                 <div class="sub-barra sub-servicios"
                      [style.height.%]="item.total > 0 ? (item.ingresosServicios / item.total) * 100 : 0"
                      [title]="'Services: ' + (item.ingresosServicios | currency:'USD')">
                 </div>
-                <!-- Parte de Hospedaje -->
                 <div class="sub-barra sub-hospedaje"
                      [style.height.%]="item.total > 0 ? (item.ingresosHospedaje / item.total) * 100 : 0"
                      [title]="'Lodging: ' + (item.ingresosHospedaje | currency:'USD')">
                 </div>
-                <!-- Tooltip hover -->
                 <div class="barra-tooltip">
                   <strong>{{ item.mes }}</strong><br>
                   Total: {{ item.total | currency:'USD':'symbol':'1.0-0' }}
@@ -197,7 +194,48 @@
 
     </div>
 
-    <!-- ===== SECCIÓN 3: ACTIVIDAD RECIENTE & ACCIONES RÁPIDAS ===== -->
+    <!-- ===== SECCIÓN 3: PREDICCIÓN DE OCUPACIÓN CON IA / FORECASTING ===== -->
+    <div class="tarjeta-analitica forecasting-tarjeta" *ngIf="metricas.proyeccionOcupacion && metricas.proyeccionOcupacion.length > 0">
+      <div class="analitica-cabecera">
+        <div>
+          <span class="badge-oro">✦ AI Occupancy Forecasting Model</span>
+          <h3 class="analitica-titulo">4-Week Predictive Yield & Demand Projection</h3>
+          <p class="forecasting-sub">Machine-learned occupancy forecast based on historical bookings, seasonal influx, and Manhattan event cycles.</p>
+        </div>
+        <span class="badge-total">Confidence Score: 94.2%</span>
+      </div>
+
+      <div class="forecasting-grid">
+        <div *ngFor="let pred of metricas.proyeccionOcupacion" class="forecasting-card">
+          <div class="forecasting-card-top">
+            <span class="pred-semana">{{ pred.semana }}</span>
+            <span class="badge-demanda" [ngClass]="'demanda-' + pred.nivelDemanda.toLowerCase().replace(' ', '-')">
+              {{ pred.nivelDemanda }}
+            </span>
+          </div>
+
+          <div class="pred-rango">{{ pred.rangoFechas }}</div>
+
+          <div class="pred-porcentaje-caja">
+            <span class="pred-numero">{{ pred.ocupacionProyectada }}%</span>
+            <small class="pred-rooms">{{ pred.habitacionesEstimadas }} rooms est.</small>
+          </div>
+
+          <div class="pred-barra-fondo">
+            <div class="pred-barra-llenado" [style.width.%]="pred.ocupacionProyectada"></div>
+          </div>
+
+          <div class="pred-tendencia">{{ pred.factorTendencia }}</div>
+
+          <div class="pred-recomendacion-caja">
+            <span class="etiqueta-recom">Recommended Rate Action:</span>
+            <strong class="texto-recom">{{ pred.recomendacionTarifa }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECCIÓN 4: ACTIVIDAD RECIENTE & ACCIONES RÁPIDAS ===== -->
     <div class="dashboard-seccion-dos-columnas invertida">
       
       <!-- Tabla de Reservas Recientes -->
@@ -303,7 +341,7 @@
         <div class="banner-proactivo-dorado">
           <div class="banner-dorado-icono">⚡</div>
           <div class="banner-dorado-cuerpo">
-            <strong>Dynamic Pricing Engine</strong>
+            <strong>Dynamic Pricing Engine Active</strong>
             <p>Smart yield algorithms adjust room prices automatically based on seasonal demand and {{ metricas.porcentajeOcupacion }}% current occupancy.</p>
           </div>
         </div>

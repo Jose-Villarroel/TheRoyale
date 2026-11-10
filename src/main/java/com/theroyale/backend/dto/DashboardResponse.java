@@ -21,7 +21,8 @@ public record DashboardResponse(
         List<OcupacionTipoDTO> ocupacionPorTipo,
         List<IngresoMensualDTO> ingresosMensuales,
         Map<String, Long> habitacionesPorEstado,
-        List<ActividadRecienteDTO> actividadReciente
+        List<ActividadRecienteDTO> actividadReciente,
+        List<PrediccionOcupacionDTO> proyeccionOcupacion
 ) {
     public record OcupacionTipoDTO(
             Long tipoId,
@@ -49,5 +50,15 @@ public record DashboardResponse(
             String estado,
             BigDecimal montoTotal,
             String fechaCreacion
+    ) {}
+
+    public record PrediccionOcupacionDTO(
+            String semana,
+            String rangoFechas,
+            double ocupacionProyectada,
+            int habitacionesEstimadas,
+            String factorTendencia,
+            String nivelDemanda,
+            String recomendacionTarifa
     ) {}
 }

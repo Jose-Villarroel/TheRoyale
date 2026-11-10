@@ -26,6 +26,16 @@ export interface ActividadReciente {
   fechaCreacion: string;
 }
 
+export interface PrediccionOcupacion {
+  semana: string;
+  rangoFechas: string;
+  ocupacionProyectada: number;
+  habitacionesEstimadas: number;
+  factorTendencia: string;
+  nivelDemanda: string;
+  recomendacionTarifa: string;
+}
+
 export interface DashboardMetricas {
   porcentajeOcupacion: number;
   habitacionesOcupadas: number;
@@ -42,4 +52,5 @@ export interface DashboardMetricas {
   ingresosMensuales: IngresoMensual[];
   habitacionesPorEstado: Record<string, number>;
   actividadReciente: ActividadReciente[];
+  proyeccionOcupacion?: PrediccionOcupacion[];
 }

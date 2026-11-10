@@ -703,3 +703,146 @@
     }
   }
 }
+
+
+/* ===== Forecasting & Predictive Model ===== */
+.forecasting-tarjeta {
+  margin-bottom: 2.5rem;
+  border-top: 3px solid var(--color-dorado);
+}
+
+.forecasting-sub {
+  font-size: 0.85rem;
+  color: var(--color-texto-etiqueta);
+  margin-top: 0.25rem;
+}
+
+.forecasting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.forecasting-card {
+  background-color: var(--color-off-blanco);
+  border: 1px solid #ebebeb;
+  border-radius: 2px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-dorado);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.forecasting-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.pred-semana {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-oscuro);
+}
+
+.badge-demanda {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+
+  &.demanda-very-high {
+    background-color: #fdf0ed;
+    color: #b52a1d;
+    border: 1px solid #f7cfc8;
+  }
+  &.demanda-high {
+    background-color: #faf3e6;
+    color: #8d6212;
+    border: 1px solid #f0dcaf;
+  }
+  &.demanda-moderate {
+    background-color: #ecf7ed;
+    color: #1b7a37;
+    border: 1px solid #cce8cf;
+  }
+}
+
+.pred-rango {
+  font-size: 0.75rem;
+  color: var(--color-texto-etiqueta);
+  margin-bottom: 0.85rem;
+}
+
+.pred-porcentaje-caja {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.pred-numero {
+  font-family: var(--fuente-titulos);
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--color-oscuro);
+  line-height: 1;
+}
+
+.pred-rooms {
+  font-size: 0.78rem;
+  color: var(--color-texto-etiqueta);
+}
+
+.pred-barra-fondo {
+  width: 100%;
+  height: 6px;
+  background-color: #eaeaea;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.pred-barra-llenado {
+  height: 100%;
+  background: linear-gradient(90deg, #c6a15b, #dbbf7f);
+  border-radius: 3px;
+}
+
+.pred-tendencia {
+  font-size: 0.74rem;
+  color: #555;
+  margin-bottom: 0.85rem;
+  font-weight: 500;
+}
+
+.pred-recomendacion-caja {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+}
+
+.etiqueta-recom {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+  letter-spacing: 0.04em;
+}
+
+.texto-recom {
+  font-size: 0.82rem;
+  color: var(--color-dorado-hover);
+  margin-top: 0.15rem;
+}
