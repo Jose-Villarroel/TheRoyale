@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit {
         const destinos: Record<string, string> = {
           CLIENTE: '/profile',
           OPERADOR: '/operator/reservas',
-          ADMIN: '/admin/reservas'
+          ADMIN: '/admin/dashboard'
         };
         this.router.navigate([destinos[usuario.tipo] ?? '/']);
       },

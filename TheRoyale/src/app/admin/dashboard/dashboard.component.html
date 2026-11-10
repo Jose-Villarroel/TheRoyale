@@ -1,0 +1,317 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  titulo="Executive Dashboard"
+  subtitulo="Real-time occupancy, revenue streams, room inventory and guest logistics for The Royale.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido dashboard-contenedor">
+  <app-nav-admin></app-nav-admin>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+  <!-- Encabezado del Dashboard -->
+  <div class="dashboard-header">
+    <div class="dashboard-titulo-bloque">
+      <p class="eyebrow">Real-Time Intelligence · The Royale Manhattan</p>
+      <h2 class="dashboard-subtitulo">Overview & Operational Analytics</h2>
+      <p class="dashboard-fecha">Last updated: {{ fechaActual | date:'EEEE, MMMM d, y · HH:mm' }}</p>
+    </div>
+    <div class="dashboard-acciones-top">
+      <button (click)="cargarMetricas()" class="btn-refrescar" title="Refresh analytics">
+        ↻ Refresh Data
+      </button>
+      <a routerLink="/book" class="btn-dorado">+ New Reservation</a>
+    </div>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="cargando" class="cargando-contenedor">
+    <div class="spinner-dorado"></div>
+    <p>Loading real-time hotel analytics...</p>
+  </div>
+
+  <!-- Contenido principal una vez cargado -->
+  <div *ngIf="!cargando && metricas" class="dashboard-grid-principal">
+
+    <!-- ===== SECCIÓN 1: KPI CARDS ===== -->
+    <div class="kpi-grid">
+      
+      <!-- KPI 1: Ocupación Actual -->
+      <div class="kpi-tarjeta">
+        <div class="kpi-cabecera">
+          <span class="kpi-icono">🏨</span>
+          <span class="kpi-etiqueta">Occupancy Rate</span>
+        </div>
+        <div class="kpi-valor-grande">
+          {{ metricas.porcentajeOcupacion }}%
+        </div>
+        <div class="kpi-barra-progreso">
+          <div class="kpi-progreso-llenado" [style.width.%]="metricas.porcentajeOcupacion"></div>
+        </div>
+        <div class="kpi-pie">
+          <span class="destacado-oro">{{ metricas.habitacionesOcupadas }}</span> of {{ metricas.totalHabitaciones }} rooms occupied
+        </div>
+      </div>
+
+      <!-- KPI 2: Llegadas Hoy (Check-ins) -->
+      <div class="kpi-tarjeta">
+        <div class="kpi-cabecera">
+          <span class="kpi-icono">🛎️</span>
+          <span class="kpi-etiqueta">Today's Arrivals</span>
+        </div>
+        <div class="kpi-valor-grande">
+          {{ metricas.llegadasHoy }}
+        </div>
+        <div class="kpi-badge-estatus badge-oro">
+          Check-ins expected today
+        </div>
+        <div class="kpi-pie">
+          Awaiting arrival & room allocation
+        </div>
+      </div>
+
+      <!-- KPI 3: Salidas Hoy (Check-outs) -->
+      <div class="kpi-tarjeta">
+        <div class="kpi-cabecera">
+          <span class="kpi-icono">🚪</span>
+          <span class="kpi-etiqueta">Today's Departures</span>
+        </div>
+        <div class="kpi-valor-grande">
+          {{ metricas.salidasHoy }}
+        </div>
+        <div class="kpi-badge-estatus badge-gris">
+          Check-outs scheduled
+        </div>
+        <div class="kpi-pie">
+          Pending final balance & housekeeping
+        </div>
+      </div>
+
+      <!-- KPI 4: Ingresos del Mes -->
+      <div class="kpi-tarjeta">
+        <div class="kpi-cabecera">
+          <span class="kpi-icono">💎</span>
+          <span class="kpi-etiqueta">Month Revenue</span>
+        </div>
+        <div class="kpi-valor-grande">
+          {{ metricas.ingresosMesActual | currency:'USD':'symbol':'1.0-0' }}
+        </div>
+        <div class="kpi-badge-estatus badge-verde">
+          Total: {{ metricas.ingresosTotales | currency:'USD':'symbol':'1.0-0' }}
+        </div>
+        <div class="kpi-pie">
+          Rooms & exclusive guest services
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SECCIÓN 2: GRÁFICAS Y DISTRIBUCIONES ===== -->
+    <div class="dashboard-seccion-dos-columnas">
+      
+      <!-- Gráfica de Ingresos Mensuales -->
+      <div class="tarjeta-analitica">
+        <div class="analitica-cabecera">
+          <div>
+            <p class="eyebrow">Financial Flow</p>
+            <h3 class="analitica-titulo">Revenue Trend (Last 6 Months)</h3>
+          </div>
+          <div class="analitica-leyenda">
+            <span class="leyenda-item"><span class="punto-color punto-oro"></span> Lodging</span>
+            <span class="leyenda-item"><span class="punto-color punto-champagne"></span> Services</span>
+          </div>
+        </div>
+
+        <div class="grafica-barras-contenedor">
+          <div class="grafica-barras-eje-y">
+            <span>{{ maxIngresoMensual | currency:'USD':'symbol':'1.0-0' }}</span>
+            <span>{{ (maxIngresoMensual / 2) | currency:'USD':'symbol':'1.0-0' }}</span>
+            <span>$0</span>
+          </div>
+
+          <div class="grafica-columnas">
+            <div *ngFor="let item of metricas.ingresosMensuales" class="columna-mes">
+              <div class="barra-apilada" [style.height.%]="obtenerPorcentajeBarra(item.total)">
+                <!-- Parte de Servicios -->
+                <div class="sub-barra sub-servicios"
+                     [style.height.%]="item.total > 0 ? (item.ingresosServicios / item.total) * 100 : 0"
+                     [title]="'Services: ' + (item.ingresosServicios | currency:'USD')">
+                </div>
+                <!-- Parte de Hospedaje -->
+                <div class="sub-barra sub-hospedaje"
+                     [style.height.%]="item.total > 0 ? (item.ingresosHospedaje / item.total) * 100 : 0"
+                     [title]="'Lodging: ' + (item.ingresosHospedaje | currency:'USD')">
+                </div>
+                <!-- Tooltip hover -->
+                <div class="barra-tooltip">
+                  <strong>{{ item.mes }}</strong><br>
+                  Total: {{ item.total | currency:'USD':'symbol':'1.0-0' }}
+                </div>
+              </div>
+              <span class="etiqueta-mes">{{ item.mes }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distribución por Tipo de Habitación & Estado de Inventario -->
+      <div class="tarjeta-analitica">
+        <div class="analitica-cabecera">
+          <div>
+            <p class="eyebrow">Room Allocation</p>
+            <h3 class="analitica-titulo">Occupancy by Category</h3>
+          </div>
+          <span class="badge-total">{{ metricas.totalHabitaciones }} Total Rooms</span>
+        </div>
+
+        <div class="lista-categorias-ocupacion">
+          <div *ngFor="let tipo of metricas.ocupacionPorTipo" class="categoria-fila">
+            <div class="categoria-info">
+              <span class="categoria-nombre">{{ tipo.tipoNombre }}</span>
+              <span class="categoria-ratio">{{ tipo.ocupadas }} / {{ tipo.total }} occupied</span>
+            </div>
+            <div class="categoria-barra-fondo">
+              <div class="categoria-barra-progreso" [style.width.%]="tipo.porcentaje"></div>
+            </div>
+            <div class="categoria-porcentaje">{{ tipo.porcentaje }}%</div>
+          </div>
+        </div>
+
+        <!-- Inventario global rápido -->
+        <div class="inventario-resumen">
+          <div class="inv-item">
+            <span class="inv-numero">{{ metricas.habitacionesDisponibles }}</span>
+            <span class="inv-label">Available</span>
+          </div>
+          <div class="inv-item">
+            <span class="inv-numero">{{ metricas.habitacionesOcupadas }}</span>
+            <span class="inv-label">Occupied</span>
+          </div>
+          <div class="inv-item">
+            <span class="inv-numero">{{ metricas.habitacionesMantenimiento }}</span>
+            <span class="inv-label">Maintenance</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SECCIÓN 3: ACTIVIDAD RECIENTE & ACCIONES RÁPIDAS ===== -->
+    <div class="dashboard-seccion-dos-columnas invertida">
+      
+      <!-- Tabla de Reservas Recientes -->
+      <div class="tarjeta-analitica tabla-contenedor">
+        <div class="analitica-cabecera">
+          <div>
+            <p class="eyebrow">Live Transactions</p>
+            <h3 class="analitica-titulo">Recent Bookings & Activity</h3>
+          </div>
+          <a routerLink="/admin/reservas" class="enlace-subrayado">View all reservations →</a>
+        </div>
+
+        <div class="tabla-scroll">
+          <table class="tabla-dashboard">
+            <thead>
+              <tr>
+                <th>Booking #</th>
+                <th>Guest</th>
+                <th>Room</th>
+                <th>Dates</th>
+                <th>Status</th>
+                <th>Est. Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of metricas.actividadReciente">
+                <td class="reserva-id">#{{ item.reservaId }}</td>
+                <td class="cliente-celda">
+                  <span class="cliente-nombre">{{ item.clienteNombreCompleto }}</span>
+                  <span class="cliente-fecha-creacion">{{ item.fechaCreacion }}</span>
+                </td>
+                <td>
+                  <span class="room-pill">Room {{ item.habitacionNumero }}</span>
+                  <small class="room-sub">{{ item.tipoHabitacion }}</small>
+                </td>
+                <td class="fechas-celda">
+                  {{ item.fechaInicio | date:'MMM d' }} – {{ item.fechaFin | date:'MMM d' }}
+                </td>
+                <td>
+                  <span class="badge-status" [ngClass]="claseEstado(item.estado)">
+                    {{ item.estado }}
+                  </span>
+                </td>
+                <td class="monto-celda">
+                  {{ item.montoTotal | currency:'USD':'symbol':'1.0-0' }}
+                </td>
+                <td>
+                  <a [routerLink]="['/admin/reservas', item.reservaId]" class="btn-gestionar-mini">
+                    Inspect
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Quick Executive Actions -->
+      <div class="tarjeta-analitica tarjeta-acciones">
+        <div class="analitica-cabecera">
+          <div>
+            <p class="eyebrow">Quick Tools</p>
+            <h3 class="analitica-titulo">Management Shortcuts</h3>
+          </div>
+        </div>
+
+        <div class="acciones-grid">
+          <a routerLink="/admin/habitaciones/nuevo" class="accion-card">
+            <span class="accion-icon">🚪</span>
+            <div class="accion-textos">
+              <strong>Add Room</strong>
+              <small>Register new suite or room</small>
+            </div>
+          </a>
+
+          <a routerLink="/admin/servicios/nuevo" class="accion-card">
+            <span class="accion-icon">🛎️</span>
+            <div class="accion-textos">
+              <strong>New Service</strong>
+              <small>Add spa, dining or business item</small>
+            </div>
+          </a>
+
+          <a routerLink="/admin/clientes" class="accion-card">
+            <span class="accion-icon">👥</span>
+            <div class="accion-textos">
+              <strong>Guest Directory</strong>
+              <small>{{ metricas.totalClientes }} verified accounts</small>
+            </div>
+          </a>
+
+          <a routerLink="/admin/operadores" class="accion-card">
+            <span class="accion-icon">👔</span>
+            <div class="accion-textos">
+              <strong>Staff & Operators</strong>
+              <small>Manage front desk personnel</small>
+            </div>
+          </a>
+        </div>
+
+        <!-- Banner Proactivo de Precios Dinámicos -->
+        <div class="banner-proactivo-dorado">
+          <div class="banner-dorado-icono">⚡</div>
+          <div class="banner-dorado-cuerpo">
+            <strong>Dynamic Pricing Engine</strong>
+            <p>Smart yield algorithms adjust room prices automatically based on seasonal demand and {{ metricas.porcentajeOcupacion }}% current occupancy.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

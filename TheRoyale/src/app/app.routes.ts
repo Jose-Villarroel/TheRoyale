@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { LandingComponent } from './landing/landing.component';
+import { AdminDashboardComponent } from './admin/dashboard/dashboard.component';
 import { TiposHabitacionListaComponent } from './admin/tipos-habitacion-lista/tipos-habitacion-lista.component';
 import { TiposHabitacionFormularioComponent } from './admin/tipos-habitacion-formulario/tipos-habitacion-formulario.component';
 import { RoomsListaComponent } from './rooms/rooms-lista/rooms-lista.component';
@@ -44,7 +45,10 @@ export const routes: Routes = [
   { path: 'services/table', component: ServiciosTablaComponent },
   { path: 'services/cards', component: ServiciosTarjetasComponent },
   { path: 'services/:id', component: ServicioDetalleComponent },
-  // ===== Panel de administración: solo administradores (un operador no entra) =====
+
+  // ===== Panel de administración: solo administradores =====
+  { path: 'admin', redirectTo: 'admin/dashboard', pathMatch: 'full' },
+  { path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [adminGuard] },
   { path: 'admin/reservas', component: ReservasListaComponent, canActivate: [adminGuard] },
   { path: 'admin/reservas/:id', component: ReservaDetalleComponent, canActivate: [adminGuard] },
   { path: 'admin/habitaciones', component: HabitacionesListaComponent, canActivate: [adminGuard] },
@@ -63,7 +67,7 @@ export const routes: Routes = [
   { path: 'admin/operadores/nuevo', component: OperadoresFormularioComponent, canActivate: [adminGuard] },
   { path: 'admin/operadores/:id/editar', component: OperadoresFormularioComponent, canActivate: [adminGuard] },
 
-  // ===== Portal del operador: solo operadores (un admin no entra). Todos inician sesión en /login =====
+  // ===== Portal del operador: solo operadores =====
   { path: 'operator/reservas', component: ReservasOperadorComponent, canActivate: [operadorGuard] },
   { path: 'operator/reservas/:id', component: ReservaDetalleOperadorComponent, canActivate: [operadorGuard] },
   { path: 'operator/buscar-habitacion', component: BuscarHabitacionComponent, canActivate: [operadorGuard] },
