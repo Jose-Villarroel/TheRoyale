@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConciergeService } from '../../services/concierge.service';
 import { MensajeChat } from '../../models/concierge.model';
+import { ModalPagoStripeComponent } from '../modal-pago-stripe/modal-pago-stripe.component';
 
 @Component({
   selector: 'app-chatbot-flotante',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalPagoStripeComponent],
   templateUrl: './chatbot-flotante.component.html',
   styleUrls: ['./chatbot-flotante.component.scss']
 })
@@ -22,6 +23,9 @@ export class ChatbotFlotanteComponent implements OnInit, AfterViewChecked {
   textoInput = '';
   cargandoRespuesta = false;
   necesitaScroll = false;
+  mostrarStripeModal = false;
+  stripeMonto = 100;
+  stripeReservaId = 1;
 
   mensajes: MensajeChat[] = [];
 
@@ -30,7 +34,7 @@ export class ChatbotFlotanteComponent implements OnInit, AfterViewChecked {
       remitente: 'concierge',
       texto: 'Welcome to The Royale. I am your personal AI Concierge. How may I assist you with accommodations, dining reservations, or crafting your bespoke Manhattan itinerary today?',
       hora: this.obtenerHoraActual(),
-      sugerencias: ['Suite Recommendations', 'Dining & Menus', 'Spa Treatments', 'Plan an Itinerary']
+      sugerencias: ['Suite Recommendations', 'Dining & Menus', 'Pay with Stripe 💳', 'Plan an Itinerary']
     });
   }
 
@@ -56,7 +60,15 @@ export class ChatbotFlotanteComponent implements OnInit, AfterViewChecked {
   }
 
   seleccionarSugerencia(sugerencia: string): void {
+    if (sugerencia.includes('Stripe')) {
+      this.mostrarStripeModal = true;
+      return;
+    }
     this.procesarMensajeUsuario(sugerencia);
+  }
+
+  abrirStripe(): void {
+    this.mostrarStripeModal = true;
   }
 
   navegarAccion(ruta?: string): void {

@@ -26,6 +26,7 @@ import { MisReservasComponent } from './reservas/mis-reservas/mis-reservas.compo
 import { ReservasOperadorComponent } from './operador/reservas/reservas-operador.component';
 import { ReservaDetalleOperadorComponent } from './operador/reserva-detalle/reserva-detalle-operador.component';
 import { ConciergePlannerComponent } from './concierge/concierge-planner.component';
+import { CheckoutComponent } from './checkout/checkout.component';
 import { clienteGuard } from './guards/cliente.guard';
 import { operadorGuard } from './guards/operador.guard';
 import { adminGuard } from './guards/admin.guard';
@@ -47,6 +48,10 @@ export const routes: Routes = [
 
   // ===== Plan de Visita con IA (Concierge) =====
   { path: 'concierge', component: ConciergePlannerComponent },
+
+  // ===== Pasarela de Pago Stripe =====
+  { path: 'payment', component: CheckoutComponent },
+  { path: 'checkout', redirectTo: 'payment', pathMatch: 'full' },
 
   // ===== Panel de administración: solo administradores =====
   { path: 'admin', redirectTo: 'admin/dashboard', pathMatch: 'full' },

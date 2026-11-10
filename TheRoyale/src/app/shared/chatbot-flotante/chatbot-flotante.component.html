@@ -19,6 +19,7 @@
         <strong>The Royale AI Concierge</strong>
         <small class="status-activo">● Available 24/7</small>
       </div>
+      <button (click)="abrirStripe()" class="btn-chat-stripe" title="Pay with Stripe">💳 Pay</button>
       <button (click)="toggleChat()" class="btn-cerrar-mini" aria-label="Close chat">✕</button>
     </div>
 
@@ -74,5 +75,12 @@
     </div>
 
   </div>
+
+  <app-modal-pago-stripe
+    [visible]="mostrarStripeModal"
+    [reservaId]="stripeReservaId"
+    [monto]="stripeMonto"
+    (cerrar)="mostrarStripeModal = false">
+  </app-modal-pago-stripe>
 
 </div>

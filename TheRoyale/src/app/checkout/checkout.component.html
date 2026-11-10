@@ -1,0 +1,119 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  eyebrow="04 — Payments & Billing"
+  titulo="Secure Online Payment"
+  subtitulo="Settle reservation deposits, room balances, and bespoke incidentals via Stripe 256-bit encrypted gateway.">
+</app-hero-interior>
+
+<main class="contenedor checkout-seccion">
+  <div class="checkout-grid">
+    
+    <!-- Tarjeta de Detalles de Pago -->
+    <div class="checkout-card">
+      <div class="card-header">
+        <span class="badge-seguro">🔒 SSL 256-Bit Encrypted</span>
+        <h2 class="card-titulo">Reservation Payment Portal</h2>
+        <p class="card-desc">Enter your Reservation ID to settle your balance directly with our secure credit card processor.</p>
+      </div>
+
+      <div class="card-body">
+        <div class="form-grupo">
+          <label for="reservaId">Reservation ID</label>
+          <div class="input-con-icono">
+            <span class="icono-prefijo">#</span>
+            <input type="number" id="reservaId" [(ngModel)]="reservaId" min="1" class="input-lujo" />
+          </div>
+          <small class="nota-campo">Default is sample reservation #1 (or your confirmed booking number).</small>
+        </div>
+
+        <div class="form-grupo">
+          <label for="monto">Amount to Pay (USD)</label>
+          <div class="input-con-icono">
+            <span class="icono-prefijo">$</span>
+            <input type="number" id="monto" [(ngModel)]="monto" min="10" step="10" class="input-lujo" />
+          </div>
+        </div>
+
+        <div class="resumen-cobro">
+          <div class="fila-resumen">
+            <span>Service / Concept</span>
+            <strong>{{ concepto }}</strong>
+          </div>
+          <div class="fila-resumen">
+            <span>Payment Processor</span>
+            <strong>Stripe Payments Inc.</strong>
+          </div>
+          <div class="fila-resumen total">
+            <span>Total Charge</span>
+            <strong class="precio-oro">{{ monto | currency:'USD' }}</strong>
+          </div>
+        </div>
+
+        @if (pagoRealizado) {
+          <div class="alerta-pago-exitoso">
+            <span class="check-icono">✓</span>
+            <div>
+              <strong>Payment Successful!</strong>
+              <p>Your payment of {{ monto | currency:'USD' }} for Reservation #{{ reservaId }} has been processed and applied via Stripe.</p>
+            </div>
+          </div>
+        } @else {
+          <button type="button" (click)="abrirStripe()" class="btn-dorado btn-bloque">
+            💳 Proceed to Stripe Checkout
+          </button>
+        }
+
+        <div class="logos-seguridad">
+          <span>Accepted: Visa · Mastercard · American Express · Apple Pay</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta Informativa de Seguridad -->
+    <div class="info-seguridad-card">
+      <h3 class="info-titulo">The Royale Guarantee</h3>
+      <p class="info-parrafo">
+        All financial transactions are handled with end-to-end tokenization adhering to PCI-DSS Level 1 specifications. No sensitive card numbers are stored on our servers.
+      </p>
+
+      <div class="ventajas-lista">
+        <div class="ventaja-item">
+          <span class="ventaja-icono">⚡</span>
+          <div>
+            <strong>Instant Settlement</strong>
+            <p>Immediate room key availability and digital receipt confirmation.</p>
+          </div>
+        </div>
+        <div class="ventaja-item">
+          <span class="ventaja-icono">🛡️</span>
+          <div>
+            <strong>Zero Fraud Liability</strong>
+            <p>Full 3D-Secure 2 authentication protocol protection.</p>
+          </div>
+        </div>
+        <div class="ventaja-item">
+          <span class="ventaja-icono">🛎️</span>
+          <div>
+            <strong>24/7 Concierge Support</strong>
+            <p>Questions regarding your account statement? Contact our front desk anytime.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Modal Stripe Embebido -->
+<app-modal-pago-stripe
+  [visible]="mostrarModalStripe"
+  [reservaId]="reservaId"
+  [monto]="monto"
+  [descripcion]="concepto + ' (Reservation #' + reservaId + ')'"
+  (cerrar)="mostrarModalStripe = false"
+  (pagoExitoso)="onPagoExitoso()">
+</app-modal-pago-stripe>
+
+<app-pie-pagina></app-pie-pagina>

@@ -4,16 +4,35 @@
       <div>
         <p class="eyebrow">Virtual Tour 360°</p>
         <h2 class="visor-titulo">Interactive 3D Room Experience</h2>
-        <p class="visor-sub">Drag to explore the layout, architecture, and luxury finishes of {{ tipoNombre }}.</p>
+        <p class="visor-sub">Drag to explore the architecture, luxury materials, and spatial layout of {{ tipoNombre }}.</p>
       </div>
 
-      <div class="visor-controles">
-        <button (click)="toggleAutoRotacion()" class="btn-control" [class.activo]="autoRotacion">
-          {{ autoRotacion ? '⏸ Pause Tour' : '▶ Auto-Rotate' }}
-        </button>
-        <button (click)="togglePantallaCompleta()" class="btn-control">
-          {{ pantallaCompleta ? '✕ Exit Fullscreen' : '⛶ Fullscreen' }}
-        </button>
+      <div class="visor-acciones-superiores">
+        <!-- Selector de Ángulos / Ambientes -->
+        <div class="selector-ambientes">
+          @for (v of vistas; track v.id) {
+            <button type="button"
+                    (click)="cambiarVista(v.id)"
+                    class="btn-ambiente"
+                    [class.activo]="vistaActivaId === v.id">
+              <span>{{ v.icono }}</span>
+              <span>{{ v.nombre }}</span>
+            </button>
+          }
+        </div>
+
+        <!-- Controles de pantalla y rotación -->
+        <div class="visor-controles">
+          <button type="button" (click)="toggleAutoRotacion()" class="btn-control" [class.activo]="autoRotacion" title="Toggle 360 Auto-Rotation">
+            {{ autoRotacion ? '⏸ Pause' : '▶ 360° Tour' }}
+          </button>
+          <button type="button" (click)="zoomIn()" class="btn-control" title="Zoom in">＋</button>
+          <button type="button" (click)="zoomOut()" class="btn-control" title="Zoom out">－</button>
+          <button type="button" (click)="reiniciarVista()" class="btn-control" title="Reset Camera">↺</button>
+          <button type="button" (click)="togglePantallaCompleta()" class="btn-control" title="Fullscreen">
+            {{ pantallaCompleta ? '✕ Exit' : '⛶ Fullscreen' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -22,40 +41,71 @@
          (mousedown)="onMouseDown($event)"
          (mousemove)="onMouseMove($event)"
          (mouseup)="onMouseUp()"
-         (mouseleave)="onMouseUp()">
+         (mouseleave)="onMouseUp()"
+         (touchstart)="onTouchStart($event)"
+         (touchmove)="onTouchMove($event)"
+         (touchend)="onTouchEnd()">
       
-      <!-- Fondo panorámico 3D rotativo -->
+      <!-- Fondo panorámico 3D rotativo interactivo -->
       <div class="panorama-capa"
-           [style.backgroundPosition]="anguloX + '% ' + (50 + anguloY) + '%'">
+           [style.backgroundImage]="'url(' + imagenActual + ')'"
+           [style.backgroundPosition]="anguloX + '% ' + (50 + anguloY) + '%'"
+           [style.transform]="'scale(' + zoomNivel + ')'">
         <div class="overlay-gradiente-3d"></div>
+        <div class="vignette-cinematica"></div>
+      </div>
+
+      <!-- Brújula / HUD Compass 360° -->
+      <div class="compass-hud">
+        <div class="compass-dial" [style.transform]="'rotate(' + headingCompass + 'deg)'">
+          <span class="compass-n">N</span>
+          <span class="compass-e">E</span>
+          <span class="compass-s">S</span>
+          <span class="compass-w">W</span>
+        </div>
+        <span class="compass-grados">{{ headingCompass }}°</span>
       </div>
 
       <!-- Hotspots / Puntos de interés interactivos -->
       <div class="hotspots-capa">
-        <div *ngFor="let p of puntosInteres"
-             class="hotspot-item"
-             [style.left.%]="(p.x + (anguloX * 0.15)) % 100"
-             [style.top.%]="p.y + (anguloY * 0.3)">
-          
-          <button (click)="seleccionarPunto(p.id)" class="hotspot-pin" [class.activo]="puntoActivo === p.id">
-            <span class="pin-pulso"></span>
-            <span class="pin-icono">✦</span>
-          </button>
+        @for (p of puntosFiltrados; track p.id) {
+          <div class="hotspot-item"
+               [style.left.%]="((p.x + (anguloX * 0.28)) % 100 + 100) % 100"
+               [style.top.%]="p.y + (anguloY * 0.25)">
+            
+            <button type="button"
+                    (click)="seleccionarPunto(p.id)"
+                    class="hotspot-pin"
+                    [class.activo]="puntoActivo === p.id"
+                    [attr.aria-label]="p.titulo">
+              <span class="pin-pulso"></span>
+              <span class="pin-icono">✦</span>
+            </button>
 
-          <div *ngIf="puntoActivo === p.id" class="hotspot-tooltip">
-            <strong>{{ p.titulo }}</strong>
-            <p>{{ p.desc }}</p>
+            @if (puntoActivo === p.id) {
+              <div class="hotspot-tooltip">
+                <div class="tooltip-header">
+                  <span class="tooltip-badge">ROYALE FINISH</span>
+                  <button type="button" class="tooltip-cerrar" (click)="puntoActivo = null; $event.stopPropagation()">✕</button>
+                </div>
+                <strong class="tooltip-titulo">{{ p.titulo }}</strong>
+                <p class="tooltip-desc">{{ p.desc }}</p>
+              </div>
+            }
           </div>
-        </div>
+        }
       </div>
 
       <!-- Overlay instructivo -->
       <div class="visor-instruccion">
-        <span>↔ Drag with mouse or swipe to rotate 360°</span>
+        <span>↔ Drag or swipe to pan 360° · Click ✦ to inspect finishes</span>
       </div>
 
+      <!-- Marca de agua de lujo -->
       <div class="watermark-royale">
-        The Royale 3D Tour · {{ tipoNombre }}
+        <span>The Royale 360° Experience</span>
+        <span class="separador">·</span>
+        <span>{{ tipoNombre }}</span>
       </div>
     </div>
 

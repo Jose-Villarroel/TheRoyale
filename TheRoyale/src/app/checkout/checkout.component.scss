@@ -1,0 +1,248 @@
+.checkout-seccion {
+  padding: 4rem 1.5rem 5rem;
+}
+
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.checkout-card {
+  background: #ffffff;
+  border: 1px solid rgba(198, 161, 91, 0.25);
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.card-header {
+  background: #1e1e1e;
+  color: white;
+  padding: 2rem 2.2rem;
+  border-bottom: 2px solid var(--color-dorado, #c6a15b);
+
+  .badge-seguro {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-dorado, #c6a15b);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-titulo {
+    font-family: var(--fuente-titulos, 'Cormorant Garamond', serif);
+    font-size: 1.8rem;
+    margin: 0.2rem 0;
+    font-weight: 400;
+  }
+
+  .card-desc {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+  }
+}
+
+.card-body {
+  padding: 2.2rem;
+}
+
+.form-grupo {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #4a4a4a;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.input-con-icono {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .icono-prefijo {
+    position: absolute;
+    left: 1rem;
+    color: var(--color-dorado, #c6a15b);
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .input-lujo {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.2rem;
+    border: 1px solid #dcd4c7;
+    border-radius: 2px;
+    font-size: 1rem;
+    background: #faf9f6;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-dorado, #c6a15b);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(198, 161, 91, 0.15);
+    }
+  }
+}
+
+.nota-campo {
+  display: block;
+  font-size: 0.75rem;
+  color: #8c827a;
+  margin-top: 0.35rem;
+}
+
+.resumen-cobro {
+  background: #f7f5f0;
+  border-radius: 3px;
+  padding: 1.25rem;
+  margin: 1.8rem 0;
+  border-left: 3px solid var(--color-dorado, #c6a15b);
+
+  .fila-resumen {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    font-size: 0.88rem;
+    color: #555;
+
+    &.total {
+      border-top: 1px solid #e0d8cc;
+      margin-top: 0.5rem;
+      padding-top: 0.75rem;
+      font-size: 1.1rem;
+      color: #1e1e1e;
+    }
+  }
+
+  .precio-oro {
+    color: #9e7b39;
+    font-weight: 700;
+  }
+}
+
+.btn-bloque {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.alerta-pago-exitoso {
+  background: #eaf6ee;
+  border: 1px solid #7bc691;
+  color: #1b5e20;
+  padding: 1.25rem;
+  border-radius: 3px;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+
+  .check-icono {
+    background: #2e7d32;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #2e7d32;
+  }
+}
+
+.logos-seguridad {
+  text-align: center;
+  margin-top: 1.25rem;
+  font-size: 0.75rem;
+  color: #8c827a;
+}
+
+/* Info Seguridad */
+.info-seguridad-card {
+  background: #1c1c1c;
+  color: white;
+  border-radius: 4px;
+  padding: 2.2rem;
+  border: 1px solid rgba(198, 161, 91, 0.3);
+
+  .info-titulo {
+    font-family: var(--fuente-titulos, 'Cormorant Garamond', serif);
+    font-size: 1.6rem;
+    color: var(--color-dorado, #c6a15b);
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    font-weight: 400;
+  }
+
+  .info-parrafo {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+}
+
+.ventajas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ventaja-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+
+  .ventaja-icono {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  strong {
+    display: block;
+    font-size: 0.95rem;
+    color: #f0e6d6;
+    margin-bottom: 0.2rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.45;
+  }
+}
