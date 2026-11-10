@@ -27,16 +27,16 @@
   <nav class="reservas-filtros" aria-label="Active or past reservations">
     <button type="button" class="btn-nav-admin"
             [class.btn-nav-admin-activo]="verActivas"
-            (click)="cambiarPestana(true)">Active</button>
+            id="mis-reservas-tab-activas" (click)="cambiarPestana(true)">Active</button>
     <button type="button" class="btn-nav-admin"
             [class.btn-nav-admin-activo]="!verActivas"
-            (click)="cambiarPestana(false)">History</button>
+            id="mis-reservas-tab-historial" (click)="cambiarPestana(false)">History</button>
   </nav>
 
   @if (cargando) {
     <p class="parrafo-cuerpo">Loading your reservations…</p>
   } @else {
-    <div class="tarjetas-admin-grid">
+    <div id="mis-reservas-grid" class="tarjetas-admin-grid">
       @for (reserva of reservas; track reserva.id) {
         <app-tarjeta-mi-reserva
           [reserva]="reserva"

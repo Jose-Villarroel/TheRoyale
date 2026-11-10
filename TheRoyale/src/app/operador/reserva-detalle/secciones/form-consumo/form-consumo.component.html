@@ -2,7 +2,7 @@
   <h3 class="operador-subtitulo">Charge a service</h3>
   <label>
     <span>Service</span>
-    <select formControlName="servicioId" class="operador-select">
+    <select id="consumo-servicio" formControlName="servicioId" class="operador-select">
       <option [ngValue]="null" disabled>Select a service…</option>
       @for (servicio of servicios(); track servicio.id) {
         <option [ngValue]="servicio.id">{{ servicio.nombre }} — {{ servicio.precio | currency:'USD' }}</option>
@@ -11,7 +11,7 @@
   </label>
   <label>
     <span>Quantity</span>
-    <input type="number" formControlName="cantidad" min="1" inputmode="numeric" class="operador-input">
+    <input type="number" id="consumo-cantidad" formControlName="cantidad" min="1" inputmode="numeric" class="operador-input">
   </label>
-  <button type="submit" class="btn-dorado" [disabled]="formulario().invalid">Add charge</button>
+  <button type="submit" id="consumo-agregar" class="btn-dorado" [disabled]="formulario().invalid">Add charge</button>
 </form>

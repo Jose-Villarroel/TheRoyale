@@ -2,19 +2,19 @@
   <h3 class="operador-subtitulo">Register payment</h3>
   <label>
     <span>Amount</span>
-    <input type="number" formControlName="monto" min="0.01" step="0.01" inputmode="decimal" class="operador-input">
+    <input type="number" id="pago-monto" formControlName="monto" min="0.01" step="0.01" inputmode="decimal" class="operador-input">
   </label>
   <label>
     <span>Method</span>
-    <select formControlName="metodoPago" class="operador-select">
+    <select id="pago-metodo" formControlName="metodoPago" class="operador-select">
       @for (metodo of metodosPago(); track metodo) {
         <option [value]="metodo">{{ metodo }}</option>
       }
     </select>
   </label>
   <div class="operador-acciones">
-    <button type="submit" class="btn-dorado" [disabled]="formulario().invalid">Register payment</button>
-    <button type="button" class="btn-contorno-oscuro btn-mini" (click)="pagarSaldo.emit()"
+    <button type="submit" id="pago-registrar" class="btn-dorado" [disabled]="formulario().invalid">Register payment</button>
+    <button type="button" id="pago-saldo-completo" class="btn-contorno-oscuro btn-mini" (click)="pagarSaldo.emit()"
             [disabled]="saldo() <= 0">Pay full balance</button>
   </div>
 </form>

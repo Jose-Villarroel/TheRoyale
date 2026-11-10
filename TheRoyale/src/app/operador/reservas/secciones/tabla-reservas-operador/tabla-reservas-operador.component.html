@@ -19,7 +19,7 @@
       </thead>
       <tbody>
         @for (reserva of reservas(); track reserva.id) {
-          <tr>
+          <tr [attr.id]="'operador-fila-' + reserva.id">
             <td class="col-num">{{ reserva.id }}</td>
             <td>
               <a [routerLink]="['/operator/reservas', reserva.id]" class="operador-celda-principal">
@@ -42,10 +42,10 @@
                 </span>
               </div>
             </td>
-            <td><span class="chip-estado" [attr.data-estado]="reserva.estado">{{ reserva.estado }}</span></td>
+            <td><span class="chip-estado" [attr.id]="'operador-estado-' + reserva.id" [attr.data-estado]="reserva.estado">{{ reserva.estado }}</span></td>
             <td class="col-acciones">
               <div class="operador-acciones">
-                <a [routerLink]="['/operator/reservas', reserva.id]" class="enlace-subrayado">Manage</a>
+                <a [routerLink]="['/operator/reservas', reserva.id]" [attr.id]="'operador-gestionar-' + reserva.id" class="enlace-subrayado">Manage</a>
               </div>
             </td>
           </tr>

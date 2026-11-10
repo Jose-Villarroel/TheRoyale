@@ -11,7 +11,7 @@
   <app-nav-operador></app-nav-operador>
   <app-alerta-error [mensaje]="error"></app-alerta-error>
   @if (mensaje) {
-    <p class="perfil-alerta perfil-alerta-ok" role="status">{{ mensaje }}</p>
+    <p id="operador-mensaje" class="perfil-alerta perfil-alerta-ok" role="status">{{ mensaje }}</p>
   }
 
   @if (reserva) {

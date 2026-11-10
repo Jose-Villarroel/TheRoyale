@@ -1,6 +1,6 @@
 <div class="operador-tarjeta-cabecera">
   <p class="eyebrow">Reservation</p>
-  <span class="chip-estado" [attr.data-estado]="reserva().estado">{{ reserva().estado }}</span>
+  <span id="reserva-estado-detalle" class="chip-estado" [attr.data-estado]="reserva().estado">{{ reserva().estado }}</span>
 </div>
 <dl class="operador-datos">
   <div><dt>Check-in</dt><dd>{{ reserva().fechaInicio | date:'fullDate' }}</dd></div>

@@ -19,7 +19,7 @@
       </thead>
       <tbody>
         @for (item of items(); track item.id) {
-          <tr>
+          <tr class="consumo-fila" [attr.id]="'consumo-fila-' + item.id">
             <td>
               <div class="operador-celda-principal">
                 <strong>{{ item.servicioNombre }}</strong>
@@ -33,7 +33,7 @@
               <div class="operador-servicio-total">
                 <strong>{{ item.total | currency:'USD' }}</strong>
                 @if (item.pagado) {
-                  <span class="operador-pagado">Paid</span>
+                  <span class="operador-pagado consumo-pagado">Paid</span>
                 }
               </div>
             </td>
