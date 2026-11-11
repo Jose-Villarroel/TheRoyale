@@ -1,0 +1,60 @@
+<section id="resenas-room" class="contenedor resenas-room" aria-labelledby="resenas-room-titulo">
+  <div class="room-disponibilidad-encabezado">
+    <p class="eyebrow">Guest Reviews</p>
+    <h2 id="resenas-room-titulo">What our guests say</h2>
+  </div>
+
+  @if (total() === 0) {
+    <p id="resenas-vacio" class="resenas-vacio">No reviews yet. Be the first guest to share your stay.</p>
+  } @else {
+    <div class="resenas-resumen">
+      <div class="resenas-resumen-promedio">
+        <strong id="resenas-promedio">{{ resumen()?.promedio | number:'1.1-1' }}</strong>
+        <app-estrellas [valor]="resumen()?.promedio ?? null" tamano="lg"></app-estrellas>
+        <span id="resenas-total">{{ total() }} {{ total() === 1 ? 'review' : 'reviews' }}</span>
+      </div>
+
+      <ul class="resenas-distribucion" aria-label="Rating distribution">
+        @for (nivel of niveles; track nivel) {
+          <li>
+            <span class="resenas-distribucion-nivel">{{ nivel }} ★</span>
+            <span class="resenas-barra" aria-hidden="true">
+              <span class="resenas-barra-relleno" [style.width.%]="porcentaje(nivel)"></span>
+            </span>
+            <span class="resenas-distribucion-cantidad">{{ cantidad(nivel) }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="resenas-lista">
+      @for (resena of resenasMostradas(); track resena.id) {
+        <article class="resena-item" [attr.id]="'resena-' + resena.id">
+          <header class="resena-item-encabezado">
+            <div>
+              <p class="resena-autor">{{ resena.clienteNombre }}</p>
+              <p class="resena-estadia">Stayed {{ resena.fechaInicioEstadia | date:'MMMM y' }}</p>
+            </div>
+            <app-estrellas [valor]="resena.calificacion" tamano="sm"></app-estrellas>
+          </header>
+          @if (resena.titulo) {
+            <h3 class="resena-titulo">{{ resena.titulo }}</h3>
+          }
+          <p class="resena-comentario">{{ resena.comentario }}</p>
+          <p class="resena-fecha">
+            {{ resena.fechaCreacion | date:'mediumDate' }}
+            @if (resena.fechaModificacion) {
+              <span class="resena-editada">· Edited</span>
+            }
+          </p>
+        </article>
+      }
+    </div>
+
+    @if (hayMas()) {
+      <button type="button" id="resenas-ver-todas" class="btn-nav-admin resenas-ver-todas" (click)="verTodas.set(true)">
+        Show all {{ resenas().length }} reviews
+      </button>
+    }
+  }
+</section>

@@ -123,6 +123,19 @@ class Cuenta {
   +cerrar(): void
 }
 
+class Resena {
+  -id: int
+  -calificacion: int {1..5}
+  -titulo: string [0..1] {max 100}
+  -comentario: string {10..1000}
+  -visible: boolean = true
+  -fechaCreacion: datetime
+  -fechaModificacion: datetime [0..1]
+  +editar(calificacion, titulo, comentario): void
+  +ocultar(): void
+  +mostrar(): void
+}
+
 class Pago {
   -id: int
   -monto: decimal
@@ -158,6 +171,9 @@ Reserva "1" *-- "1..*" ReservaHabitacion : incluye >
 Habitacion "1" -- "0..*" ReservaHabitacion : es reservada en >
 
 Reserva "1" *-- "1" Cuenta : tiene >
+Reserva "1" -- "0..1" Resena : es reseñada en >
+Cliente "1" -- "0..*" Resena : escribe >
+TipoHabitacion "1" -- "0..*" Resena : recibe >
 
 Cuenta "1" *-- "0..*" ItemConsumo : contiene >
 Cuenta "1" -- "0..*" Pago : recibe >
@@ -173,6 +189,7 @@ Administrador ..> Servicio : administra (CRUD)
 Administrador ..> Habitacion : administra (CRUD)
 Administrador ..> TipoHabitacion : administra
 Administrador ..> Imagen : administra
+Administrador ..> Resena : modera (ocultar / mostrar)
 
 Habitacion -- EstadoHabitacion
 Reserva -- EstadoReserva

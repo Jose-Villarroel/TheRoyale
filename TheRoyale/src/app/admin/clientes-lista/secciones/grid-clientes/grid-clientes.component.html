@@ -1,0 +1,7 @@
+<div class="tarjetas-admin-grid">
+  @for (cliente of clientes(); track cliente.id) {
+    <app-tarjeta-cliente [cliente]="cliente" (eliminar)="eliminar.emit($event)"></app-tarjeta-cliente>
+  } @empty {
+    <p class="parrafo-cuerpo">No clients yet.</p>
+  }
+</div>

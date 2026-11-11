@@ -1,5 +1,6 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,12 +38,14 @@ public class TipoHabitacion {
     // ===== Lado inverso de la relación: un tipo tiene muchas habitaciones =====
     // mappedBy = "tipoHabitacion" apunta al nombre EXACTO del campo en la clase Habitacion,
     // no al nombre de la columna. Este lado no es "dueño" de la relación, por eso no lleva @JoinColumn.
+    @JsonIgnore
     @OneToMany(mappedBy = "tipoHabitacion", orphanRemoval = false)
     @Builder.Default
     @ToString.Exclude
     private List<Habitacion> habitaciones = new ArrayList<>();
 
     // ===== Lado inverso de la relación: un tipo tiene muchas imágenes en su galería =====
+    @JsonIgnore
     @OneToMany(mappedBy = "tipoHabitacion", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude

@@ -1,5 +1,6 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -50,9 +51,17 @@ public class Reserva {
     private LocalDateTime fechaCreacion;
 
     // ===== Lado inverso: la cuenta asociada a esta reserva (relación 1 a 1) =====
+    @JsonIgnore
     @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Cuenta cuenta;
+
+    // ===== Lado inverso: la reseña que el huésped dejó de esta estadía (0 o 1) =====
+    // Sin cascade: ReservaService.eliminar la borra explícitamente antes que la reserva (RN-9).
+    @JsonIgnore
+    @OneToOne(mappedBy = "reserva")
+    @ToString.Exclude
+    private Resena resena;
 
     // Calculado (no se persiste: la entidad usa acceso por campo)
     public long getNoches() {

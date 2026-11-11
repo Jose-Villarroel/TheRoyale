@@ -1,5 +1,6 @@
 package com.theroyale.backend;
 
+import com.theroyale.backend.model.Admin;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.Cuenta;
 import com.theroyale.backend.model.EstadoCuenta;
@@ -9,19 +10,23 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.ItemConsumo;
 import com.theroyale.backend.model.Operador;
 import com.theroyale.backend.model.Pago;
+import com.theroyale.backend.model.Resena;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.model.TipoOperador;
+import com.theroyale.backend.repository.AdminRepository;
 import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.OperadorRepository;
+import com.theroyale.backend.repository.ResenaRepository;
 import com.theroyale.backend.repository.ReservaRepository;
 import com.theroyale.backend.repository.ServicioRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +40,9 @@ import java.util.List;
 // Necesario porque ddl-auto=create-drop borra y recrea la base de datos en cada reinicio.
 // Nota: este es el único archivo del proyecto donde se accede directo a los Repository,
 // saltándose la capa de Service — es una excepción intencional solo para este propósito.
+// Solo corre en el perfil por defecto: las pruebas (perfil "test") preparan sus propios datos.
 @Component
+@Profile("default")
 @Transactional
 public class DataLoader implements CommandLineRunner {
 
@@ -55,10 +62,16 @@ public class DataLoader implements CommandLineRunner {
     private OperadorRepository operadorRepository;
 
     @Autowired
+    private AdminRepository adminRepository;
+
+    @Autowired
     private ReservaRepository reservaRepository;
 
     @Autowired
     private CuentaRepository cuentaRepository;
+
+    @Autowired
+    private ResenaRepository resenaRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -67,7 +80,19 @@ public class DataLoader implements CommandLineRunner {
         cargarHabitaciones();
         cargarServicios();
         cargarOperadores();
+        cargarAdmins();
         cargarReservas();
+    }
+
+    // ===== 2 administradores: gestionan el catálogo y el personal, no la operación diaria =====
+    private void cargarAdmins() {
+        adminRepository.save(Admin.builder()
+                .nombre("Mono").email("mono@theroyale.com").password("admin123")
+                .build());
+
+        adminRepository.save(Admin.builder()
+                .nombre("Mati").email("mati@theroyale.com").password("admin123")
+                .build());
     }
 
     // ===== 5 tipos de habitación =====
@@ -106,52 +131,52 @@ public class DataLoader implements CommandLineRunner {
     // ===== 10 clientes =====
     private void cargarClientes() {
         clienteRepository.save(Cliente.builder()
-                .nombre("Carlos").apellido("Mendoza").email("carlos.mendoza@email.com")
+                .nombre("Carlos").apellido("Mendoza").cedula("1020304050").email("carlos.mendoza@email.com")
                 .password("pass1234").telefono("+1-555-0101").fechaRegistro(LocalDate.of(2025, 1, 15))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Ana").apellido("García").email("ana.garcia@email.com")
+                .nombre("Ana").apellido("García").cedula("1020304051").email("ana.garcia@email.com")
                 .password("pass1234").telefono("+1-555-0102").fechaRegistro(LocalDate.of(2025, 2, 20))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Luis").apellido("Hernández").email("luis.hernandez@email.com")
+                .nombre("Luis").apellido("Hernández").cedula("1020304052").email("luis.hernandez@email.com")
                 .password("pass1234").telefono("+1-555-0103").fechaRegistro(LocalDate.of(2025, 3, 5))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Sofia").apellido("Torres").email("sofia.torres@email.com")
+                .nombre("Sofia").apellido("Torres").cedula("1020304053").email("sofia.torres@email.com")
                 .password("pass1234").telefono("+1-555-0104").fechaRegistro(LocalDate.of(2025, 3, 18))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Miguel").apellido("Ramírez").email("miguel.ramirez@email.com")
+                .nombre("Miguel").apellido("Ramírez").cedula("1020304054").email("miguel.ramirez@email.com")
                 .password("pass1234").telefono("+1-555-0105").fechaRegistro(LocalDate.of(2025, 4, 2))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Isabella").apellido("López").email("isabella.lopez@email.com")
+                .nombre("Isabella").apellido("López").cedula("1020304055").email("isabella.lopez@email.com")
                 .password("pass1234").telefono("+1-555-0106").fechaRegistro(LocalDate.of(2025, 4, 25))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Andrés").apellido("Martínez").email("andres.martinez@email.com")
+                .nombre("Andrés").apellido("Martínez").cedula("1020304056").email("andres.martinez@email.com")
                 .password("pass1234").telefono("+1-555-0107").fechaRegistro(LocalDate.of(2025, 5, 10))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Valentina").apellido("Rodríguez").email("valentina.rodriguez@email.com")
+                .nombre("Valentina").apellido("Rodríguez").cedula("1020304057").email("valentina.rodriguez@email.com")
                 .password("pass1234").telefono("+1-555-0108").fechaRegistro(LocalDate.of(2025, 6, 1))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Jorge").apellido("Sánchez").email("jorge.sanchez@email.com")
+                .nombre("Jorge").apellido("Sánchez").cedula("1020304058").email("jorge.sanchez@email.com")
                 .password("pass1234").telefono("+1-555-0109").fechaRegistro(LocalDate.of(2025, 7, 14))
                 .build());
 
         clienteRepository.save(Cliente.builder()
-                .nombre("Camila").apellido("Díaz").email("camila.diaz@email.com")
+                .nombre("Camila").apellido("Díaz").cedula("1020304059").email("camila.diaz@email.com")
                 .password("pass1234").telefono("+1-555-0110").fechaRegistro(LocalDate.of(2025, 8, 22))
                 .build());
     }
@@ -443,6 +468,68 @@ public class DataLoader implements CommandLineRunner {
 
         // CANCELADA
         guardarReserva(clientes.get(8), "303", hoy.plusDays(1), hoy.plusDays(3), EstadoReserva.CANCELADA, 1);
+
+        // ===== Más estadías terminadas, para que los tipos tengan reseñas (cuenta cerrada y sin saldo) =====
+        Reserva finalizada106 = guardarEstadiaFinalizada(clientes.get(2), "106", hoy.minusDays(30), hoy.minusDays(27), 2);
+        Reserva finalizada503 = guardarEstadiaFinalizada(clientes.get(3), "503", hoy.minusDays(25), hoy.minusDays(22), 3);
+        Reserva finalizada303 = guardarEstadiaFinalizada(clientes.get(4), "303", hoy.minusDays(20), hoy.minusDays(18), 1);
+        Reserva finalizada304 = guardarEstadiaFinalizada(clientes.get(6), "304", hoy.minusDays(35), hoy.minusDays(33), 2);
+        Reserva finalizada704 = guardarEstadiaFinalizada(clientes.get(1), "704", hoy.minusDays(40), hoy.minusDays(36), 2);
+        Reserva finalizada705 = guardarEstadiaFinalizada(clientes.get(9), "705", hoy.minusDays(15), hoy.minusDays(12), 2);
+
+        // Estadías terminadas SIN reseña: el huésped puede reseñarlas desde "My reservations".
+        // La de la Presidential Suite deja ese tipo sin reseñas ("No reviews yet").
+        guardarEstadiaFinalizada(clientes.get(1), "108", hoy.minusDays(12), hoy.minusDays(10), 1);
+        guardarEstadiaFinalizada(clientes.get(5), "902", hoy.minusDays(60), hoy.minusDays(55), 4);
+
+        cargarResenas(finalizada104, finalizada501, finalizada106, finalizada503,
+                finalizada303, finalizada304, finalizada704, finalizada705);
+    }
+
+    // ===== Reseñas de ejemplo: Normal, Executive, VIP y Luxury tienen promedio; Presidential no =====
+    // La de la 705 está oculta por el admin: no se ve en /rooms ni cuenta para el promedio de Luxury.
+    private void cargarResenas(Reserva finalizada104, Reserva finalizada501, Reserva finalizada106,
+                               Reserva finalizada503, Reserva finalizada303, Reserva finalizada304,
+                               Reserva finalizada704, Reserva finalizada705) {
+        guardarResena(finalizada104, 4, "Great value in Manhattan",
+                "Comfortable bed, quiet room and a very helpful front desk. The bathroom could be a bit bigger.", true);
+        guardarResena(finalizada501, 5, "Perfect city view",
+                "Spotless room and very attentive staff. The living area was ideal for working in the evenings.", true);
+        guardarResena(finalizada106, 5, "Better than expected",
+                "Elegant and cozy room, excellent Wi-Fi and the breakfast in the restaurant was delicious.", true);
+        guardarResena(finalizada503, 4, "Lovely stay with the family",
+                "Plenty of space for three people and great amenities. Check-in took a little longer than expected.", true);
+        guardarResena(finalizada303, 4, "Ideal for a business trip",
+                "The workspace is well designed and the room is very quiet. I would stay here again for work.", true);
+        guardarResena(finalizada304, 3, null,
+                "Good location and a nice desk, but the air conditioning was noisy during the night.", true);
+        guardarResena(finalizada704, 5, "Pure luxury",
+                "The jacuzzi and the view over the city were unforgettable. Impeccable service from start to finish.", true);
+        guardarResena(finalizada705, 1, "Not happy",
+                "This review contains language that the hotel considered inappropriate and was hidden by the admin.", false);
+    }
+
+    private void guardarResena(Reserva reserva, int calificacion, String titulo, String comentario, boolean visible) {
+        resenaRepository.save(Resena.builder()
+                .reserva(reserva)
+                .cliente(reserva.getCliente())
+                .tipoHabitacion(reserva.getHabitacion().getTipoHabitacion())
+                .calificacion(calificacion)
+                .titulo(titulo)
+                .comentario(comentario)
+                .visible(visible)
+                .fechaCreacion(reserva.getFechaFin().atTime(18, 30))
+                .build());
+    }
+
+    // Reserva FINALIZADA con su cuenta ya cerrada, como queda tras el check-out
+    private Reserva guardarEstadiaFinalizada(Cliente cliente, String numeroHabitacion,
+                                             LocalDate inicio, LocalDate fin, int personas) {
+        Reserva reserva = guardarReserva(cliente, numeroHabitacion, inicio, fin, EstadoReserva.FINALIZADA, personas);
+        Cuenta cuenta = abrirCuenta(reserva, inicio);
+        cuenta.setEstado(EstadoCuenta.CERRADA);
+        cuentaRepository.save(cuenta);
+        return reserva;
     }
 
     private Reserva guardarReserva(Cliente cliente, String numeroHabitacion,

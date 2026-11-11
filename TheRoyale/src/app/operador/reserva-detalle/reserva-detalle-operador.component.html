@@ -1,0 +1,81 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  eyebrow="Operations"
+  [titulo]="'Reservation #' + id"
+  [subtitulo]="subtituloHero">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido panel-operador">
+  <app-nav-operador></app-nav-operador>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+  @if (mensaje) {
+    <p id="operador-mensaje" class="perfil-alerta perfil-alerta-ok" role="status">{{ mensaje }}</p>
+  }
+
+  @if (reserva) {
+    <div class="operador-detalle">
+
+      <!-- ===== Columna izquierda: estadía y acciones, huésped y habitación (AC22) ===== -->
+      <aside class="operador-lateral">
+        <section app-tarjeta-estadia [reserva]="reserva" [noches]="noches" [totalEstadia]="totalEstadia">
+          <app-acciones-reserva
+            [puedeConfirmar]="puedeConfirmar"
+            [puedeCheckIn]="puedeCheckIn"
+            [puedeCheckOut]="puedeCheckOut"
+            [puedeCancelar]="puedeCancelar"
+            [puedeEliminar]="puedeEliminar"
+            (confirmar)="confirmar()"
+            (checkIn)="checkIn()"
+            (checkOut)="checkOut()"
+            (cancelar)="cancelar()"
+            (eliminar)="eliminar()">
+          </app-acciones-reserva>
+        </section>
+        <section app-tarjeta-huesped [reserva]="reserva"></section>
+        <section app-tarjeta-habitacion-asignada [reserva]="reserva"></section>
+      </aside>
+
+      <!-- ===== Columna derecha: cuenta de la estadía (AC23, AC24, AC25) ===== -->
+      <section class="operador-cuenta">
+        <app-cuenta-resumen
+          [cuenta]="cuenta"
+          [numeroHabitacion]="reserva.habitacionNumero"
+          [saldada]="cuentaSaldada">
+        </app-cuenta-resumen>
+
+        @if (cuenta) {
+          <app-tabla-consumos
+            [items]="cuenta.items"
+            [operable]="cuentaOperable"
+            (quitar)="eliminarConsumo($event)">
+          </app-tabla-consumos>
+
+          <app-tabla-pagos [pagos]="cuenta.pagos"></app-tabla-pagos>
+
+          @if (cuentaOperable) {
+            <div class="operador-formularios">
+              <app-form-consumo
+                [formulario]="consumoForm"
+                [servicios]="servicios"
+                (agregar)="agregarConsumo()">
+              </app-form-consumo>
+              <app-form-pago
+                [formulario]="pagoForm"
+                [metodosPago]="metodosPago"
+                [saldo]="cuenta.saldo"
+                (registrar)="registrarPago()"
+                (pagarSaldo)="pagarSaldoCompleto()">
+              </app-form-pago>
+            </div>
+          } @else {
+            <p class="reserva-paso-nota">This account is closed. No further charges or payments can be added.</p>
+          }
+        }
+      </section>
+    </div>
+  }
+</main>
+
+<app-pie-pagina></app-pie-pagina>

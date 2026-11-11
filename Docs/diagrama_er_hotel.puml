@@ -83,6 +83,20 @@ entity Cuenta {
   fecha_creacion : TIMESTAMP
 }
 
+entity Resena {
+  * id : int <<PK>>
+  --
+  # reserva_id : int <<FK -> Reserva.id, unique, not null>>
+  # cliente_id : int <<FK -> Cliente.id, not null>>
+  # tipo_habitacion_id : int <<FK -> TipoHabitacion.id, not null>>
+  calificacion : int <<check: 1..5, not null>>
+  titulo : VARCHAR(100)
+  comentario : VARCHAR(1000) <<not null>>
+  visible : BOOLEAN <<not null, default true>>
+  fecha_creacion : TIMESTAMP <<not null>>
+  fecha_modificacion : TIMESTAMP
+}
+
 entity Servicio {
   * id : int <<PK>>
   --
@@ -126,6 +140,9 @@ TipoHabitacion   ||--o{ Imagen             : tiene
 
 Habitacion       ||--o{ Reserva            : es_reservada_en
 Reserva          ||--||  Cuenta            : tiene
+Reserva          ||--o|  Resena            : es_resenada_en
+Cliente          ||--o{ Resena             : escribe
+TipoHabitacion   ||--o{ Resena             : recibe
 
 Cuenta           ||--o{ ItemConsumo        : contiene
 Servicio         ||--o{ ItemConsumo        : corresponde_a

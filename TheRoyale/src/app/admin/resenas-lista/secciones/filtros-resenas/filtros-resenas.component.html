@@ -1,0 +1,22 @@
+<div class="filtros-resenas">
+  <label>
+    <span>Room type</span>
+    <select id="filtro-resenas-tipo" class="operador-select"
+            (change)="cambiarTipo.emit(aNumero($any($event.target).value))">
+      <option value="" [selected]="tipoActivo() === null">All room types</option>
+      @for (tipo of tipos(); track tipo.id) {
+        <option [value]="tipo.id" [selected]="tipoActivo() === tipo.id">{{ tipo.nombre }}</option>
+      }
+    </select>
+  </label>
+  <label>
+    <span>Rating</span>
+    <select id="filtro-resenas-calificacion" class="operador-select"
+            (change)="cambiarCalificacion.emit(aNumero($any($event.target).value))">
+      <option value="" [selected]="calificacionActiva() === null">All ratings</option>
+      @for (n of calificaciones; track n) {
+        <option [value]="n" [selected]="calificacionActiva() === n">{{ n }} {{ n === 1 ? 'star' : 'stars' }}</option>
+      }
+    </select>
+  </label>
+</div>

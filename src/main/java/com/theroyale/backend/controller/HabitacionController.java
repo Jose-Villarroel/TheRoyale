@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+// ===== Panel de administración (Thymeleaf): CRUD de habitaciones físicas =====
+// Los errores de validación se pintan en el mismo formulario; los de borrado vuelven a la lista.
 @Controller
 @RequestMapping("/admin/habitaciones")
 public class HabitacionController {
@@ -45,10 +47,7 @@ public class HabitacionController {
                           @RequestParam(required = false) Long tipoHabitacionId,
                           Model model) {
         try {
-            if (tipoHabitacionId != null) {
-                habitacion.setTipoHabitacion(tipoHabitacionService.obtenerPorId(tipoHabitacionId));
-            }
-            habitacionService.guardar(habitacion);
+            habitacionService.guardar(habitacion, tipoHabitacionId);
             return "redirect:/admin/habitaciones";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("habitacion", habitacion);

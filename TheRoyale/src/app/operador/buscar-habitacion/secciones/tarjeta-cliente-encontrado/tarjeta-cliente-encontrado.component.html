@@ -1,0 +1,46 @@
+<section class="reserva-paso">
+  <header class="reserva-paso-encabezado">
+    <span class="reserva-paso-numero">02</span>
+    <div>
+      <h2 class="reserva-paso-titulo">Confirm guest identity</h2>
+      <p class="reserva-paso-nota">Make sure this is the correct guest before proceeding.</p>
+    </div>
+  </header>
+
+  <div class="operador-encontrado">
+    <!-- Datos del huésped -->
+    <div class="operador-tarjeta">
+      <p class="eyebrow">Guest</p>
+      <h3 class="operador-tarjeta-titulo">{{ reserva().clienteNombre }} {{ reserva().clienteApellido }}</h3>
+      <dl class="operador-datos">
+        <div><dt>ID number</dt><dd>{{ reserva().clienteCedula || '—' }}</dd></div>
+        <div><dt>Email</dt><dd>{{ reserva().clienteEmail }}</dd></div>
+        <div><dt>Phone</dt><dd>{{ reserva().clienteTelefono || '—' }}</dd></div>
+      </dl>
+    </div>
+
+    <!-- Datos de la reserva -->
+    <div class="operador-tarjeta">
+      <div class="operador-tarjeta-cabecera">
+        <p class="eyebrow">Reservation #{{ reserva().id }}</p>
+        <span class="chip-estado" [attr.data-estado]="reserva().estado">{{ reserva().estado }}</span>
+      </div>
+      <h3 class="operador-tarjeta-titulo">Room {{ reserva().habitacionNumero }}</h3>
+      <dl class="operador-datos">
+        <div><dt>Room type</dt><dd>{{ reserva().tipoHabitacionNombre }}</dd></div>
+        <div><dt>Check-in</dt><dd>{{ reserva().fechaInicio | date:'mediumDate' }}</dd></div>
+        <div><dt>Check-out</dt><dd>{{ reserva().fechaFin | date:'mediumDate' }}</dd></div>
+        <div><dt>Guests</dt><dd>{{ reserva().cantidadPersonas }}</dd></div>
+      </dl>
+    </div>
+
+    <!-- Acción -->
+    <div class="operador-acciones">
+      <button type="button" class="btn-dorado" (click)="gestionar.emit()">Manage Reservation →</button>
+      <button type="button" class="btn-contorno-oscuro" (click)="limpiar.emit()">Search Another Room</button>
+      <p class="reserva-paso-nota">
+        You will be taken to the reservation detail page to add services, register payments, and manage the stay.
+      </p>
+    </div>
+  </div>
+</section>

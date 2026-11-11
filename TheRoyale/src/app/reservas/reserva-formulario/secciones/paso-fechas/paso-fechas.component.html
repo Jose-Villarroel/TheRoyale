@@ -1,0 +1,26 @@
+<header class="reserva-paso-encabezado">
+  <span class="reserva-paso-numero">01</span>
+  <div>
+    <h2 class="reserva-paso-titulo">Your dates</h2>
+    <p class="reserva-paso-nota">Availability updates as soon as both dates are set.</p>
+  </div>
+</header>
+
+<div class="reserva-campos" [formGroup]="formulario()">
+  <label>
+    <span>Arrival</span>
+    <input type="date" formControlName="fechaInicio" [min]="hoy()">
+  </label>
+  <label>
+    <span>Departure</span>
+    <input type="date" formControlName="fechaFin" [min]="minimaSalida()">
+  </label>
+  <label>
+    <span>Guests</span>
+    <select formControlName="cantidadPersonas">
+      @for (n of opcionesHuespedes; track n) {
+        <option [ngValue]="n">{{ n }} {{ n === 1 ? 'guest' : 'guests' }}</option>
+      }
+    </select>
+  </label>
+</div>

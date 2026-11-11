@@ -1,0 +1,29 @@
+<p class="eyebrow">Client Record</p>
+<h2>{{ cliente().nombre }} {{ cliente().apellido }}</h2>
+<dl class="perfil-datos">
+  <div>
+    <dt>ID</dt>
+    <dd>{{ cliente().id }}</dd>
+  </div>
+  <div>
+    <dt>Email</dt>
+    <dd>{{ cliente().email }}</dd>
+  </div>
+  <div>
+    <dt>ID Number</dt>
+    <dd>{{ cliente().cedula }}</dd>
+  </div>
+  <div>
+    <dt>Phone</dt>
+    <dd>{{ cliente().telefono || 'Not registered' }}</dd>
+  </div>
+  <div>
+    <dt>Registered</dt>
+    <dd>{{ cliente().fechaRegistro || 'Pending' }}</dd>
+  </div>
+</dl>
+
+<div class="perfil-acciones-secundarias">
+  <a routerLink="/my-reservations" class="enlace-subrayado">My Reservations</a>
+  <button type="button" class="btn-eliminar" (click)="cerrarSesion.emit()">Sign Out</button>
+</div>

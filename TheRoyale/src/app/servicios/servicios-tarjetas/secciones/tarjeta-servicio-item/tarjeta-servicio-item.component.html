@@ -1,0 +1,15 @@
+<div class="tarjeta-servicio-imagen-wrap">
+  <img [src]="servicio().imagenUrl || '/images/hotel.webp'" [alt]="servicio().nombre">
+  <span class="tarjeta-numero-romano">{{ posicion() | number:'2.0-0' }}</span>
+</div>
+<div class="tarjeta-servicio-info-wrap">
+  <div class="tarjeta-servicio-encabezado">
+    <h3>{{ servicio().nombre }}</h3>
+    <span class="tarjeta-precio">From ${{ servicio().precio | number:'1.0-0' }}</span>
+  </div>
+  <p class="tarjeta-descripcion">{{ servicio().descripcion }}</p>
+  <span class="tarjeta-enlace">
+    View Detail
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5H10M10 5.5L6 1.5M10 5.5L6 9.5" stroke="currentColor" stroke-width="0.9" stroke-linecap="square"/></svg>
+  </span>
+</div>

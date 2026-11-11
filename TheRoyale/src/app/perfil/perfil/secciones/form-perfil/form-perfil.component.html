@@ -1,0 +1,51 @@
+<div class="admin-encabezado perfil-encabezado-form">
+  <div>
+    <p class="eyebrow">Update</p>
+    <h2>Edit Profile</h2>
+  </div>
+</div>
+
+<form [formGroup]="formulario()" (ngSubmit)="guardar.emit()" class="formulario-admin perfil-formulario">
+  <div class="perfil-form-grid">
+    <label>
+      <span>First Name</span>
+      <input type="text" formControlName="nombre">
+      <app-campo-error [control]="formulario().get('nombre')"
+        [mensajes]="{ required: 'First name is required.', maxlength: 'Maximum 100 characters.' }">
+      </app-campo-error>
+    </label>
+    <label>
+      <span>Last Name</span>
+      <input type="text" formControlName="apellido">
+      <app-campo-error [control]="formulario().get('apellido')"
+        [mensajes]="{ required: 'Last name is required.', maxlength: 'Maximum 100 characters.' }">
+      </app-campo-error>
+    </label>
+  </div>
+
+  <label>
+    <span>Email</span>
+    <input type="email" formControlName="email">
+    <app-campo-error [control]="formulario().get('email')"
+      [mensajes]="{ required: 'Email is required.', email: 'Enter a valid email.', maxlength: 'Maximum 150 characters.' }">
+    </app-campo-error>
+  </label>
+
+  <label>
+    <span>Phone</span>
+    <input type="tel" formControlName="telefono" placeholder="+1 555 000 0000">
+    <app-campo-error [control]="formulario().get('telefono')"
+      [mensajes]="{ maxlength: 'Maximum 20 characters.' }">
+    </app-campo-error>
+  </label>
+
+  <label>
+    <span>New Password</span>
+    <input type="password" formControlName="password" placeholder="Leave blank to keep current password" autocomplete="new-password">
+  </label>
+
+  <div class="formulario-admin-botones">
+    <button type="submit" class="btn-dorado" [disabled]="formulario().invalid">Save Profile</button>
+    <button type="button" class="btn-contorno-oscuro" (click)="cancelar.emit()">Cancel</button>
+  </div>
+</form>

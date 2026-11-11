@@ -1,5 +1,7 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +13,8 @@ import java.util.List;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+// ===== Modelo: huésped registrado que hace reservas =====
+// email y cédula son únicos: identifican a la persona al iniciar sesión y al registrarse.
 @Entity
 @Table(name = "cliente")
 @Getter
@@ -34,13 +38,18 @@ public class Cliente {
     private String email;
 
     @Column(nullable = false, length = 255)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    @Column(nullable = false, unique = true, length = 20)
+    private String cedula;
 
     @Column(length = 20)
     private String telefono;
 
     private LocalDate fechaRegistro;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cliente")
     @Builder.Default
     @ToString.Exclude
@@ -53,7 +62,7 @@ public class Cliente {
     @Override
     public String toString() {
         return "Cliente{id=" + id + ", nombre='" + nombre + "', apellido='" + apellido +
-                "', email='" + email + "', telefono='" + telefono +
+                "', email='" + email + "', cedula='" + cedula + "', telefono='" + telefono +
                 "', fechaRegistro=" + fechaRegistro + "}";
     }
 }

@@ -1,0 +1,16 @@
+<article class="tarjeta-admin-item">
+  <div class="tarjeta-admin-imagen-wrap">
+    <img [src]="servicio().imagenUrl || '/images/hotel.webp'" [alt]="servicio().nombre">
+  </div>
+  <div class="tarjeta-admin-info-wrap">
+    <div class="tarjeta-admin-encabezado">
+      <h3>{{ servicio().nombre }}</h3>
+      <span class="numero-dorado">${{ servicio().precio }}</span>
+    </div>
+    <p class="tarjeta-admin-descripcion">{{ servicio().descripcion }}</p>
+    <div class="tarjeta-admin-acciones">
+      <a [routerLink]="['/admin/servicios', servicio().id, 'editar']" class="enlace-subrayado">Edit</a>
+      <button type="button" class="btn-eliminar" (click)="eliminar.emit(servicio())">Delete</button>
+    </div>
+  </div>
+</article>

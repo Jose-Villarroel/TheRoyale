@@ -1,0 +1,17 @@
+<app-cabecera [mostrarAccesosStaff]="false" (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [mostrarAccesosStaff]="false" [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<main>
+  <app-hero></app-hero>
+  <app-buscador-reserva [tipos]="tiposHabitacion" (buscar)="manejarFormularioReserva($event)"></app-buscador-reserva>
+  <app-seccion-hotel></app-seccion-hotel>
+  <app-seccion-cita></app-seccion-cita>
+  <app-carrusel-habitaciones [tipos]="tiposHabitacion"></app-carrusel-habitaciones>
+  <app-seccion-servicios [servicios]="servicios"></app-seccion-servicios>
+  <app-seccion-experiencias></app-seccion-experiencias>
+  <app-seccion-business></app-seccion-business>
+  <app-seccion-galeria></app-seccion-galeria>
+  <app-seccion-cta></app-seccion-cta>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

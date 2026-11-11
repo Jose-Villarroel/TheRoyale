@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+// ===== Reglas del CRUD de clientes: email y cédula únicos, contraseña opcional al editar =====
+// Un cliente con reservas no se puede borrar, para no dejar reservas sin titular.
 @Service
 @Transactional(readOnly = true)
 public class ClienteService {
@@ -48,8 +50,14 @@ public class ClienteService {
             throw new IllegalArgumentException("A client with email " + email + " already exists.");
         }
 
+        String cedula = normalizarCedula(cliente.getCedula());
+        if (clienteRepository.findByCedula(cedula).isPresent()) {
+            throw new IllegalArgumentException("A client with ID number " + cedula + " already exists.");
+        }
+
         cliente.setId(null);
         cliente.setEmail(email);
+        cliente.setCedula(cedula);
         cliente.setFechaRegistro(LocalDate.now());
         return clienteRepository.save(cliente);
     }
@@ -66,6 +74,7 @@ public class ClienteService {
             throw new IllegalArgumentException("A client with email " + email + " already exists.");
         }
 
+        // La cedula identifica a la persona: no se reescribe desde el formulario de perfil
         clienteExistente.setNombre(clienteActualizado.getNombre());
         clienteExistente.setApellido(clienteActualizado.getApellido());
         clienteExistente.setEmail(email);
@@ -96,8 +105,13 @@ public class ClienteService {
             throw new IllegalArgumentException("First name, last name and email are required.");
         }
 
-        if (requierePassword && estaVacio(cliente.getPassword())) {
-            throw new IllegalArgumentException("Password is required.");
+        if (requierePassword) {
+            if (estaVacio(cliente.getPassword())) {
+                throw new IllegalArgumentException("Password is required.");
+            }
+            if (estaVacio(cliente.getCedula())) {
+                throw new IllegalArgumentException("ID number is required.");
+            }
         }
     }
 
@@ -107,5 +121,9 @@ public class ClienteService {
 
     private String normalizarEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase();
+    }
+
+    private String normalizarCedula(String cedula) {
+        return cedula == null ? "" : cedula.trim();
     }
 }

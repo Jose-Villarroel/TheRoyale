@@ -1,0 +1,30 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  eyebrow="03 — Services"
+  titulo="All Services"
+  subtitulo="From wellness and dining to private experiences, every service is designed to elevate your stay at The Royale.">
+</app-hero-interior>
+
+<main>
+  <app-barra-vistas [cantidad]="servicios.length"></app-barra-vistas>
+
+  <section class="seccion-tarjetas">
+    <div class="contenedor">
+      <div class="tarjetas-servicios-grid">
+        @for (servicio of servicios; track servicio.id) {
+          <a app-tarjeta-servicio-item class="tarjeta-servicio-item"
+             [routerLink]="['/services', servicio.id]"
+             [servicio]="servicio" [posicion]="$index + 1"></a>
+        } @empty {
+          <p class="parrafo-cuerpo">No services available right now.</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <app-cta-interior texto="Ready to personalize your stay?"></app-cta-interior>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

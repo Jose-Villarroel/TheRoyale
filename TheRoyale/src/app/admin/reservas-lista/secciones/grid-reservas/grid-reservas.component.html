@@ -1,0 +1,7 @@
+<div class="tarjetas-admin-grid">
+  @for (reserva of reservas(); track reserva.id) {
+    <app-tarjeta-reserva [reserva]="reserva"></app-tarjeta-reserva>
+  } @empty {
+    <p class="parrafo-cuerpo">No reservations yet.</p>
+  }
+</div>

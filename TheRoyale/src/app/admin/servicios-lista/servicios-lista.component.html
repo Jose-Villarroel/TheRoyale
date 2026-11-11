@@ -1,0 +1,16 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  titulo="Services"
+  subtitulo="Everything guests can add to their stay — manage pricing, descriptions and imagery.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-nav-admin></app-nav-admin>
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+  <app-encabezado-servicios></app-encabezado-servicios>
+  <app-grid-servicios [servicios]="servicios" (eliminar)="eliminar($event)"></app-grid-servicios>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

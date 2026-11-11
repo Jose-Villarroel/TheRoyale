@@ -1,0 +1,68 @@
+<app-cabecera (abrirMenu)="menuAbierto = true"></app-cabecera>
+<app-menu-movil [abierto]="menuAbierto" (cerrar)="menuAbierto = false"></app-menu-movil>
+
+<app-hero-interior
+  [titulo]="id !== null ? 'Edit Service' : 'New Service'"
+  subtitulo="Describe what's included, set the price, and add the images guests will see.">
+</app-hero-interior>
+
+<main class="contenedor seccion-admin-contenido">
+  <app-alerta-error [mensaje]="error"></app-alerta-error>
+
+  <div class="formulario-admin-panel">
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" class="formulario-admin">
+
+      <label>
+        <span>Name</span>
+        <input type="text" formControlName="nombre">
+        <app-campo-error [control]="nombre"
+          [mensajes]="{ required: 'Name is required.', minlength: 'Name must have at least 3 characters.' }">
+        </app-campo-error>
+      </label>
+
+      <label>
+        <span>Description</span>
+        <textarea formControlName="descripcion" rows="4"></textarea>
+        <app-campo-error [control]="descripcion"
+          [mensajes]="{ required: 'Description is required.', minlength: 'Description must have at least 10 characters.' }">
+        </app-campo-error>
+      </label>
+
+      <label>
+        <span>Price (USD)</span>
+        <input type="number" formControlName="precio" min="1" step="1">
+        <app-campo-error [control]="precio"
+          [mensajes]="{ required: 'Price is required.', min: 'Price must be greater than 0.' }">
+        </app-campo-error>
+      </label>
+
+      <div class="formulario-admin-imagen">
+        <label>
+          <span>Main Image URL</span>
+          <input type="text" formControlName="imagenUrl" placeholder="/images/spa.webp">
+        </label>
+
+        <div class="imagen-previa-wrap">
+          <img [src]="formulario.get('imagenUrl')?.value || '/images/hotel.webp'" alt="Preview">
+        </div>
+      </div>
+
+      <label>
+        <span>Features (one per line)</span>
+        <textarea formControlName="caracteristicasTexto" rows="6" placeholder="Heated Indoor Pool - Open daily 06:00 to 22:00"></textarea>
+      </label>
+
+      <label>
+        <span>Gallery Image URLs (one per line)</span>
+        <textarea formControlName="galeriaUrlsTexto" rows="3" placeholder="/images/spa.webp"></textarea>
+      </label>
+
+      <div class="formulario-admin-botones">
+        <button type="submit" class="btn-dorado">Save</button>
+        <a routerLink="/admin/servicios" class="btn-contorno-oscuro">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<app-pie-pagina></app-pie-pagina>

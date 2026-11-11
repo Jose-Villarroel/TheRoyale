@@ -1,0 +1,9 @@
+@if (urls().length > 0) {
+  <div class="contenedor detalle-galeria">
+    <div class="detalle-galeria-grid">
+      @for (imgUrl of urls(); track imgUrl) {
+        <img [src]="imgUrl" [alt]="nombre() + ' Gallery'" class="detalle-galeria-img">
+      }
+    </div>
+  </div>
+}

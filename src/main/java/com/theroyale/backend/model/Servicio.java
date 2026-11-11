@@ -1,9 +1,11 @@
 package com.theroyale.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,6 +23,8 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
+// ===== Modelo: servicio del hotel (spa, restaurante, etc.) que se puede cargar a la cuenta de una reserva =====
+// Características y galería son listas simples de texto (@ElementCollection), sin entidad propia.
 @Entity
 @Table(name = "servicio")
 @Getter
@@ -46,20 +50,21 @@ public class Servicio {
     @Column(nullable = false, length = 255)
     private String imagenUrl;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "servicio_caracteristica", joinColumns = @JoinColumn(name = "servicio_id"))
     @OrderColumn(name = "orden")
     @Column(name = "caracteristica", nullable = false, length = 500)
     @Builder.Default
     private List<String> caracteristicas = new ArrayList<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "servicio_galeria_url", joinColumns = @JoinColumn(name = "servicio_id"))
     @OrderColumn(name = "orden")
     @Column(name = "galeria_url", nullable = false, length = 255)
     @Builder.Default
     private List<String> galeriaUrls = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "servicio")
     @Builder.Default
     @ToString.Exclude
