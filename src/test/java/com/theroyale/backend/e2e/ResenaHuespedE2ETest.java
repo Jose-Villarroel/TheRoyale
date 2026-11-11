@@ -44,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 // Igual que los casos 1 y 2, DEFINED_PORT levanta el backend completo (con su DataLoader) en el
 // puerto 8080, el que consume el frontend. Para correrlo:
 //   1. el backend normal APAGADO (este test ocupa el 8080),
-//   2. Angular corriendo aparte:  cd TheRoyale && ng serve   (queda en localhost:4200),
+//   2. Angular corriendo aparte:  cd ../TheRoyaleFront && ng serve   (queda en localhost:4200),
 //   3. mvn test -Dtest=ResenaHuespedE2ETest
 // DirtiesContext cierra la aplicación al terminar: así la base vuelve a sembrarse desde cero (la
 // estadía vuelve a quedar sin reseña) y no queda el puerto ocupado.

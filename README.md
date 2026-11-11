@@ -199,21 +199,26 @@ The-Royale/
 │   ├── errors/
 │   └── DataLoader.java         # Datos de prueba iniciales
 │
-├── src/main/resources/
-│   ├── application.properties  # H2 en memoria
-│   ├── templates/              # Vistas Thymeleaf (frontend heredado)
-│   └── static/
-│
-└── TheRoyale/                  # SPA Angular 19 (standalone components)
-    └── src/app/
-        ├── landing/            # Página pública
-        ├── auth/               # Login y registro de clientes
-        ├── rooms/ · servicios/ # Catálogo público
-        ├── reservas/           # Reservar, mis reservas
-        ├── perfil/             # Datos del cliente
-        ├── operador/           # Portal de operaciones
-        ├── admin/              # Panel de administración
-        ├── services/ · models/ · guards/ · shared/
+└── src/main/resources/
+    ├── application.properties  # H2 en memoria
+    ├── templates/              # Vistas Thymeleaf (frontend heredado)
+    └── static/
+```
+
+La SPA Angular 19 está en su propio repositorio,
+[TheRoyaleFront](https://github.com/Jose-Villarroel/TheRoyaleFront), y se clona al lado de
+este (`../TheRoyaleFront`):
+
+```text
+TheRoyaleFront/src/app/
+├── landing/            # Página pública
+├── auth/               # Login y registro de clientes
+├── rooms/ · servicios/ # Catálogo público
+├── reservas/           # Reservar, mis reservas
+├── perfil/             # Datos del cliente
+├── operador/           # Portal de operaciones
+├── admin/              # Panel de administración
+└── services/ · models/ · guards/ · shared/
 ```
 
 El backend Spring Boot corre en el puerto 8080 y la SPA Angular en el 4200, consumiendo
