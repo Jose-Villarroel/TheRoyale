@@ -33,6 +33,18 @@
             id="mis-reservas-tab-historial" (click)="cambiarPestana(false)">History</button>
   </nav>
 
+  @if (reservaResenando) {
+    <app-form-resena
+      [reserva]="reservaResenando"
+      [resena]="resenaEditando"
+      [error]="errorResena"
+      [enviando]="enviandoResena"
+      (enviar)="enviarResena($event)"
+      (eliminar)="eliminarResena()"
+      (cancelar)="cerrarFormularioResena()">
+    </app-form-resena>
+  }
+
   @if (cargando) {
     <p class="parrafo-cuerpo">Loading your reservations…</p>
   } @else {
@@ -40,8 +52,11 @@
       @for (reserva of reservas; track reserva.id) {
         <app-tarjeta-mi-reserva
           [reserva]="reserva"
+          [resena]="resenasPorReserva[reserva.id] ?? null"
           (modificar)="modificar($event)"
-          (cancelar)="cancelar($event)">
+          (cancelar)="cancelar($event)"
+          (resenar)="resenar($event)"
+          (editarResena)="editarResena($event)">
         </app-tarjeta-mi-reserva>
       } @empty {
         <p class="parrafo-cuerpo">

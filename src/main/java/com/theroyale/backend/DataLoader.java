@@ -10,6 +10,7 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.ItemConsumo;
 import com.theroyale.backend.model.Operador;
 import com.theroyale.backend.model.Pago;
+import com.theroyale.backend.model.Resena;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.model.TipoHabitacion;
@@ -19,6 +20,7 @@ import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.OperadorRepository;
+import com.theroyale.backend.repository.ResenaRepository;
 import com.theroyale.backend.repository.ReservaRepository;
 import com.theroyale.backend.repository.ServicioRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
@@ -67,6 +69,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private CuentaRepository cuentaRepository;
+
+    @Autowired
+    private ResenaRepository resenaRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -463,6 +468,68 @@ public class DataLoader implements CommandLineRunner {
 
         // CANCELADA
         guardarReserva(clientes.get(8), "303", hoy.plusDays(1), hoy.plusDays(3), EstadoReserva.CANCELADA, 1);
+
+        // ===== Más estadías terminadas, para que los tipos tengan reseñas (cuenta cerrada y sin saldo) =====
+        Reserva finalizada106 = guardarEstadiaFinalizada(clientes.get(2), "106", hoy.minusDays(30), hoy.minusDays(27), 2);
+        Reserva finalizada503 = guardarEstadiaFinalizada(clientes.get(3), "503", hoy.minusDays(25), hoy.minusDays(22), 3);
+        Reserva finalizada303 = guardarEstadiaFinalizada(clientes.get(4), "303", hoy.minusDays(20), hoy.minusDays(18), 1);
+        Reserva finalizada304 = guardarEstadiaFinalizada(clientes.get(6), "304", hoy.minusDays(35), hoy.minusDays(33), 2);
+        Reserva finalizada704 = guardarEstadiaFinalizada(clientes.get(1), "704", hoy.minusDays(40), hoy.minusDays(36), 2);
+        Reserva finalizada705 = guardarEstadiaFinalizada(clientes.get(9), "705", hoy.minusDays(15), hoy.minusDays(12), 2);
+
+        // Estadías terminadas SIN reseña: el huésped puede reseñarlas desde "My reservations".
+        // La de la Presidential Suite deja ese tipo sin reseñas ("No reviews yet").
+        guardarEstadiaFinalizada(clientes.get(1), "108", hoy.minusDays(12), hoy.minusDays(10), 1);
+        guardarEstadiaFinalizada(clientes.get(5), "902", hoy.minusDays(60), hoy.minusDays(55), 4);
+
+        cargarResenas(finalizada104, finalizada501, finalizada106, finalizada503,
+                finalizada303, finalizada304, finalizada704, finalizada705);
+    }
+
+    // ===== Reseñas de ejemplo: Normal, Executive, VIP y Luxury tienen promedio; Presidential no =====
+    // La de la 705 está oculta por el admin: no se ve en /rooms ni cuenta para el promedio de Luxury.
+    private void cargarResenas(Reserva finalizada104, Reserva finalizada501, Reserva finalizada106,
+                               Reserva finalizada503, Reserva finalizada303, Reserva finalizada304,
+                               Reserva finalizada704, Reserva finalizada705) {
+        guardarResena(finalizada104, 4, "Great value in Manhattan",
+                "Comfortable bed, quiet room and a very helpful front desk. The bathroom could be a bit bigger.", true);
+        guardarResena(finalizada501, 5, "Perfect city view",
+                "Spotless room and very attentive staff. The living area was ideal for working in the evenings.", true);
+        guardarResena(finalizada106, 5, "Better than expected",
+                "Elegant and cozy room, excellent Wi-Fi and the breakfast in the restaurant was delicious.", true);
+        guardarResena(finalizada503, 4, "Lovely stay with the family",
+                "Plenty of space for three people and great amenities. Check-in took a little longer than expected.", true);
+        guardarResena(finalizada303, 4, "Ideal for a business trip",
+                "The workspace is well designed and the room is very quiet. I would stay here again for work.", true);
+        guardarResena(finalizada304, 3, null,
+                "Good location and a nice desk, but the air conditioning was noisy during the night.", true);
+        guardarResena(finalizada704, 5, "Pure luxury",
+                "The jacuzzi and the view over the city were unforgettable. Impeccable service from start to finish.", true);
+        guardarResena(finalizada705, 1, "Not happy",
+                "This review contains language that the hotel considered inappropriate and was hidden by the admin.", false);
+    }
+
+    private void guardarResena(Reserva reserva, int calificacion, String titulo, String comentario, boolean visible) {
+        resenaRepository.save(Resena.builder()
+                .reserva(reserva)
+                .cliente(reserva.getCliente())
+                .tipoHabitacion(reserva.getHabitacion().getTipoHabitacion())
+                .calificacion(calificacion)
+                .titulo(titulo)
+                .comentario(comentario)
+                .visible(visible)
+                .fechaCreacion(reserva.getFechaFin().atTime(18, 30))
+                .build());
+    }
+
+    // Reserva FINALIZADA con su cuenta ya cerrada, como queda tras el check-out
+    private Reserva guardarEstadiaFinalizada(Cliente cliente, String numeroHabitacion,
+                                             LocalDate inicio, LocalDate fin, int personas) {
+        Reserva reserva = guardarReserva(cliente, numeroHabitacion, inicio, fin, EstadoReserva.FINALIZADA, personas);
+        Cuenta cuenta = abrirCuenta(reserva, inicio);
+        cuenta.setEstado(EstadoCuenta.CERRADA);
+        cuentaRepository.save(cuenta);
+        return reserva;
     }
 
     private Reserva guardarReserva(Cliente cliente, String numeroHabitacion,

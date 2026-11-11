@@ -1,0 +1,20 @@
+@if (modo() === 'entrada') {
+  <div class="estrellas estrellas-entrada" [attr.data-tamano]="tamano()"
+       role="radiogroup" [attr.aria-label]="etiqueta()" (keydown)="alPulsarTecla($event)">
+    @for (n of posiciones; track n) {
+      <button #estrella type="button" role="radio"
+              class="estrella" [attr.data-relleno]="rellenos()[n - 1]"
+              [attr.id]="'resena-estrella-' + n"
+              [attr.aria-label]="'Rate ' + n + ' of 5'"
+              [attr.aria-checked]="valor() === n"
+              [tabindex]="indiceTab(n)"
+              (click)="elegir(n)">★</button>
+    }
+  </div>
+} @else {
+  <span class="estrellas" [attr.data-tamano]="tamano()" role="img" [attr.aria-label]="textoLectura()">
+    @for (n of posiciones; track n) {
+      <span class="estrella" [attr.data-relleno]="rellenos()[n - 1]" aria-hidden="true">★</span>
+    }
+  </span>
+}

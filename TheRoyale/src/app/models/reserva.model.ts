@@ -38,6 +38,8 @@ export interface Reserva {
   tipoHabitacionId: number;
   tipoHabitacionNombre: string;
   tipoHabitacionImagenUrl: string | null;
+  // Id de la reseña de esta estadía; null si aún no la tiene (solo las FINALIZADA se pueden reseñar)
+  resenaId: number | null;
 }
 
 // Lo que espera CrearReservaRequest del backend: el cliente pide un TIPO, no una habitación

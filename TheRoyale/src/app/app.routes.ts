@@ -21,6 +21,7 @@ import { ClientesListaComponent } from './admin/clientes-lista/clientes-lista.co
 import { ClientesFormularioComponent } from './admin/clientes-formulario/clientes-formulario.component';
 import { OperadoresListaComponent } from './admin/operadores-lista/operadores-lista.component';
 import { OperadoresFormularioComponent } from './admin/operadores-formulario/operadores-formulario.component';
+import { ResenasListaComponent } from './admin/resenas-lista/resenas-lista.component';
 import { MisReservasComponent } from './reservas/mis-reservas/mis-reservas.component';
 import { ReservasOperadorComponent } from './operador/reservas/reservas-operador.component';
 import { ReservaDetalleOperadorComponent } from './operador/reserva-detalle/reserva-detalle-operador.component';
@@ -62,6 +63,7 @@ export const routes: Routes = [
   { path: 'admin/operadores', component: OperadoresListaComponent, canActivate: [adminGuard] },
   { path: 'admin/operadores/nuevo', component: OperadoresFormularioComponent, canActivate: [adminGuard] },
   { path: 'admin/operadores/:id/editar', component: OperadoresFormularioComponent, canActivate: [adminGuard] },
+  { path: 'admin/resenas', component: ResenasListaComponent, canActivate: [adminGuard] },
 
   // ===== Portal del operador: solo operadores (un admin no entra). Todos inician sesión en /login =====
   { path: 'operator/reservas', component: ReservasOperadorComponent, canActivate: [operadorGuard] },

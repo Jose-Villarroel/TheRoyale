@@ -56,6 +56,13 @@ public class Reserva {
     @ToString.Exclude
     private Cuenta cuenta;
 
+    // ===== Lado inverso: la reseña que el huésped dejó de esta estadía (0 o 1) =====
+    // Sin cascade: ReservaService.eliminar la borra explícitamente antes que la reserva (RN-9).
+    @JsonIgnore
+    @OneToOne(mappedBy = "reserva")
+    @ToString.Exclude
+    private Resena resena;
+
     // Calculado (no se persiste: la entidad usa acceso por campo)
     public long getNoches() {
         return ChronoUnit.DAYS.between(fechaInicio, fechaFin);

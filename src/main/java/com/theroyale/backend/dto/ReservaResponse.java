@@ -31,7 +31,10 @@ public record ReservaResponse(
         String habitacionNumero,
         Long tipoHabitacionId,
         String tipoHabitacionNombre,
-        String tipoHabitacionImagenUrl
+        String tipoHabitacionImagenUrl,
+        // Reseña de esta estadía, o null si aún no tiene: "My reservations" decide entre
+        // "Write a review" y "Edit review" sin otra petición
+        Long resenaId
 ) {
 
     public static ReservaResponse from(Reserva r) {
@@ -57,6 +60,7 @@ public record ReservaResponse(
                 habitacion == null ? null : habitacion.getNumero(),
                 tipo == null ? null : tipo.getId(),
                 tipo == null ? null : tipo.getNombre(),
-                tipo == null ? null : tipo.getImagenUrl());
+                tipo == null ? null : tipo.getImagenUrl(),
+                r.getResena() == null ? null : r.getResena().getId());
     }
 }

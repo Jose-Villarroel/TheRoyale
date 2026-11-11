@@ -1,0 +1,12 @@
+<div id="admin-resenas-grid" class="tarjetas-admin-grid">
+  @for (resena of resenas(); track resena.id) {
+    <app-tarjeta-resena
+      [resena]="resena"
+      [procesando]="procesandoId() === resena.id"
+      (ocultar)="ocultar.emit($event)"
+      (mostrar)="mostrar.emit($event)">
+    </app-tarjeta-resena>
+  } @empty {
+    <p class="parrafo-cuerpo">No reviews match these filters.</p>
+  }
+</div>

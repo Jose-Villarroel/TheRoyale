@@ -51,6 +51,11 @@ public class ReservaService {
     @Autowired
     private HabitacionRepository habitacionRepository;
 
+    // Solo para RN-9 (borrar la reseña con la reserva). ResenaService no depende de este servicio
+    // (carga las reservas con ReservaRepository), así que no hay ciclo de dependencias.
+    @Autowired
+    private ResenaService resenaService;
+
       // Habitaciones que no se pueden usar sin importar las fechas
     private static final List<EstadoHabitacion> ESTADOS_HABITACION_NO_UTILIZABLES =
             List.of(EstadoHabitacion.MANTENIMIENTO, EstadoHabitacion.DESHABILITADA);
@@ -272,7 +277,7 @@ public class ReservaService {
         return reservaRepository.save(reserva);
     }
 
-    // ===== Borra una reserva junto con su cuenta (consumos y pagos incluidos) =====
+    // ===== Borra una reserva junto con su reseña y su cuenta (consumos y pagos incluidos) =====
     // Una estadía EN_CURSO tiene al huésped en la habitación y una cuenta viva: se cierra con
     // check-out, no se borra. Las demás (pendientes, confirmadas, canceladas o finalizadas) sí.
     @Transactional
@@ -282,6 +287,7 @@ public class ReservaService {
             throw new IllegalStateException("Cannot delete a reservation that is in progress: check the guest out first.");
         }
 
+        resenaService.eliminarPorReserva(reserva);
         cuentaService.eliminarPorReserva(reserva);
         reservaRepository.delete(reserva);
     }

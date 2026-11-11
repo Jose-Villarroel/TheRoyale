@@ -11,11 +11,15 @@
           [tipo]="tipo"
           [precioDesde]="precioDesde"
           [disponibles]="habitacionesDisponibles"
-          [total]="habitaciones.length">
+          [total]="habitaciones.length"
+          [promedio]="resumenResenas?.promedio ?? null"
+          [totalResenas]="resumenResenas?.total ?? 0">
         </app-info-room>
       </div>
 
       <app-disponibilidad-room [habitaciones]="habitaciones"></app-disponibilidad-room>
+
+      <app-resenas-room [resumen]="resumenResenas" [resenas]="resenas"></app-resenas-room>
     </section>
 
     <app-cta-interior></app-cta-interior>

@@ -1,5 +1,6 @@
 package com.theroyale.backend.service;
 
+import com.theroyale.backend.dto.CrearResenaRequest;
 import com.theroyale.backend.dto.CrearReservaRequest;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.Cuenta;
@@ -8,6 +9,7 @@ import com.theroyale.backend.model.EstadoHabitacion;
 import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.Operador;
+import com.theroyale.backend.model.Resena;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.model.TipoHabitacion;
@@ -15,6 +17,8 @@ import com.theroyale.backend.model.TipoOperador;
 import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.OperadorRepository;
+import com.theroyale.backend.repository.ResenaRepository;
+import com.theroyale.backend.repository.ReservaRepository;
 import com.theroyale.backend.repository.ServicioRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +62,15 @@ class ReservaServiceIntegrationTest {
 
     @Autowired
     private OperadorRepository operadorRepository;
+
+    @Autowired
+    private ResenaService resenaService;
+
+    @Autowired
+    private ResenaRepository resenaRepository;
+
+    @Autowired
+    private ReservaRepository reservaRepository;
 
     private TipoHabitacion suite;
     private Habitacion unicaHabitacion;
@@ -153,6 +166,29 @@ class ReservaServiceIntegrationTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("outstanding balance");
         assertThat(reservaService.obtenerPorId(reserva.getId()).getEstado()).isEqualTo(EstadoReserva.EN_CURSO);
+    }
+
+    // ===== RN-9: borrar una reserva con reseña borra también la reseña, sin error de integridad =====
+    @Test
+    void reservaService_eliminar_reservaFinalizadaConResena_borraTambienLaResena() {
+        // Arrange: estadía completa (confirmar, check-in y check-out sin consumos) y su reseña
+        Reserva reserva = reservaService.crear(solicitudDesdeHoy(2));
+        reservaService.confirmar(reserva.getId());
+        reservaService.hacerCheckIn(reserva.getId());
+        reservaService.hacerCheckOut(reserva.getId());
+        Resena resena = resenaService.crear(new CrearResenaRequest(reserva.getId(), cliente.getId(), 5,
+                "Great stay", "Spotless room and very attentive staff."));
+        assertThat(resenaRepository.findById(resena.getId())).isPresent();
+
+        // Act
+        reservaService.eliminar(reserva.getId());
+        reservaRepository.flush();
+
+        // Assert
+        assertThat(resenaRepository.findById(resena.getId())).isEmpty();
+        assertThat(resenaRepository.findByReservaId(reserva.getId())).isEmpty();
+        assertThat(reservaRepository.findById(reserva.getId())).isEmpty();
+        assertThat(cuentaService.buscarPorReserva(reserva.getId())).isEmpty();
     }
 
     // Empieza hoy porque el servicio rechaza fechas pasadas y el check-in exige que ya sea el día de llegada

@@ -9,6 +9,8 @@ import { RoomListaItemComponent } from './secciones/room-lista-item/room-lista-i
 import { TipoHabitacionService } from '../../services/tipo-habitacion.service';
 import { HabitacionService } from '../../services/habitacion.service';
 import { TipoHabitacion } from '../../models/tipo-habitacion.model';
+import { ResenaService } from '../../services/resena.service';
+import { ResumenResenas } from '../../models/resena.model';
 
 // Listado público de tipos de habitación (/rooms), el rooms-lista.html del backend.
 // Hace los mismos cálculos que RoomController.listarRooms: precio mínimo y
@@ -29,14 +31,28 @@ import { TipoHabitacion } from '../../models/tipo-habitacion.model';
 export class RoomsListaComponent implements OnInit {
   private tipoHabitacionService = inject(TipoHabitacionService);
   private habitacionService = inject(HabitacionService);
+  private resenaService = inject(ResenaService);
 
   tipos: TipoHabitacion[] = [];
   // Indexados por id del tipo; si un tipo no aparece es que no tiene habitaciones
   preciosDesde: Partial<Record<number, number>> = {};
   disponibles: Partial<Record<number, number>> = {};
+  // Resumen de reseñas por id del tipo; si un tipo no aparece es que no tiene reseñas visibles
+  resumenes: Partial<Record<number, ResumenResenas>> = {};
   menuAbierto = false;
 
   ngOnInit(): void {
+    // Una sola petición con el resumen de todos los tipos; va aparte del forkJoin
+    // para que, si falla, el listado se muestre igual (solo sin calificaciones)
+    this.resenaService.resumenTodos().subscribe({
+      next: (resumenes) => {
+        for (const resumen of resumenes) {
+          this.resumenes[resumen.tipoHabitacionId] = resumen;
+        }
+      },
+      error: () => this.resumenes = {}
+    });
+
     forkJoin({
       tipos: this.tipoHabitacionService.obtenerTodos(),
       habitaciones: this.habitacionService.obtenerTodos()

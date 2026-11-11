@@ -4168,3 +4168,369 @@ button.enlace-subrayado {
   font-family: inherit;
   font-weight: inherit;
 }
+
+/* ================================================================
+   Reseñas de habitaciones
+   Estrellas doradas (shared/estrellas), sección de opiniones de /rooms/:id,
+   promedio en /rooms, formulario del huésped y moderación del admin.
+   ================================================================ */
+
+/* --- Estrellas: lectura (medias estrellas) y entrada (botones) --- */
+.estrellas {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  line-height: 1;
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+.estrellas[data-tamano="sm"] { font-size: .85rem; }
+.estrellas[data-tamano="lg"] { font-size: 1.55rem; gap: 4px; }
+
+.estrella {
+  color: var(--color-borde-claro);
+}
+
+.estrella[data-relleno="llena"] {
+  color: var(--color-dorado);
+}
+
+/* Media estrella: el glifo se pinta mitad dorado, mitad gris */
+.estrella[data-relleno="media"] {
+  background: linear-gradient(90deg, var(--color-dorado) 50%, var(--color-borde-claro) 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.estrellas-entrada .estrella {
+  background: none;
+  border: none;
+  padding: 2px;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .2s, transform .2s var(--ease-out);
+}
+
+/* Al pasar el ratón se iluminan la estrella señalada y las anteriores */
+.estrellas-entrada:hover .estrella {
+  color: var(--color-dorado-hover);
+}
+
+.estrellas-entrada .estrella:hover ~ .estrella {
+  color: var(--color-borde-claro);
+}
+
+.estrellas-entrada .estrella:hover {
+  transform: translateY(-1px);
+}
+
+.estrellas-entrada .estrella:focus-visible {
+  outline: 1px solid var(--color-dorado);
+  outline-offset: 2px;
+}
+
+/* --- Promedio junto al precio (info-room) --- */
+.detalle-resenas-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  margin: -14px 0 28px;
+  font-size: .85rem;
+  color: var(--color-oscuro);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 3px;
+  transition: border-color .3s;
+}
+
+.detalle-resenas-enlace:hover {
+  border-color: var(--color-dorado);
+}
+
+.detalle-resenas-total {
+  font-size: .64rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+}
+
+/* --- Promedio en el listado /rooms --- */
+.room-lista-resenas {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 4px 0 2px;
+  font-size: .85rem;
+  color: var(--color-oscuro);
+}
+
+.room-lista-resenas-total {
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+}
+
+/* --- Sección de opiniones de /rooms/:id --- */
+.resenas-room {
+  margin-top: clamp(58px, 9vh, 110px);
+  /* La cabecera es fija: al bajar con el enlace del precio el título no queda tapado */
+  scroll-margin-top: calc(var(--alto-cabecera) - 60px);
+}
+
+.resenas-vacio {
+  padding: 28px 0;
+  font-family: var(--fuente-titulos);
+  font-size: 1.3rem;
+  color: var(--color-texto-etiqueta);
+}
+
+.resenas-resumen {
+  display: grid;
+  grid-template-columns: minmax(180px, .6fr) 1.4fr;
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--color-borde-claro);
+}
+
+.resenas-resumen-promedio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.resenas-resumen-promedio strong {
+  font-family: var(--fuente-titulos);
+  font-size: clamp(56px, 7vw, 88px);
+  font-weight: 300;
+  line-height: .9;
+  color: var(--color-oscuro);
+}
+
+.resenas-resumen-promedio > span:last-child {
+  font-size: .62rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+}
+
+.resenas-distribucion {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resenas-distribucion li {
+  display: grid;
+  grid-template-columns: 42px 1fr 36px;
+  align-items: center;
+  gap: 14px;
+  font-size: .75rem;
+  color: var(--color-texto-etiqueta);
+}
+
+.resenas-distribucion-nivel {
+  letter-spacing: .1em;
+}
+
+.resenas-distribucion-cantidad {
+  text-align: right;
+}
+
+.resenas-barra {
+  display: block;
+  height: 4px;
+  background: var(--color-off-blanco);
+  border: 1px solid var(--color-borde-claro);
+  overflow: hidden;
+}
+
+.resenas-barra-relleno {
+  display: block;
+  height: 100%;
+  background: var(--color-dorado);
+  transition: width .6s var(--ease-out);
+}
+
+.resenas-lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.resena-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--color-borde-claro);
+}
+
+.resena-item-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.resena-autor {
+  font-family: var(--fuente-titulos);
+  font-size: 1.25rem;
+  color: var(--color-oscuro);
+}
+
+.resena-estadia,
+.resena-fecha {
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+}
+
+.resena-titulo {
+  font-family: var(--fuente-titulos);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--color-texto-oscuro);
+}
+
+.resena-comentario {
+  font-size: .92rem;
+  line-height: 1.75;
+  color: var(--color-texto-cuerpo);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.resena-editada {
+  font-style: italic;
+}
+
+.resenas-ver-todas {
+  margin-top: 28px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+@media (max-width: 760px) {
+  .resenas-resumen {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Mis reservas: estado de la reseña en la tarjeta y formulario --- */
+.mi-reserva-resena {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+/* .enlace-subrayado pensado para <a>: en un <button> se quitan los bordes y el fondo nativos */
+.mi-reserva-resena .enlace-subrayado,
+.tarjeta-resena-admin .enlace-subrayado,
+.form-resena-panel button.enlace-subrayado {
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.chip-resena-oculta {
+  color: var(--admin-rojo);
+  border-style: dashed;
+}
+
+.form-resena-panel {
+  max-width: 720px;
+  margin: 0 auto 48px;
+}
+
+.form-resena-panel > .eyebrow {
+  margin-bottom: 6px;
+}
+
+.form-resena-titulo {
+  font-size: clamp(26px, 3vw, 36px);
+  margin-bottom: 4px;
+}
+
+.form-resena-panel .tarjeta-reserva-meta {
+  margin-bottom: 24px;
+}
+
+.form-resena-calificacion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-resena-etiqueta {
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+}
+
+.form-resena-contador {
+  align-self: flex-end;
+  font-size: .7rem;
+  letter-spacing: .08em;
+  color: var(--color-texto-etiqueta);
+}
+
+.form-resena-contador-excedido {
+  color: var(--admin-rojo);
+}
+
+.form-resena-panel .btn-dorado:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* --- Moderación (admin/resenas) --- */
+.filtros-resenas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.filtros-resenas label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filtros-resenas label > span {
+  font-size: .62rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--color-texto-etiqueta);
+}
+
+.chip-estado[data-estado="VISIBLE"] { color: #2f6f48; }
+.chip-estado[data-estado="OCULTA"]  { color: var(--admin-rojo); border-style: dashed; }
+
+.tarjeta-resena-oculta {
+  opacity: .78;
+}
+
+.tarjeta-resena-admin .resena-titulo {
+  font-size: 1.15rem;
+}
+
+.tarjeta-resena-admin button:disabled {
+  opacity: .5;
+  cursor: progress;
+}

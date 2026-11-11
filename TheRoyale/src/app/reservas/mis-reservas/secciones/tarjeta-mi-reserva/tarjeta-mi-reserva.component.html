@@ -29,5 +29,25 @@
                 (click)="cancelar.emit(reserva())">Cancel</button>
       </div>
     }
+
+    @if (sePuedeResenar) {
+      @if (!reserva().resenaId) {
+        <div class="tarjeta-admin-acciones">
+          <button type="button" class="btn-dorado-sm" [attr.id]="'btn-resenar-' + reserva().id"
+                  (click)="resenar.emit(reserva())">Write a review</button>
+        </div>
+      } @else {
+        <div class="mi-reserva-resena" [attr.id]="'mi-reserva-resena-' + reserva().id">
+          @if (resena(); as r) {
+            <app-estrellas [valor]="r.calificacion" tamano="sm"></app-estrellas>
+            @if (!r.visible) {
+              <span class="chip-estado chip-resena-oculta" [attr.id]="'mi-reserva-resena-oculta-' + reserva().id">Hidden by the hotel</span>
+            }
+          }
+          <button type="button" class="enlace-subrayado" [attr.id]="'btn-editar-resena-' + reserva().id"
+                  (click)="editarResena.emit(reserva())">Edit review</button>
+        </div>
+      }
+    }
   </div>
 </article>

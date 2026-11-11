@@ -1,7 +1,7 @@
 @if (variante() === 'operador') {
   <!-- Pestañas del operador: un clic, la activa en oscuro (como operator/reservas.html) -->
   <nav class="operador-filtros" aria-label="Filter by status">
-    @for (filtro of filtros; track filtro.etiqueta) {
+    @for (filtro of opciones(); track filtro.etiqueta) {
       <button type="button"
               [attr.id]="'filtro-' + (filtro.estado ?? 'todas')"
               [class.es-activo]="estadoActivo() === filtro.estado"
@@ -11,7 +11,7 @@
   </nav>
 } @else {
   <nav class="reservas-filtros" aria-label="Filter by status">
-    @for (filtro of filtros; track filtro.etiqueta) {
+    @for (filtro of opciones(); track filtro.etiqueta) {
       <button type="button"
               [attr.id]="'filtro-' + (filtro.estado ?? 'todas')"
               class="btn-nav-admin"

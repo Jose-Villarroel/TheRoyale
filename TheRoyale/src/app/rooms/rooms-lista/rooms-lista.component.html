@@ -22,7 +22,9 @@
           <article app-room-lista-item class="room-lista-item"
                    [tipo]="tipo" [posicion]="$index + 1"
                    [precioDesde]="preciosDesde[tipo.id] ?? null"
-                   [disponibles]="disponibles[tipo.id] ?? 0"></article>
+                   [disponibles]="disponibles[tipo.id] ?? 0"
+                   [promedio]="resumenes[tipo.id]?.promedio ?? null"
+                   [totalResenas]="resumenes[tipo.id]?.total ?? 0"></article>
         }
       </div>
 

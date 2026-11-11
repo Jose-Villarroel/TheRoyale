@@ -9,6 +9,16 @@
   <span class="linea-dorada-det"></span>
   <p class="room-lista-descripcion">{{ tipo().descripcion }}</p>
 
+  <p class="room-lista-resenas" [attr.id]="'room-lista-resenas-' + tipo().id">
+    @if (totalResenas() > 0) {
+      <app-estrellas [valor]="promedio()" tamano="sm"></app-estrellas>
+      <span class="room-lista-resenas-promedio">{{ promedio() | number:'1.1-1' }}</span>
+      <span class="room-lista-resenas-total">({{ totalResenas() }} {{ totalResenas() === 1 ? 'review' : 'reviews' }})</span>
+    } @else {
+      <span class="room-lista-resenas-total">No reviews yet</span>
+    }
+  </p>
+
   <div class="room-lista-meta">
     <div>
       <span>Starting from</span>
