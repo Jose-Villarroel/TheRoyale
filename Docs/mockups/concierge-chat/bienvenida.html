@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Royale Concierge, first open</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#252525}a:hover{color:#b28e4c}
+input::placeholder{color:#545454;opacity:1}
+input:focus{outline:none}
+button:focus-visible,a:focus-visible{outline:2px solid #252525;outline-offset:2px}
+</style>
+</head>
+<body>
+<section aria-label="Royale Concierge" style="width: 420px; height: 720px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #fafaf9; font-family: Lato, Helvetica, Arial, sans-serif; font-weight: 400; color: #545454">
+
+  <header style="flex: none; height: 68px; box-sizing: border-box; padding: 0 8px 0 20px; display: flex; align-items: center; gap: 12px; background: #252525">
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+      <h2 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 21px; line-height: 1.15; color: #ffffff">Royale Concierge</h2>
+      <p style="margin: 0; font-size: 12px; line-height: 1.4; color: #c6a15b">Available now</p>
+    </div>
+    <button type="button" aria-label="Close chat" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: #cfcfcf; cursor: pointer">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"></path></svg>
+    </button>
+  </header>
+
+  <div style="flex: 1; min-height: 0; box-sizing: border-box; padding: 24px 20px 20px; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px">
+    <h3 style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.15; color: #252525; text-wrap: balance">Good evening, and welcome to The Royale.</h3>
+    <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #545454">I can help with rooms, dining, the spa and availability, in whichever language you prefer.</p>
+  </div>
+
+  <div role="group" aria-label="Suggested questions" style="flex: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 12px">
+    <button type="button" style="height: 44px; padding: 0 16px; background: #ffffff; border: 1px solid #c6a15b; border-radius: 22px; color: #252525; font-family: inherit; font-size: 14px; cursor: pointer">Find a room</button>
+    <button type="button" style="height: 44px; padding: 0 16px; background: #ffffff; border: 1px solid #c6a15b; border-radius: 22px; color: #252525; font-family: inherit; font-size: 14px; cursor: pointer">See the menu</button>
+    <button type="button" style="height: 44px; padding: 0 16px; background: #ffffff; border: 1px solid #c6a15b; border-radius: 22px; color: #252525; font-family: inherit; font-size: 14px; cursor: pointer">About the spa</button>
+  </div>
+
+  <form style="flex: none; margin: 0; padding: 4px 20px 12px; display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; gap: 8px; height: 52px; box-sizing: border-box; padding: 0 4px 0 18px; background: #ffffff; border: 1px solid #cfcfcf; border-radius: 26px">
+      <label for="welcome-pregunta" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%)">Your message</label>
+      <input id="welcome-pregunta" type="text" placeholder="Ask about rooms, dining, the spa..." style="flex: 1; min-width: 0; height: 44px; padding: 0; background: none; border: 0; color: #252525; font-family: inherit; font-size: 15px">
+      <button type="button" aria-label="Send message" style="flex: none; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #c6a15b; border: 0; border-radius: 50%; color: #252525; cursor: pointer">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </button>
+    </div>
+    <p style="margin: 0; text-align: center; font-size: 11px; line-height: 1.4; color: #545454">AI concierge. Please confirm rates when you reserve.</p>
+  </form>
+</section>
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.theroyale.backend.errors;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +38,16 @@ public class ApiExceptionHandler {
         return respuesta(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(LimiteExcedidoException.class)
+    public ResponseEntity<Map<String, Object>> manejarLimiteExcedido(LimiteExcedidoException ex) {
+        return respuesta(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+    }
+
+    @ExceptionHandler(ServicioNoDisponibleException.class)
+    public ResponseEntity<Map<String, Object>> manejarServicioNoDisponible(ServicioNoDisponibleException ex) {
+        return respuesta(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> manejarIntegridadDatos(DataIntegrityViolationException ex) {
         return respuesta(HttpStatus.CONFLICT,
@@ -55,8 +66,11 @@ public class ApiExceptionHandler {
                 "The request body is missing or has an invalid format (dates must be yyyy-MM-dd).");
     }
 
+    // El Content-Type se fija en JSON para que el error se pueda escribir aunque el cliente
+    // pida text/event-stream (POST /api/chat); sin esto Spring respondería 406.
     private ResponseEntity<Map<String, Object>> respuesta(HttpStatus estado, String mensaje) {
         return ResponseEntity.status(estado)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(Map.of("status", estado.value(), "message", mensaje));
     }
 }

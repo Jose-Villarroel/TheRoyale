@@ -10,6 +10,10 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.ItemConsumo;
 import com.theroyale.backend.model.Operador;
 import com.theroyale.backend.model.Pago;
+import com.theroyale.backend.model.CategoriaPlato;
+import com.theroyale.backend.model.EtiquetaPlato;
+import com.theroyale.backend.model.PlatoMenu;
+import com.theroyale.backend.model.RestauranteHotel;
 import com.theroyale.backend.model.Resena;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
@@ -20,6 +24,7 @@ import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.OperadorRepository;
+import com.theroyale.backend.repository.PlatoMenuRepository;
 import com.theroyale.backend.repository.ResenaRepository;
 import com.theroyale.backend.repository.ReservaRepository;
 import com.theroyale.backend.repository.ServicioRepository;
@@ -34,6 +39,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 // ===== Carga datos iniciales de prueba cada vez que la aplicación arranca =====
@@ -73,6 +79,9 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private ResenaRepository resenaRepository;
 
+    @Autowired
+    private PlatoMenuRepository platoMenuRepository;
+
     @Override
     public void run(String... args) throws Exception {
         cargarTiposHabitacion();
@@ -82,6 +91,110 @@ public class DataLoader implements CommandLineRunner {
         cargarOperadores();
         cargarAdmins();
         cargarReservas();
+        cargarPlatosMenu();
+    }
+
+    // ===== Carta de los 4 restaurantes (28 platos), coherente con las características de "Dining" =====
+    // Incluye opciones veganas, vegetarianas y sin gluten ("Dietary Menus"). Uno queda no disponible
+    // (plato de temporada) para que el admin y el filtro soloDisponibles tengan con qué trabajar.
+    private void cargarPlatosMenu() {
+        // Signature Restaurant: cocina contemporánea de Nueva York
+        guardarPlato("Roasted Beet Carpaccio", "Thinly sliced roasted beets, citrus segments, pistachio crumble and aged balsamic.",
+                "17.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Burrata and Heirloom Tomatoes", "Creamy burrata, heirloom tomatoes from the Hudson Valley, basil oil and sea salt.",
+                "19.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true,
+                EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Yellowfin Tuna Tartare", "Hand-cut yellowfin tuna, avocado, yuzu dressing and sesame tuile.",
+                "24.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true);
+        guardarPlato("Dry-Aged New York Strip", "28-day dry-aged strip steak, roasted bone marrow butter and pommes puree.",
+                "58.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Pan-Seared Atlantic Salmon", "Crispy-skin salmon, lemon beurre blanc, charred asparagus and fingerling potatoes.",
+                "42.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Wild Mushroom Risotto", "Carnaroli rice, forest mushrooms, aged parmesan and white truffle oil.",
+                "34.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Spiced Cauliflower Steak", "Harissa-roasted cauliflower, tahini, pomegranate and herb quinoa.",
+                "29.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN, EtiquetaPlato.PICANTE);
+        guardarPlato("Maine Lobster Linguine", "Fresh linguine, butter-poached Maine lobster, cherry tomatoes and chili. Seasonal.",
+                "49.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, false,
+                EtiquetaPlato.PICANTE);
+        guardarPlato("Classic New York Cheesecake", "Vanilla bean cheesecake on a graham cracker crust with berry compote.",
+                "14.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.POSTRE, true,
+                EtiquetaPlato.VEGETARIANO);
+        guardarPlato("Dark Chocolate Mousse", "Silky 70% dark chocolate and coconut mousse with raspberries.",
+                "13.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.POSTRE, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+
+        // Craft Cocktail Bar: cócteles de autor y algo para picar
+        guardarPlato("The Royale Manhattan", "Rye whiskey, sweet vermouth, house bitters and a brandied cherry, stirred to order.",
+                "22.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Fifth Avenue Spritz", "Elderflower liqueur, prosecco, white peach and soda.",
+                "19.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Smoky Jalapeno Margarita", "Mezcal, fresh lime, agave and jalapeno with a chili-salt rim.",
+                "20.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN, EtiquetaPlato.PICANTE);
+        guardarPlato("Garden Mocktail", "Alcohol-free blend of cucumber, mint, lime and sparkling tonic.",
+                "12.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Truffle Parmesan Fries", "Hand-cut fries, black truffle, parmesan and rosemary aioli.",
+                "14.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.ENTRADA, true,
+                EtiquetaPlato.VEGETARIANO);
+        guardarPlato("Wagyu Sliders", "Three mini wagyu burgers with aged cheddar and caramelized onions.",
+                "24.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.ENTRADA, true);
+
+        // 24h Room Service: carta a la habitación a cualquier hora
+        guardarPlato("The Royale Club Sandwich", "Roasted turkey, bacon, avocado, tomato and herb mayo on toasted brioche, with fries.",
+                "26.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+        guardarPlato("Classic Cheeseburger", "Prime beef patty, cheddar, lettuce, tomato and house sauce, with fries.",
+                "28.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+        guardarPlato("Buddha Bowl", "Quinoa, roasted sweet potato, chickpeas, kale, avocado and miso-ginger dressing.",
+                "24.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Chicken Caesar Salad", "Grilled chicken, romaine hearts, parmesan, croutons and classic Caesar dressing.",
+                "22.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+        guardarPlato("Seasonal Fruit Platter", "A selection of fresh seasonal fruit with mint.",
+                "15.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.POSTRE, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+
+        // Breakfast Lounge
+        guardarPlato("Eggs Benedict", "Poached eggs, smoked ham and hollandaise on a toasted English muffin.",
+                "24.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true);
+        guardarPlato("Avocado Toast", "Smashed avocado, cherry tomatoes, chili flakes and microgreens on sourdough.",
+                "19.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                EtiquetaPlato.VEGANO);
+        guardarPlato("Buttermilk Pancakes", "Fluffy stack with Vermont maple syrup, berries and whipped butter.",
+                "18.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                EtiquetaPlato.VEGETARIANO);
+        guardarPlato("Acai Bowl", "Acai, banana, toasted seed crunch, fresh berries and coconut.",
+                "16.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Smoked Salmon Bagel", "New York bagel, smoked salmon, cream cheese, capers and red onion.",
+                "22.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true);
+        guardarPlato("Greek Yogurt Parfait", "Greek yogurt, gluten-free granola, honey and seasonal berries.",
+                "14.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Cold-Pressed Green Juice", "Kale, cucumber, green apple, celery, lemon and ginger.",
+                "11.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+    }
+
+    private void guardarPlato(String nombre, String descripcion, String precio, RestauranteHotel restaurante,
+            CategoriaPlato categoria, boolean disponible, EtiquetaPlato... etiquetas) {
+        platoMenuRepository.save(PlatoMenu.builder()
+                .nombre(nombre)
+                .descripcion(descripcion)
+                .precio(new BigDecimal(precio))
+                .restaurante(restaurante)
+                .categoria(categoria)
+                .disponible(disponible)
+                .etiquetas(new LinkedHashSet<>(List.of(etiquetas)))
+                .build());
     }
 
     // ===== 2 administradores: gestionan el catálogo y el personal, no la operación diaria =====
