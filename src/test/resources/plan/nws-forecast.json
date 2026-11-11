@@ -1,0 +1,234 @@
+{
+ "type": "Feature",
+ "properties": {
+  "units": "us",
+  "generatedAt": "2026-11-11T15:58:36+00:00",
+  "updateTime": "2026-11-11T13:57:00+00:00",
+  "periods": [
+   {
+    "number": 1,
+    "name": "Veterans Day",
+    "startTime": "2026-11-11T10:00:00-05:00",
+    "endTime": "2026-11-11T18:00:00-05:00",
+    "isDaytime": true,
+    "temperature": 63,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 0
+    },
+    "windSpeed": "6 mph",
+    "windDirection": "SW",
+    "shortForecast": "Mostly Sunny"
+   },
+   {
+    "number": 2,
+    "name": "Tonight",
+    "startTime": "2026-11-11T18:00:00-05:00",
+    "endTime": "2026-11-12T06:00:00-05:00",
+    "isDaytime": false,
+    "temperature": 51,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 18
+    },
+    "windSpeed": "2 to 7 mph",
+    "windDirection": "SE",
+    "shortForecast": "Mostly Cloudy then Slight Chance Light Rain"
+   },
+   {
+    "number": 3,
+    "name": "Thursday",
+    "startTime": "2026-11-12T06:00:00-05:00",
+    "endTime": "2026-11-12T18:00:00-05:00",
+    "isDaytime": true,
+    "temperature": 61,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 98
+    },
+    "windSpeed": "8 to 12 mph",
+    "windDirection": "E",
+    "shortForecast": "Rain"
+   },
+   {
+    "number": 4,
+    "name": "Thursday Night",
+    "startTime": "2026-11-12T18:00:00-05:00",
+    "endTime": "2026-11-13T06:00:00-05:00",
+    "isDaytime": false,
+    "temperature": 44,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 98
+    },
+    "windSpeed": "9 to 13 mph",
+    "windDirection": "N",
+    "shortForecast": "Rain"
+   },
+   {
+    "number": 5,
+    "name": "Friday",
+    "startTime": "2026-11-13T06:00:00-05:00",
+    "endTime": "2026-11-13T18:00:00-05:00",
+    "isDaytime": true,
+    "temperature": 48,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 77
+    },
+    "windSpeed": "15 mph",
+    "windDirection": "NW",
+    "shortForecast": "Light Rain"
+   },
+   {
+    "number": 6,
+    "name": "Friday Night",
+    "startTime": "2026-11-13T18:00:00-05:00",
+    "endTime": "2026-11-14T06:00:00-05:00",
+    "isDaytime": false,
+    "temperature": 39,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 48
+    },
+    "windSpeed": "12 mph",
+    "windDirection": "NW",
+    "shortForecast": "Chance Light Rain"
+   },
+   {
+    "number": 7,
+    "name": "Saturday",
+    "startTime": "2026-11-14T06:00:00-05:00",
+    "endTime": "2026-11-14T18:00:00-05:00",
+    "isDaytime": true,
+    "temperature": 49,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 22
+    },
+    "windSpeed": "10 to 16 mph",
+    "windDirection": "NW",
+    "shortForecast": "Slight Chance Light Rain then Partly Sunny"
+   },
+   {
+    "number": 8,
+    "name": "Saturday Night",
+    "startTime": "2026-11-14T18:00:00-05:00",
+    "endTime": "2026-11-15T06:00:00-05:00",
+    "isDaytime": false,
+    "temperature": 39,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 1
+    },
+    "windSpeed": "9 to 13 mph",
+    "windDirection": "NW",
+    "shortForecast": "Partly Cloudy"
+   },
+   {
+    "number": 9,
+    "name": "Sunday",
+    "startTime": "2026-11-15T06:00:00-05:00",
+    "endTime": "2026-11-15T18:00:00-05:00",
+    "isDaytime": true,
+    "temperature": 51,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 0
+    },
+    "windSpeed": "9 to 13 mph",
+    "windDirection": "NW",
+    "shortForecast": "Mostly Sunny"
+   },
+   {
+    "number": 10,
+    "name": "Sunday Night",
+    "startTime": "2026-11-15T18:00:00-05:00",
+    "endTime": "2026-11-16T06:00:00-05:00",
+    "isDaytime": false,
+    "temperature": 38,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 0
+    },
+    "windSpeed": "6 to 9 mph",
+    "windDirection": "NW",
+    "shortForecast": "Partly Cloudy"
+   },
+   {
+    "number": 11,
+    "name": "Monday",
+    "startTime": "2026-11-16T06:00:00-05:00",
+    "endTime": "2026-11-16T18:00:00-05:00",
+    "isDaytime": true,
+    "temperature": 52,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 1
+    },
+    "windSpeed": "6 to 9 mph",
+    "windDirection": "NW",
+    "shortForecast": "Sunny"
+   },
+   {
+    "number": 12,
+    "name": "Monday Night",
+    "startTime": "2026-11-16T18:00:00-05:00",
+    "endTime": "2026-11-17T06:00:00-05:00",
+    "isDaytime": false,
+    "temperature": 37,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 1
+    },
+    "windSpeed": "3 to 7 mph",
+    "windDirection": "NW",
+    "shortForecast": "Mostly Clear"
+   },
+   {
+    "number": 13,
+    "name": "Tuesday",
+    "startTime": "2026-11-17T06:00:00-05:00",
+    "endTime": "2026-11-17T18:00:00-05:00",
+    "isDaytime": true,
+    "temperature": 53,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 2
+    },
+    "windSpeed": "6 mph",
+    "windDirection": "NW",
+    "shortForecast": "Sunny"
+   },
+   {
+    "number": 14,
+    "name": "Tuesday Night",
+    "startTime": "2026-11-17T18:00:00-05:00",
+    "endTime": "2026-11-18T06:00:00-05:00",
+    "isDaytime": false,
+    "temperature": 36,
+    "temperatureUnit": "F",
+    "probabilityOfPrecipitation": {
+     "unitCode": "wmoUnit:percent",
+     "value": 2
+    },
+    "windSpeed": "5 mph",
+    "windDirection": "N",
+    "shortForecast": "Partly Cloudy"
+   }
+  ]
+ }
+}

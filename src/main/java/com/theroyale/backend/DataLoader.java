@@ -1,6 +1,13 @@
 package com.theroyale.backend;
 
+import com.theroyale.backend.dto.plan.EntendidoItem;
+import com.theroyale.backend.dto.plan.PreferenciasPlan;
 import com.theroyale.backend.model.Admin;
+import com.theroyale.backend.model.CategoriaLugar;
+import com.theroyale.backend.model.Interes;
+import com.theroyale.backend.model.LugarNyc;
+import com.theroyale.backend.model.Presupuesto;
+import com.theroyale.backend.model.Ritmo;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.Cuenta;
 import com.theroyale.backend.model.EstadoCuenta;
@@ -10,6 +17,10 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.ItemConsumo;
 import com.theroyale.backend.model.Operador;
 import com.theroyale.backend.model.Pago;
+import com.theroyale.backend.model.CategoriaPlato;
+import com.theroyale.backend.model.EtiquetaPlato;
+import com.theroyale.backend.model.PlatoMenu;
+import com.theroyale.backend.model.RestauranteHotel;
 import com.theroyale.backend.model.Resena;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
@@ -19,11 +30,17 @@ import com.theroyale.backend.repository.AdminRepository;
 import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.CuentaRepository;
 import com.theroyale.backend.repository.HabitacionRepository;
+import com.theroyale.backend.repository.LugarNycRepository;
 import com.theroyale.backend.repository.OperadorRepository;
+import com.theroyale.backend.repository.PlatoMenuRepository;
 import com.theroyale.backend.repository.ResenaRepository;
 import com.theroyale.backend.repository.ReservaRepository;
 import com.theroyale.backend.repository.ServicioRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
+import com.theroyale.backend.service.plan.PlanGenerado;
+import com.theroyale.backend.service.plan.PlanGenerado.BloqueGenerado;
+import com.theroyale.backend.service.plan.PlanGenerado.DiaGenerado;
+import com.theroyale.backend.service.plan.PlanVisitaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -34,6 +51,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 // ===== Carga datos iniciales de prueba cada vez que la aplicación arranca =====
@@ -73,6 +91,15 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private ResenaRepository resenaRepository;
 
+    @Autowired
+    private PlatoMenuRepository platoMenuRepository;
+
+    @Autowired
+    private LugarNycRepository lugarNycRepository;
+
+    @Autowired
+    private PlanVisitaService planVisitaService;
+
     @Override
     public void run(String... args) throws Exception {
         cargarTiposHabitacion();
@@ -82,6 +109,253 @@ public class DataLoader implements CommandLineRunner {
         cargarOperadores();
         cargarAdmins();
         cargarReservas();
+        cargarReservasParaPlan();
+        cargarPlatosMenu();
+        cargarLugaresNyc();
+        cargarPlanDeEjemplo();
+    }
+
+    // ===== Catálogo curado de 25 lugares de Nueva York para el plan de visita =====
+    // Coordenadas reales; bajoTecho decide si el plan los evita con lluvia. Horarios de referencia.
+    private void cargarLugaresNyc() {
+        guardarLugar("Central Park", CategoriaLugar.PARQUE, 40.7829, -73.9654, false, 120,
+                "Daily 06:00-01:00", "https://www.centralparknyc.org");
+        guardarLugar("The Metropolitan Museum of Art", CategoriaLugar.MUSEO, 40.7794, -73.9632, true, 180,
+                "Sun-Tue and Thu 10:00-17:00, Fri-Sat 10:00-21:00, closed Wednesday", "https://www.metmuseum.org");
+        guardarLugar("The Museum of Modern Art (MoMA)", CategoriaLugar.MUSEO, 40.7614, -73.9776, true, 150,
+                "Daily 10:30-17:30, Saturday until 19:00", "https://www.moma.org");
+        guardarLugar("Top of the Rock", CategoriaLugar.MIRADOR, 40.7593, -73.9794, false, 60,
+                "Daily 09:00-24:00", "https://www.rockefellercenter.com/attractions/top-of-the-rock-observation-deck/");
+        guardarLugar("Rockefeller Center", CategoriaLugar.LANDMARK, 40.7587, -73.9787, false, 60,
+                "Open daily; ice rink and Christmas tree in winter", "https://www.rockefellercenter.com");
+        guardarLugar("St. Patrick's Cathedral", CategoriaLugar.LANDMARK, 40.7585, -73.9760, true, 45,
+                "Daily 06:30-20:45", "https://saintpatrickscathedral.org");
+        guardarLugar("Bryant Park", CategoriaLugar.PARQUE, 40.7536, -73.9832, false, 60,
+                "Daily 07:00-22:00; Winter Village in season", "https://bryantpark.org");
+        guardarLugar("New York Public Library (Stephen A. Schwarzman Building)", CategoriaLugar.LANDMARK, 40.7532, -73.9822, true, 60,
+                "Mon-Sat 10:00-18:00 (Tue-Wed until 20:00), Sun 13:00-17:00", "https://www.nypl.org/locations/schwarzman");
+        guardarLugar("Grand Central Terminal", CategoriaLugar.LANDMARK, 40.7527, -73.9772, true, 45,
+                "Daily 05:15-02:00", "https://www.grandcentralterminal.com");
+        guardarLugar("Times Square", CategoriaLugar.LANDMARK, 40.7580, -73.9855, false, 45,
+                "Always open; best after dark", "https://www.timessquarenyc.org");
+        guardarLugar("The High Line", CategoriaLugar.PASEO, 40.7480, -74.0048, false, 90,
+                "Daily 07:00-22:00 (until 19:00 in winter)", "https://www.thehighline.org");
+        guardarLugar("Vessel and Hudson Yards", CategoriaLugar.LANDMARK, 40.7538, -74.0022, false, 60,
+                "Daily 10:00-21:00", "https://www.hudsonyardsnewyork.com");
+        guardarLugar("Chelsea Market", CategoriaLugar.COMPRAS, 40.7424, -74.0061, true, 75,
+                "Daily 07:00-02:00", "https://www.chelseamarket.com");
+        guardarLugar("9/11 Memorial & Museum", CategoriaLugar.MUSEO, 40.7115, -74.0134, true, 150,
+                "Museum Wed-Mon 09:00-19:00; Memorial plaza daily", "https://www.911memorial.org");
+        guardarLugar("One World Observatory", CategoriaLugar.MIRADOR, 40.7130, -74.0132, true, 75,
+                "Daily 09:00-21:00", "https://www.oneworldobservatory.com");
+        guardarLugar("Brooklyn Bridge", CategoriaLugar.PASEO, 40.7061, -73.9969, false, 60,
+                "Always open; walk from City Hall", "https://www.nyc.gov/html/dot/html/infrastructure/brooklyn-bridge.shtml");
+        guardarLugar("DUMBO", CategoriaLugar.PASEO, 40.7033, -73.9881, false, 90,
+                "Always open; Washington Street view of the Manhattan Bridge", "https://dumbo.is");
+        guardarLugar("Statue of Liberty Ferry", CategoriaLugar.LANDMARK, 40.7033, -74.0170, false, 240,
+                "Ferries daily from about 09:00 at Battery Park", "https://www.nps.gov/stli");
+        guardarLugar("American Museum of Natural History", CategoriaLugar.MUSEO, 40.7813, -73.9740, true, 180,
+                "Daily 10:00-17:30", "https://www.amnh.org");
+        guardarLugar("Solomon R. Guggenheim Museum", CategoriaLugar.MUSEO, 40.7830, -73.9590, true, 120,
+                "Sun-Mon and Wed-Fri 11:00-18:00, Sat until 20:00, closed Tuesday", "https://www.guggenheim.org");
+        guardarLugar("Fifth Avenue shopping", CategoriaLugar.COMPRAS, 40.7625, -73.9739, false, 120,
+                "Most stores 10:00-20:00", "https://www.fifthavenue.nyc");
+        guardarLugar("Greenwich Village", CategoriaLugar.PASEO, 40.7336, -74.0027, false, 120,
+                "Always open; Washington Square Park and Bleecker Street", "https://www.villagepreservation.org");
+        guardarLugar("SoHo", CategoriaLugar.COMPRAS, 40.7233, -74.0030, false, 120,
+                "Most stores 11:00-19:00", "https://sohobroadway.org");
+        guardarLugar("Little Island", CategoriaLugar.PARQUE, 40.7420, -74.0103, false, 45,
+                "Daily 06:00-01:00", "https://littleisland.org");
+        guardarLugar("SUMMIT One Vanderbilt", CategoriaLugar.MIRADOR, 40.7531, -73.9787, true, 90,
+                "Daily 09:00-24:00", "https://summitov.com");
+    }
+
+    private void guardarLugar(String nombre, CategoriaLugar categoria, double latitud, double longitud,
+                              boolean bajoTecho, int duracionMinutos, String horario, String url) {
+        lugarNycRepository.save(LugarNyc.builder()
+                .nombre(nombre).categoria(categoria).latitud(latitud).longitud(longitud)
+                .bajoTecho(bajoTecho).duracionMinutos(duracionMinutos).horarioReferencia(horario)
+                .urlOficial(url).activo(true)
+                .build());
+    }
+
+    // ===== Plan de visita de ejemplo, ya validado, para que la demo funcione sin claves =====
+    // Reserva CONFIRMADA de la 703 (Sofia Torres, sofia.torres@email.com / pass1234): llega en 10 días,
+    // 4 noches, 3 huéspedes. No la usa ninguna prueba E2E. Se escribe como lo devolvería Gemini y pasa
+    // por ValidadorPlanService, así los nombres, URL, traslados y precios salen de las fuentes reales.
+    private void cargarPlanDeEjemplo() {
+        Reserva reserva = reservaRepository.findFirstByHabitacionNumeroAndEstadoIn("703", List.of(EstadoReserva.CONFIRMADA))
+                .orElseThrow();
+        LocalDate dia1 = reserva.getFechaInicio();
+        Servicio wellness = servicioRepository.findByNombreIgnoreCase("Wellness").orElseThrow();
+        Servicio concierge = servicioRepository.findByNombreIgnoreCase("Concierge").orElseThrow();
+
+        PreferenciasPlan preferencias = new PreferenciasPlan(List.of(Interes.MUSEOS, Interes.PARQUES, Interes.FAMILIA),
+                Ritmo.EQUILIBRADO, Presupuesto.ALTO, List.of(), false, true,
+                "Our daughter loves dinosaurs. One special dinner, please.");
+        String descripcion = "We are a family of three. Our daughter loves dinosaurs, we like parks and calm "
+                + "mornings, and we would like one special dinner during the trip.";
+        List<EntendidoItem> entendido = List.of(
+                new EntendidoItem("A family trip.", "Every day has family-friendly places and time to rest."),
+                new EntendidoItem("Dinosaurs first.", "Your first full morning is at the American Museum of Natural History."),
+                new EntendidoItem("One special dinner.", "Your arrival evening ends at the Signature Restaurant."));
+
+        PlanGenerado plan = new PlanGenerado(
+                "A gentle family week: dinosaurs, Central Park, the city from above and one special dinner.",
+                List.of(
+                        new DiaGenerado(dia1.toString(), "An easy first evening", List.of(
+                                bloque("16:00", "17:30", "LUGAR", lugarId("Rockefeller Center"), null,
+                                        "A short walk from the hotel to see the plaza and the rink."),
+                                bloque("19:00", "20:30", "RESTAURANTE_HOTEL", "SIGNATURE_RESTAURANT", null,
+                                        "Your special dinner, without leaving the hotel."))),
+                        new DiaGenerado(dia1.plusDays(1).toString(), "Dinosaurs and Central Park", List.of(
+                                bloque("08:00", "09:00", "RESTAURANTE_HOTEL", "BREAKFAST_LOUNGE", null,
+                                        "A calm breakfast before the museum."),
+                                bloque("10:00", "13:00", "LUGAR", lugarId("American Museum of Natural History"), null,
+                                        "The dinosaur halls your daughter is waiting for."),
+                                bloque("13:00", "14:00", "TIEMPO_LIBRE", "", null,
+                                        "Lunch is yours to choose on Columbus Avenue, next to the museum."),
+                                bloque("14:30", "16:30", "LUGAR", lugarId("Central Park"), null,
+                                        "Cross the park on foot back toward the hotel."),
+                                bloque("17:30", "18:30", "SERVICIO_HOTEL", String.valueOf(wellness.getId()),
+                                        "Heated Indoor Pool - Open daily 06:00 to 22:00",
+                                        "A swim for everyone after a long day outside."))),
+                        new DiaGenerado(dia1.plusDays(2).toString(), "Art and the city from above", List.of(
+                                bloque("10:00", "12:30", "LUGAR", lugarId("The Metropolitan Museum of Art"), null,
+                                        "Armor, mummies and the Temple of Dendur hold a child's attention."),
+                                bloque("13:00", "14:00", "RESTAURANTE_HOTEL", "SIGNATURE_RESTAURANT", null,
+                                        "Lunch back at the hotel to rest a little."),
+                                bloque("15:30", "16:30", "LUGAR", lugarId("Top of the Rock"), null,
+                                        "Central Park and the whole skyline from the terraces."))),
+                        new DiaGenerado(dia1.plusDays(3).toString(), "The West Side on foot", List.of(
+                                bloque("10:00", "11:30", "LUGAR", lugarId("The High Line"), null,
+                                        "An elevated park walk with gardens and city views."),
+                                bloque("11:45", "13:00", "LUGAR", lugarId("Chelsea Market"), null,
+                                        "Many food stalls, so everyone picks their own lunch."),
+                                bloque("16:00", "17:30", "SERVICIO_HOTEL", String.valueOf(concierge.getId()),
+                                        "Private Museum Tours - After-hours access to MET, MoMA and more",
+                                        "A quiet private visit, with no crowds."),
+                                bloque("19:00", "20:00", "RESTAURANTE_HOTEL", "ROOM_SERVICE", null,
+                                        "Dinner in the suite after a full day."))),
+                        new DiaGenerado(dia1.plusDays(4).toString(), "A last stroll", List.of(
+                                bloque("08:00", "09:00", "RESTAURANTE_HOTEL", "BREAKFAST_LOUNGE", null,
+                                        "A last breakfast at the hotel."),
+                                bloque("09:30", "11:00", "LUGAR", lugarId("Bryant Park"), null,
+                                        "A short walk before check-out at noon.")))));
+
+        planVisitaService.sembrarPlanDeEjemplo(reserva, preferencias, descripcion, entendido, plan);
+    }
+
+    private BloqueGenerado bloque(String inicio, String fin, String tipo, String referenciaId, String caracteristica,
+                                  String motivo) {
+        return new BloqueGenerado(inicio, fin, tipo, referenciaId, caracteristica, "", motivo);
+    }
+
+    private String lugarId(String nombre) {
+        return String.valueOf(lugarNycRepository.findByNombre(nombre).orElseThrow().getId());
+    }
+
+    // ===== Carta de los 4 restaurantes (28 platos), coherente con las características de "Dining" =====
+    // Incluye opciones veganas, vegetarianas y sin gluten ("Dietary Menus"). Uno queda no disponible
+    // (plato de temporada) para que el admin y el filtro soloDisponibles tengan con qué trabajar.
+    private void cargarPlatosMenu() {
+        // Signature Restaurant: cocina contemporánea de Nueva York
+        guardarPlato("Roasted Beet Carpaccio", "Thinly sliced roasted beets, citrus segments, pistachio crumble and aged balsamic.",
+                "17.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Burrata and Heirloom Tomatoes", "Creamy burrata, heirloom tomatoes from the Hudson Valley, basil oil and sea salt.",
+                "19.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true,
+                EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Yellowfin Tuna Tartare", "Hand-cut yellowfin tuna, avocado, yuzu dressing and sesame tuile.",
+                "24.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true);
+        guardarPlato("Dry-Aged New York Strip", "28-day dry-aged strip steak, roasted bone marrow butter and pommes puree.",
+                "58.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Pan-Seared Atlantic Salmon", "Crispy-skin salmon, lemon beurre blanc, charred asparagus and fingerling potatoes.",
+                "42.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Wild Mushroom Risotto", "Carnaroli rice, forest mushrooms, aged parmesan and white truffle oil.",
+                "34.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Spiced Cauliflower Steak", "Harissa-roasted cauliflower, tahini, pomegranate and herb quinoa.",
+                "29.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN, EtiquetaPlato.PICANTE);
+        guardarPlato("Maine Lobster Linguine", "Fresh linguine, butter-poached Maine lobster, cherry tomatoes and chili. Seasonal.",
+                "49.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, false,
+                EtiquetaPlato.PICANTE);
+        guardarPlato("Classic New York Cheesecake", "Vanilla bean cheesecake on a graham cracker crust with berry compote.",
+                "14.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.POSTRE, true,
+                EtiquetaPlato.VEGETARIANO);
+        guardarPlato("Dark Chocolate Mousse", "Silky 70% dark chocolate and coconut mousse with raspberries.",
+                "13.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.POSTRE, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+
+        // Craft Cocktail Bar: cócteles de autor y algo para picar
+        guardarPlato("The Royale Manhattan", "Rye whiskey, sweet vermouth, house bitters and a brandied cherry, stirred to order.",
+                "22.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Fifth Avenue Spritz", "Elderflower liqueur, prosecco, white peach and soda.",
+                "19.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Smoky Jalapeno Margarita", "Mezcal, fresh lime, agave and jalapeno with a chili-salt rim.",
+                "20.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN, EtiquetaPlato.PICANTE);
+        guardarPlato("Garden Mocktail", "Alcohol-free blend of cucumber, mint, lime and sparkling tonic.",
+                "12.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Truffle Parmesan Fries", "Hand-cut fries, black truffle, parmesan and rosemary aioli.",
+                "14.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.ENTRADA, true,
+                EtiquetaPlato.VEGETARIANO);
+        guardarPlato("Wagyu Sliders", "Three mini wagyu burgers with aged cheddar and caramelized onions.",
+                "24.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.ENTRADA, true);
+
+        // 24h Room Service: carta a la habitación a cualquier hora
+        guardarPlato("The Royale Club Sandwich", "Roasted turkey, bacon, avocado, tomato and herb mayo on toasted brioche, with fries.",
+                "26.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+        guardarPlato("Classic Cheeseburger", "Prime beef patty, cheddar, lettuce, tomato and house sauce, with fries.",
+                "28.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+        guardarPlato("Buddha Bowl", "Quinoa, roasted sweet potato, chickpeas, kale, avocado and miso-ginger dressing.",
+                "24.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Chicken Caesar Salad", "Grilled chicken, romaine hearts, parmesan, croutons and classic Caesar dressing.",
+                "22.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+        guardarPlato("Seasonal Fruit Platter", "A selection of fresh seasonal fruit with mint.",
+                "15.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.POSTRE, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+
+        // Breakfast Lounge
+        guardarPlato("Eggs Benedict", "Poached eggs, smoked ham and hollandaise on a toasted English muffin.",
+                "24.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true);
+        guardarPlato("Avocado Toast", "Smashed avocado, cherry tomatoes, chili flakes and microgreens on sourdough.",
+                "19.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                EtiquetaPlato.VEGANO);
+        guardarPlato("Buttermilk Pancakes", "Fluffy stack with Vermont maple syrup, berries and whipped butter.",
+                "18.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                EtiquetaPlato.VEGETARIANO);
+        guardarPlato("Acai Bowl", "Acai, banana, toasted seed crunch, fresh berries and coconut.",
+                "16.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Smoked Salmon Bagel", "New York bagel, smoked salmon, cream cheese, capers and red onion.",
+                "22.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true);
+        guardarPlato("Greek Yogurt Parfait", "Greek yogurt, gluten-free granola, honey and seasonal berries.",
+                "14.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
+        guardarPlato("Cold-Pressed Green Juice", "Kale, cucumber, green apple, celery, lemon and ginger.",
+                "11.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.BEBIDA, true,
+                EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
+    }
+
+    private void guardarPlato(String nombre, String descripcion, String precio, RestauranteHotel restaurante,
+            CategoriaPlato categoria, boolean disponible, EtiquetaPlato... etiquetas) {
+        platoMenuRepository.save(PlatoMenu.builder()
+                .nombre(nombre)
+                .descripcion(descripcion)
+                .precio(new BigDecimal(precio))
+                .restaurante(restaurante)
+                .categoria(categoria)
+                .disponible(disponible)
+                .etiquetas(new LinkedHashSet<>(List.of(etiquetas)))
+                .build());
     }
 
     // ===== 2 administradores: gestionan el catálogo y el personal, no la operación diaria =====
@@ -178,6 +452,33 @@ public class DataLoader implements CommandLineRunner {
         clienteRepository.save(Cliente.builder()
                 .nombre("Camila").apellido("Díaz").cedula("1020304059").email("camila.diaz@email.com")
                 .password("pass1234").telefono("+1-555-0110").fechaRegistro(LocalDate.of(2025, 8, 22))
+                .build());
+
+        // ===== Huéspedes para probar el plan de visita (ver cargarReservasParaPlan) =====
+        // Van al final para no mover los índices clientes.get(0..9) que usan las demás reservas.
+        clienteRepository.save(Cliente.builder()
+                .nombre("Daniel").apellido("Castro").cedula("1020304060").email("daniel.castro@email.com")
+                .password("pass1234").telefono("+1-555-0111").fechaRegistro(LocalDate.of(2025, 9, 3))
+                .build());
+
+        clienteRepository.save(Cliente.builder()
+                .nombre("Lucía").apellido("Moreno").cedula("1020304061").email("lucia.moreno@email.com")
+                .password("pass1234").telefono("+1-555-0112").fechaRegistro(LocalDate.of(2025, 9, 18))
+                .build());
+
+        clienteRepository.save(Cliente.builder()
+                .nombre("Mateo").apellido("Vargas").cedula("1020304062").email("mateo.vargas@email.com")
+                .password("pass1234").telefono("+1-555-0113").fechaRegistro(LocalDate.of(2025, 10, 2))
+                .build());
+
+        clienteRepository.save(Cliente.builder()
+                .nombre("Elena").apellido("Ruiz").cedula("1020304063").email("elena.ruiz@email.com")
+                .password("pass1234").telefono("+1-555-0114").fechaRegistro(LocalDate.of(2025, 10, 20))
+                .build());
+
+        clienteRepository.save(Cliente.builder()
+                .nombre("Tomás").apellido("Herrera").cedula("1020304064").email("tomas.herrera@email.com")
+                .password("pass1234").telefono("+1-555-0115").fechaRegistro(LocalDate.of(2025, 11, 1))
                 .build());
     }
 
@@ -484,6 +785,40 @@ public class DataLoader implements CommandLineRunner {
 
         cargarResenas(finalizada104, finalizada501, finalizada106, finalizada503,
                 finalizada303, finalizada304, finalizada704, finalizada705);
+    }
+
+    // ===== Reservas sin plan para probar "Plan my visit", una por cada caso del planificador =====
+    // Ninguna tiene plan todavía (la 703 de Sofia ya trae el de ejemplo) y no tocan las habitaciones
+    // ni las fechas que usan los E2E (Normal entre hoy+7 y hoy+11, la 101, la 902 y la 901).
+    private void cargarReservasParaPlan() {
+        LocalDate hoy = LocalDate.now();
+        Cliente daniel = clienteRepository.findByEmailIgnoreCase("daniel.castro@email.com").orElseThrow();
+        Cliente lucia = clienteRepository.findByEmailIgnoreCase("lucia.moreno@email.com").orElseThrow();
+        Cliente mateo = clienteRepository.findByEmailIgnoreCase("mateo.vargas@email.com").orElseThrow();
+        Cliente elena = clienteRepository.findByEmailIgnoreCase("elena.ruiz@email.com").orElseThrow();
+        Cliente tomas = clienteRepository.findByEmailIgnoreCase("tomas.herrera@email.com").orElseThrow();
+
+        // Llega en 3 días: clima con el pronóstico de NWS. Cuenta abierta, así que "Add to my stay" funciona
+        Reserva pronosticoNws = guardarReserva(daniel, "707", hoy.plusDays(3), hoy.plusDays(6), EstadoReserva.CONFIRMADA, 2);
+        abrirCuenta(pronosticoNws, hoy.minusDays(1));
+
+        // Llega en 12 días: clima con el pronóstico de Open-Meteo (días 8 a 16)
+        Reserva pronosticoOpenMeteo = guardarReserva(lucia, "504", hoy.plusDays(12), hoy.plusDays(16), EstadoReserva.CONFIRMADA, 3);
+        abrirCuenta(pronosticoOpenMeteo, hoy.minusDays(1));
+
+        // Llega en 45 días: muy lejos para un pronóstico, se usa el clima típico de esas fechas
+        Reserva climaTipico = guardarReserva(mateo, "306", hoy.plusDays(45), hoy.plusDays(48), EstadoReserva.CONFIRMADA, 2);
+        abrirCuenta(climaTipico, hoy.minusDays(1));
+
+        // PENDIENTE: el plan se puede armar, pero "Add to my stay" queda deshabilitado (sin cuenta abierta)
+        guardarReserva(elena, "109", hoy.plusDays(20), hoy.plusDays(23), EstadoReserva.PENDIENTE, 2);
+
+        // EN_CURSO desde ayer: solo se planifican los días que faltan. La suite queda OCUPADA, como tras el check-in
+        Reserva enCurso = guardarReserva(tomas, "904", hoy.minusDays(1), hoy.plusDays(3), EstadoReserva.EN_CURSO, 4);
+        abrirCuenta(enCurso, hoy.minusDays(1));
+        Habitacion suite904 = enCurso.getHabitacion();
+        suite904.setEstado(EstadoHabitacion.OCUPADA);
+        habitacionRepository.save(suite904);
     }
 
     // ===== Reseñas de ejemplo: Normal, Executive, VIP y Luxury tienen promedio; Presidential no =====

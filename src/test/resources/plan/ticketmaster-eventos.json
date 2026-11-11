@@ -1,0 +1,83 @@
+{
+  "_comment": "Fixture hecho a mano con la forma documentada de Discovery API v2 (no hay clave para una respuesta real).",
+  "_embedded": {
+    "events": [
+      {
+        "name": "Holiday Concert at Carnegie Hall",
+        "type": "event",
+        "id": "vvG1zZ9KbK8aaa",
+        "url": "https://www.ticketmaster.com/holiday-concert-new-york-new-york-12-12-2026/event/3B006100AAAA",
+        "locale": "en-us",
+        "dates": {
+          "start": { "localDate": "2026-12-12", "localTime": "19:30:00", "dateTime": "2026-12-13T00:30:00Z" },
+          "timezone": "America/New_York",
+          "status": { "code": "onsale" }
+        },
+        "classifications": [
+          { "primary": true, "segment": { "id": "KZFzniwnSyZfZ7v7nJ", "name": "Music" }, "genre": { "name": "Classical" } }
+        ],
+        "_embedded": {
+          "venues": [
+            {
+              "name": "Carnegie Hall",
+              "id": "KovZpZAEdFtJ",
+              "city": { "name": "New York" },
+              "location": { "longitude": "-73.97996", "latitude": "40.765" }
+            }
+          ]
+        }
+      },
+      {
+        "name": "The Lion King",
+        "type": "event",
+        "id": "vvG1zZ9KbK8bbb",
+        "url": "https://www.ticketmaster.com/the-lion-king-new-york-new-york-12-13-2026/event/3B006100BBBB",
+        "dates": {
+          "start": { "localDate": "2026-12-13", "localTime": "14:00:00" },
+          "status": { "code": "onsale" }
+        },
+        "classifications": [
+          { "primary": true, "segment": { "name": "Arts & Theatre" } }
+        ],
+        "_embedded": {
+          "venues": [
+            { "name": "Minskoff Theatre", "location": { "longitude": "-73.98585", "latitude": "40.75773" } }
+          ]
+        }
+      },
+      {
+        "name": "New York Knicks vs. Boston Celtics",
+        "type": "event",
+        "id": "vvG1zZ9KbK8ccc",
+        "url": "https://www.ticketmaster.com/knicks-celtics/event/3B006100CCCC",
+        "dates": {
+          "start": { "localDate": "2026-12-14" },
+          "status": { "code": "onsale" }
+        },
+        "classifications": [
+          { "primary": true, "segment": { "name": "Sports" } }
+        ],
+        "_embedded": {
+          "venues": [
+            { "name": "Madison Square Garden", "location": { "longitude": "-73.99351", "latitude": "40.75051" } }
+          ]
+        }
+      },
+      {
+        "name": "Cancelled Show",
+        "type": "event",
+        "id": "vvG1zZ9KbK8ddd",
+        "url": "https://www.ticketmaster.com/cancelled/event/3B006100DDDD",
+        "dates": {
+          "start": { "localDate": "2026-12-14", "localTime": "20:00:00" },
+          "status": { "code": "cancelled" }
+        },
+        "classifications": [
+          { "primary": true, "segment": { "name": "Music" } }
+        ],
+        "_embedded": { "venues": [ { "name": "Somewhere" } ] }
+      }
+    ]
+  },
+  "page": { "size": 50, "totalElements": 4, "totalPages": 1, "number": 0 }
+}

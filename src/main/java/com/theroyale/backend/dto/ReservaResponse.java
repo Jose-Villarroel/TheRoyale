@@ -34,7 +34,9 @@ public record ReservaResponse(
         String tipoHabitacionImagenUrl,
         // Reseña de esta estadía, o null si aún no tiene: "My reservations" decide entre
         // "Write a review" y "Edit review" sin otra petición
-        Long resenaId
+        Long resenaId,
+        // true si la estadía ya tiene plan de visita: "Plan my visit" o "View my plan"
+        boolean tienePlan
 ) {
 
     public static ReservaResponse from(Reserva r) {
@@ -61,6 +63,7 @@ public record ReservaResponse(
                 tipo == null ? null : tipo.getId(),
                 tipo == null ? null : tipo.getNombre(),
                 tipo == null ? null : tipo.getImagenUrl(),
-                r.getResena() == null ? null : r.getResena().getId());
+                r.getResena() == null ? null : r.getResena().getId(),
+                r.getPlanVisita() != null);
     }
 }

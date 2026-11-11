@@ -63,6 +63,13 @@ public class Reserva {
     @ToString.Exclude
     private Resena resena;
 
+    // ===== Lado inverso: el plan de visita de esta estadía (0 o 1) =====
+    // Sin cascade: ReservaService.eliminar lo borra explícitamente antes que la reserva.
+    @JsonIgnore
+    @OneToOne(mappedBy = "reserva")
+    @ToString.Exclude
+    private PlanVisita planVisita;
+
     // Calculado (no se persiste: la entidad usa acceso por campo)
     public long getNoches() {
         return ChronoUnit.DAYS.between(fechaInicio, fechaFin);
