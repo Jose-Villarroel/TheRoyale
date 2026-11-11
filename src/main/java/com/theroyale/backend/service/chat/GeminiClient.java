@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-// ===== Puerto hacia la API de Gemini (streamGenerateContent) =====
+// ===== Puerto hacia la API de Gemini (streamGenerateContent y generateContent con JSON) =====
 // Es una interfaz para que las pruebas usen un Gemini falso: ninguna prueba llama a la API real.
 // La implementación de producción es GeminiRestClient.
 public interface GeminiClient {
@@ -12,6 +12,17 @@ public interface GeminiClient {
     // Envía la conversación y entrega cada parte de la respuesta (texto o llamada a herramienta)
     // a medida que llega. Bloquea hasta que Gemini termina; si falla lanza GeminiException.
     void transmitir(SolicitudGemini solicitud, Consumer<ParteGemini> alRecibirParte);
+
+    // Llamada sin streaming que obliga a Gemini a responder JSON con el esquema dado (formato
+    // responseSchema de Gemini: "type": "OBJECT" / "ARRAY" / "STRING"...). La usa el plan de visita.
+    // Devuelve el JSON y el modelo que respondió (principal o de respaldo); si falla lanza GeminiException.
+    // Por defecto no está soportada, para que los Gemini falsos que solo transmiten sigan compilando.
+    default RespuestaJson generarJson(SolicitudGemini solicitud, Map<String, Object> esquemaRespuesta) {
+        throw new GeminiException("Este cliente de Gemini no soporta respuestas JSON.");
+    }
+
+    record RespuestaJson(String json, String modelo) {
+    }
 
     // herramientasHabilitadas = false obliga al modelo a responder solo con texto (última ronda)
     record SolicitudGemini(

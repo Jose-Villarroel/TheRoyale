@@ -39,6 +39,7 @@ public class GeminiRestClient implements GeminiClient {
     private final GeminiProperties propiedades;
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
+    private final RestClient restClientJson;
 
     @Autowired
     public GeminiRestClient(GeminiProperties propiedades, ObjectMapper objectMapper) {
@@ -57,6 +58,15 @@ public class GeminiRestClient implements GeminiClient {
         this.restClient = RestClient.builder()
                 .baseUrl(urlBase)
                 .requestFactory(fabrica)
+                .build();
+
+        // generateContent responde todo al final: el read timeout cubre la generación completa
+        SimpleClientHttpRequestFactory fabricaJson = new SimpleClientHttpRequestFactory();
+        fabricaJson.setConnectTimeout(TIMEOUT_CONEXION_MS);
+        fabricaJson.setReadTimeout(Math.max(propiedades.getTimeoutJsonSegundos(), propiedades.getTimeoutSegundos()) * 1000);
+        this.restClientJson = RestClient.builder()
+                .baseUrl(urlBase)
+                .requestFactory(fabricaJson)
                 .build();
     }
 
@@ -148,6 +158,84 @@ public class GeminiRestClient implements GeminiClient {
                 alRecibirParte.accept(new ParteGemini(parte.path("text").asText(""), null, null, firma));
             }
         }
+    }
+
+    // ===== Respuesta JSON con esquema (generateContent, sin streaming) =====
+    // Mismo respaldo que transmitir: si un modelo falla se prueba el siguiente. Aquí siempre se puede
+    // reintentar, porque no se entregó nada al cliente hasta tener la respuesta completa.
+    @Override
+    public RespuestaJson generarJson(SolicitudGemini solicitud, Map<String, Object> esquemaRespuesta) {
+        Map<String, Object> cuerpo = construirCuerpoJson(solicitud, esquemaRespuesta);
+        GeminiException ultimoError = null;
+
+        for (String modelo : propiedades.modelosEnOrden()) {
+            try {
+                long inicio = System.currentTimeMillis();
+                String json = llamarModeloJson(modelo, cuerpo);
+                log.info("Gemini respondió JSON con el modelo {} en {} ms", modelo, System.currentTimeMillis() - inicio);
+                return new RespuestaJson(json, modelo);
+            } catch (GeminiException ex) {
+                log.warn("Gemini (JSON) falló con el modelo {}; se prueba el siguiente si hay: {}", modelo, ex.getMessage());
+                ultimoError = ex;
+            }
+        }
+        throw ultimoError != null ? ultimoError : new GeminiException("No hay ningún modelo de Gemini configurado.");
+    }
+
+    private String llamarModeloJson(String modelo, Map<String, Object> cuerpo) {
+        String respuesta;
+        try {
+            respuesta = restClientJson.post()
+                    .uri("/models/{modelo}:generateContent", modelo)
+                    .header("x-goog-api-key", propiedades.getApiKey())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .body(cuerpo)
+                    .exchange((peticion, res) -> {
+                        String texto = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
+                        if (res.getStatusCode().isError()) {
+                            throw new GeminiException("Gemini respondió " + res.getStatusCode().value()
+                                    + ": " + recortar(texto));
+                        }
+                        return texto;
+                    });
+        } catch (RestClientException ex) {
+            throw new GeminiException("No se pudo completar la llamada a Gemini: " + ex.getMessage(), ex);
+        }
+
+        try {
+            JsonNode raiz = objectMapper.readTree(respuesta);
+            JsonNode bloqueo = raiz.path("promptFeedback").path("blockReason");
+            if (!bloqueo.isMissingNode()) {
+                throw new GeminiException("Gemini bloqueó la consulta: " + bloqueo.asText());
+            }
+            StringBuilder texto = new StringBuilder();
+            for (JsonNode parte : raiz.path("candidates").path(0).path("content").path("parts")) {
+                if (!parte.path("thought").asBoolean(false) && parte.has("text")) {
+                    texto.append(parte.get("text").asText());
+                }
+            }
+            if (texto.isEmpty()) {
+                throw new GeminiException("Gemini no devolvió contenido (finishReason="
+                        + raiz.path("candidates").path(0).path("finishReason").asText("?") + ").");
+            }
+            return texto.toString();
+        } catch (IOException ex) {
+            throw new GeminiException("Gemini devolvió una respuesta ilegible: " + ex.getMessage(), ex);
+        }
+    }
+
+    // Igual que construirCuerpo, pero sin herramientas y con el formato de salida en generationConfig
+    private Map<String, Object> construirCuerpoJson(SolicitudGemini solicitud, Map<String, Object> esquema) {
+        Map<String, Object> cuerpo = construirCuerpo(solicitud);
+        cuerpo.remove("tools");
+        cuerpo.remove("toolConfig");
+        Map<String, Object> configuracion = new LinkedHashMap<>();
+        configuracion.put("temperature", TEMPERATURA);
+        configuracion.put("responseMimeType", "application/json");
+        configuracion.put("responseSchema", esquema);
+        cuerpo.put("generationConfig", configuracion);
+        return cuerpo;
     }
 
     // ===== Cuerpo de la petición en el formato REST de Gemini =====

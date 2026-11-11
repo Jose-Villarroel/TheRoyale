@@ -16,6 +16,7 @@ import com.theroyale.backend.dto.DisponibilidadTipoResponse;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.repository.HabitacionRepository;
+import com.theroyale.backend.service.plan.PlanVisitaService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -55,6 +56,11 @@ public class ReservaService {
     // (carga las reservas con ReservaRepository), así que no hay ciclo de dependencias.
     @Autowired
     private ResenaService resenaService;
+
+    // El plan de visita se borra con la reserva. PlanVisitaService carga las reservas con
+    // ReservaRepository (como ResenaService), así que tampoco hay ciclo de dependencias.
+    @Autowired
+    private PlanVisitaService planVisitaService;
 
       // Habitaciones que no se pueden usar sin importar las fechas
     private static final List<EstadoHabitacion> ESTADOS_HABITACION_NO_UTILIZABLES =
@@ -277,7 +283,7 @@ public class ReservaService {
         return reservaRepository.save(reserva);
     }
 
-    // ===== Borra una reserva junto con su reseña y su cuenta (consumos y pagos incluidos) =====
+    // ===== Borra una reserva junto con su reseña, su plan de visita y su cuenta (consumos y pagos incluidos) =====
     // Una estadía EN_CURSO tiene al huésped en la habitación y una cuenta viva: se cierra con
     // check-out, no se borra. Las demás (pendientes, confirmadas, canceladas o finalizadas) sí.
     @Transactional
@@ -288,6 +294,7 @@ public class ReservaService {
         }
 
         resenaService.eliminarPorReserva(reserva);
+        planVisitaService.eliminarPorReserva(reserva);
         cuentaService.eliminarPorReserva(reserva);
         reservaRepository.delete(reserva);
     }

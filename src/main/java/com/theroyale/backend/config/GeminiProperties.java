@@ -33,6 +33,10 @@ public class GeminiProperties {
     // Tiempo máximo sin recibir datos de Gemini antes de abortar (y pasar al modelo de respaldo)
     private int timeoutSegundos = 20;
 
+    // generarJson (plan de visita) no transmite: Gemini no envía nada hasta terminar el plan completo,
+    // que puede tardar más que una respuesta del chat. Por eso tiene su propio tiempo máximo.
+    private int timeoutJsonSegundos = 60;
+
     public boolean tieneClave() {
         return apiKey != null && !apiKey.isBlank();
     }

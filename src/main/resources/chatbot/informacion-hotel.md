@@ -1,7 +1,8 @@
 # The Royale - general information for the Royale Concierge
 
 ## Location and contact
-- Address: The Royale, Fifth Avenue, Midtown Manhattan, New York, NY, United States.
+- Address: The Royale, 640 Fifth Avenue, New York, NY 10019, United States (Fifth Avenue at West 51st Street, Midtown Manhattan). Nearest subway: 5 Av/53 St (E, M) and 47-50 Sts-Rockefeller Ctr (B, D, F, M).
+- Within walking distance: Rockefeller Center and St. Patrick's Cathedral (3 min), MoMA (6 min), Central Park South (10 min), Times Square and Bryant Park (12 min).
 - Front desk and reservations: +1 507 3165 232 (24 hours, every day).
 - The front desk can help with anything the concierge cannot answer.
 

@@ -190,6 +190,61 @@ class GeminiRestClientTest {
         assertThat(partes).extracting(ParteGemini::texto).containsExactly("Hel");
     }
 
+    // ===== generarJson (plan de visita): generateContent sin streaming con esquema =====
+    @Test
+    void geminiRestClient_generarJson_pideJsonConEsquemaYDevuelveElTextoYElModelo() throws IOException {
+        // Arrange
+        estadoRespuesta = 200;
+        cuerpoRespuesta = "{\"candidates\":[{\"content\":{\"role\":\"model\",\"parts\":["
+                + "{\"text\":\"pensando\",\"thought\":true},{\"text\":\"{\\\"resumen\\\":\"},{\"text\":\"\\\"ok\\\"}\"}]},"
+                + "\"finishReason\":\"STOP\"}]}";
+        Map<String, Object> esquema = Map.of("type", "OBJECT", "properties", Map.of("resumen", Map.of("type", "STRING")));
+
+        // Act
+        GeminiClient.RespuestaJson respuesta = cliente.generarJson(solicitudSimple(false), esquema);
+
+        // Assert
+        assertThat(respuesta.json()).isEqualTo("{\"resumen\":\"ok\"}");
+        assertThat(respuesta.modelo()).isEqualTo("gemini-3.1-flash-lite");
+        assertThat(rutaRecibida).isEqualTo("/v1beta/models/gemini-3.1-flash-lite:generateContent");
+        assertThat(claveRecibida).isEqualTo("clave-falsa-de-prueba");
+        JsonNode cuerpo = new ObjectMapper().readTree(cuerpoRecibido);
+        assertThat(cuerpo.at("/generationConfig/responseMimeType").asText()).isEqualTo("application/json");
+        assertThat(cuerpo.at("/generationConfig/responseSchema/type").asText()).isEqualTo("OBJECT");
+        assertThat(cuerpo.at("/systemInstruction/parts/0/text").asText()).isEqualTo("SYSTEM");
+        assertThat(cuerpo.has("tools")).isFalse();
+    }
+
+    @Test
+    void geminiRestClient_generarJson_principalFalla_usaElRespaldoYLoInforma() {
+        // Arrange
+        propiedades.setModelo("modelo-principal");
+        propiedades.setModelosRespaldo(List.of("modelo-respaldo"));
+        modeloQueFalla = "modelo-principal";
+        estadoRespuesta = 200;
+        cuerpoRespuesta = "{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"{}\"}]}}]}";
+
+        // Act
+        GeminiClient.RespuestaJson respuesta = cliente.generarJson(solicitudSimple(false), Map.of("type", "OBJECT"));
+
+        // Assert
+        assertThat(rutasRecibidas).containsExactly("/v1beta/models/modelo-principal:generateContent",
+                "/v1beta/models/modelo-respaldo:generateContent");
+        assertThat(respuesta.modelo()).isEqualTo("modelo-respaldo");
+    }
+
+    @Test
+    void geminiRestClient_generarJson_todosFallanOBloqueada_lanzaGeminiException() {
+        // Arrange
+        estadoRespuesta = 200;
+        cuerpoRespuesta = "{\"promptFeedback\":{\"blockReason\":\"SAFETY\"}}";
+
+        // Act & Assert
+        assertThatThrownBy(() -> cliente.generarJson(solicitudSimple(false), Map.of("type", "OBJECT")))
+                .isInstanceOf(GeminiException.class)
+                .hasMessageContaining("SAFETY");
+    }
+
     private SolicitudGemini solicitudSimple(boolean herramientas) {
         return new SolicitudGemini("SYSTEM",
                 List.of(new MensajeGemini("user", List.of(ParteGemini.deTexto("Hi")))),

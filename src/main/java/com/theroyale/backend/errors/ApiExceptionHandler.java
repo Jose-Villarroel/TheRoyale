@@ -48,6 +48,11 @@ public class ApiExceptionHandler {
         return respuesta(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
+    @ExceptionHandler(PlanNoConfiableException.class)
+    public ResponseEntity<Map<String, Object>> manejarPlanNoConfiable(PlanNoConfiableException ex) {
+        return respuesta(HttpStatus.BAD_GATEWAY, ex.getMessage());
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> manejarIntegridadDatos(DataIntegrityViolationException ex) {
         return respuesta(HttpStatus.CONFLICT,
