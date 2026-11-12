@@ -24,9 +24,7 @@ import java.util.Comparator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 
 // ===== Ciclo de vida de una reserva gestionado por el operador =====
 // PENDIENTE -> CONFIRMADA (se abre la cuenta) -> EN_CURSO (check-in) -> FINALIZADA (check-out);
@@ -106,28 +104,6 @@ public class ReservaService {
                         List.of(EstadoReserva.CONFIRMADA, EstadoReserva.EN_CURSO))
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "No active reservation found for room " + numero));
-    }
-
-    public long contarPorEstado(EstadoReserva estado) {
-        return reservaRepository.countByEstado(estado);
-    }
-
-    // Cantidad de reservas por estado (para las pestanas de filtro del panel)
-    public Map<EstadoReserva, Long> contarTodasPorEstado() {
-        Map<EstadoReserva, Long> conteos = new EnumMap<>(EstadoReserva.class);
-        for (EstadoReserva estado : EstadoReserva.values()) {
-            conteos.put(estado, reservaRepository.countByEstado(estado));
-        }
-        return conteos;
-    }
-
-    public List<Reserva> llegadasDeHoy() {
-        return reservaRepository.findByFechaInicioAndEstadoIn(
-                LocalDate.now(), List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA));
-    }
-
-    public List<Reserva> salidasDeHoy() {
-        return reservaRepository.findByFechaFinAndEstado(LocalDate.now(), EstadoReserva.EN_CURSO);
     }
 
     // ===== Cuántas habitaciones quedan libres de cada tipo entre dos fechas =====

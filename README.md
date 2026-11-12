@@ -194,15 +194,14 @@ The-Royale/
 │   ├── repository/             # Repositorios Spring Data
 │   ├── service/                # Reglas de negocio
 │   ├── api/                    # Controladores REST (/api/**) que consume la SPA
-│   ├── controller/             # Controladores MVC de las vistas Thymeleaf
 │   ├── dto/
 │   ├── errors/
 │   └── DataLoader.java         # Datos de prueba iniciales
 │
 └── src/main/resources/
     ├── application.properties  # H2 en memoria
-    ├── templates/              # Vistas Thymeleaf (frontend heredado)
-    └── static/
+    ├── chatbot/                # Contexto del hotel para el Royale Concierge
+    └── plan/                   # Plantillas de prompt del plan de visita
 ```
 
 La SPA Angular 19 está en su propio repositorio,
@@ -221,9 +220,8 @@ TheRoyaleFront/src/app/
 └── services/ · models/ · guards/ · shared/
 ```
 
-El backend Spring Boot corre en el puerto 8080 y la SPA Angular en el 4200, consumiendo
-la API REST bajo `/api`. Las vistas Thymeleaf se conservan como respaldo del portal de
-operador y del panel de administración.
+El backend Spring Boot corre en el puerto 8080 y expone únicamente la API REST bajo `/api`;
+la SPA Angular corre en el 4200 y es el único frontend del proyecto.
 
 La estructura puede evolucionar durante el desarrollo del proyecto según las necesidades técnicas de cada Sprint.
 
