@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 // ===== API REST consumida por auth.service.ts del frontend Angular =====
-// El POST /login de AutenticacionController sigue sirviendo al formulario Thymeleaf;
-// este endpoint es el equivalente en JSON para la SPA. Ambos delegan en AutenticacionService.login.
+// Único punto de login del sistema: delega en AutenticacionService.login y devuelve JSON.
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:4200")

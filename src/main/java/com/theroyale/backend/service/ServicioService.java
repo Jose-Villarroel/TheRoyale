@@ -40,12 +40,6 @@ public class ServicioService implements InterfaceService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Servicio no encontrado: " + id));
     }
 
-    @Override
-    public Servicio buscarPorNombre(String nombre) {
-        return servicioRepository.findByNombreIgnoreCase(nombre)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Servicio no encontrado: " + nombre));
-    }
-
     // Al editar se copian solo los campos editables sobre la entidad existente:
     // hacer merge del objeto entrante dejaria sus itemsConsumo fuera del contexto de persistencia.
     @Override

@@ -8,12 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
-// ===== Registro e inicio de sesión de huéspedes, operadores y administradores =====
-// Concentra la decisión de "quién es" el usuario para que el login JSON (AutenticacionRestController)
-// y el formulario Thymeleaf (AutenticacionController) apliquen exactamente la misma regla.
+// ===== Inicio de sesión de huéspedes, operadores y administradores =====
+// Concentra la decisión de "quién es" el usuario detrás del login JSON de AutenticacionRestController.
 // Hay un solo login para los tres roles; el tipo devuelto decide a qué panel puede entrar cada uno.
 @Service
 @Transactional(readOnly = true)
@@ -31,35 +29,6 @@ public class AutenticacionService {
 
     @Autowired
     private OperadorService operadorService;
-
-    @Transactional
-    public ResultadoRegistro registrarCliente(Cliente cliente, String confirmPassword) {
-        if (cliente == null || estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) ||
-                estaVacio(cliente.getEmail()) || estaVacio(cliente.getPassword()) ||
-                estaVacio(cliente.getCedula())) {
-            return ResultadoRegistro.INCOMPLETO;
-        }
-
-        if (!cliente.getPassword().equals(confirmPassword)) {
-            return ResultadoRegistro.PASSWORD_NO_COINCIDE;
-        }
-
-        String emailNormalizado = normalizarEmail(cliente.getEmail());
-
-        String cedulaNormalizada = cliente.getCedula().trim();
-
-        if (emailNormalizado.isBlank() || clienteRepository.findByEmailIgnoreCase(emailNormalizado).isPresent()
-                || clienteRepository.findByCedula(cedulaNormalizada).isPresent()) {
-            return ResultadoRegistro.DUPLICADO;
-        }
-
-        cliente.setId(null);
-        cliente.setEmail(emailNormalizado);
-        cliente.setCedula(cedulaNormalizada);
-        cliente.setFechaRegistro(LocalDate.now());
-        clienteRepository.save(cliente);
-        return ResultadoRegistro.EXITO;
-    }
 
     public Optional<Cliente> autenticar(String email, String password) {
         Optional<Cliente> cliente = clienteRepository.findByEmailIgnoreCase(normalizarEmail(email));
@@ -111,30 +80,7 @@ public class AutenticacionService {
                         admin.getEmail()));
     }
 
-    public Optional<Cliente> obtenerClienteAutenticado(Long clienteId) {
-        if (clienteId == null) {
-            return Optional.empty();
-        }
-
-        return clienteRepository.findById(clienteId);
-    }
-
-    public boolean existeCliente(String email) {
-        return clienteRepository.findByEmailIgnoreCase(normalizarEmail(email)).isPresent();
-    }
-
-    private boolean estaVacio(String valor) {
-        return valor == null || valor.trim().isEmpty();
-    }
-
     private String normalizarEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase();
-    }
-
-    public enum ResultadoRegistro {
-        EXITO,
-        INCOMPLETO,
-        PASSWORD_NO_COINCIDE,
-        DUPLICADO
     }
 }
