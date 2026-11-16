@@ -28,9 +28,14 @@ public class Admin {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(nullable = false, length = 255)
+    @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private UserEntity user;
 
     // ===== Relaciones muchos a muchos: qué administra cada admin =====
     // Cada una crea su propia tabla intermedia (join table) en la base de datos.

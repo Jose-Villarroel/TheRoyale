@@ -2,13 +2,19 @@ package com.theroyale.backend.service;
 
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Cliente;
+import com.theroyale.backend.model.Role;
+import com.theroyale.backend.model.UserEntity;
 import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.ReservaRepository;
+import com.theroyale.backend.repository.RoleRepository;
+import com.theroyale.backend.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +29,15 @@ public class ClienteService {
 
     @Autowired
     private ReservaRepository reservaRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private UserEntityRepository userEntityRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<Cliente> listarTodos() {
         return clienteRepository.findAll();
@@ -59,6 +74,19 @@ public class ClienteService {
         cliente.setEmail(email);
         cliente.setCedula(cedula);
         cliente.setFechaRegistro(LocalDate.now());
+
+        if (cliente.getUser() == null) {
+            Role rol = roleRepository.findByName("ROLE_CLIENTE")
+                    .orElseGet(() -> roleRepository.save(new Role("ROLE_CLIENTE")));
+            String rawPass = (cliente.getPassword() != null && !cliente.getPassword().isBlank()) ? cliente.getPassword() : "123";
+            UserEntity user = UserEntity.builder()
+                    .username(email)
+                    .password(passwordEncoder.encode(rawPass))
+                    .roles(new ArrayList<>(List.of(rol)))
+                    .build();
+            cliente.setUser(user);
+        }
+
         return clienteRepository.save(cliente);
     }
 
@@ -80,6 +108,9 @@ public class ClienteService {
         clienteExistente.setEmail(email);
         if (!estaVacio(clienteActualizado.getPassword())) {
             clienteExistente.setPassword(clienteActualizado.getPassword());
+            if (clienteExistente.getUser() != null) {
+                clienteExistente.getUser().setPassword(passwordEncoder.encode(clienteActualizado.getPassword()));
+            }
         }
         clienteExistente.setTelefono(clienteActualizado.getTelefono());
 

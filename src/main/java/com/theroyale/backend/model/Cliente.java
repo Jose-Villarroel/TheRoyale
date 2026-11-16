@@ -37,9 +37,14 @@ public class Cliente {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(nullable = false, length = 255)
+    @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private UserEntity user;
 
     @Column(nullable = false, unique = true, length = 20)
     private String cedula;

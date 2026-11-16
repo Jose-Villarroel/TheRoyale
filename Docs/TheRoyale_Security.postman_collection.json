@@ -1,0 +1,649 @@
+{
+	"info": {
+		"_postman_id": "b1a2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+		"name": "The Royale - Seguridad & Endpoints",
+		"description": "Colección completa de pruebas para los endpoints de The Royale Hotel con Autenticación JWT, Control de Acceso por Roles (RBAC), y verificación de DTOs limpios.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticación & JWT",
+			"item": [
+				{
+					"name": "Login - Admin (Mono)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data.token) {",
+									"    pm.environment.set(\"jwt_token\", data.token);",
+									"    pm.environment.set(\"user_role\", data.tipo);",
+									"    console.log(\"Token guardado para ADMIN:\", data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"mono@theroyale.com\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login - Operador (Laura)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data.token) {",
+									"    pm.environment.set(\"jwt_token\", data.token);",
+									"    pm.environment.set(\"user_role\", data.tipo);",
+									"    console.log(\"Token guardado para OPERADOR:\", data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"laura.gomez@theroyale.com\",\n    \"password\": \"operator123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login - Cliente (Carlos)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data.token) {",
+									"    pm.environment.set(\"jwt_token\", data.token);",
+									"    pm.environment.set(\"user_role\", data.tipo);",
+									"    console.log(\"Token guardado para CLIENTE:\", data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"carlos.mendoza@email.com\",\n    \"password\": \"pass1234\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Perfil Actual (/api/auth/me)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Clientes (DTOs Limpios)",
+			"item": [
+				{
+					"name": "Listar Clientes (DTO sin contraseñas)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"No retorna contraseñas ni reservas anidadas\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.be.an('array');",
+									"    if (data.length > 0) {",
+									"        pm.expect(data[0].password).to.be.undefined;",
+									"        pm.expect(data[0].reservas).to.be.undefined;",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes"
+							]
+						}
+					}
+				},
+				{
+					"name": "Detalle del Cliente Autenticado (/details)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes/details",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"details"
+							]
+						}
+					}
+				},
+				{
+					"name": "Crear Cliente (Registro)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Estudiante\",\n    \"apellido\": \"Prueba\",\n    \"email\": \"estudiante.prueba@email.com\",\n    \"password\": \"pass1234\",\n    \"cedula\": \"999888777\",\n    \"telefono\": \"+573001234567\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Operadores (Solo ADMIN)",
+			"item": [
+				{
+					"name": "Listar Operadores",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores"
+							]
+						}
+					}
+				},
+				{
+					"name": "Crear Operador",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Carlos Operador\",\n    \"email\": \"carlos.operador@theroyale.com\",\n    \"password\": \"operator123\",\n    \"tipo\": \"OPERADOR\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Habitaciones & Tipos",
+			"item": [
+				{
+					"name": "Listar Tipos de Habitación (Público)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tipos-habitacion",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tipos-habitacion"
+							]
+						}
+					}
+				},
+				{
+					"name": "Listar Habitaciones (Público)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/habitaciones",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"habitaciones"
+							]
+						}
+					}
+				},
+				{
+					"name": "Crear Habitación (Solo ADMIN)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"numero\": \"901\",\n    \"tipoHabitacionId\": 1,\n    \"precio\": 250.0,\n    \"estado\": \"DISPONIBLE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/habitaciones",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"habitaciones"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Servicios (DTOs Limpios)",
+			"item": [
+				{
+					"name": "Listar Servicios (Público)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/servicios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"servicios"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Reservas & Operaciones",
+			"item": [
+				{
+					"name": "Listar Reservas (Autenticado)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							]
+						}
+					}
+				},
+				{
+					"name": "Buscar Habitación por Número (Operador)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/buscar-habitacion?numero=101",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"buscar-habitacion"
+							],
+							"query": [
+								{
+									"key": "numero",
+									"value": "101"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Pruebas de Seguridad (401 & 403)",
+			"item": [
+				{
+					"name": "Caso 401 - Petición sin Token a Endpoint Protegido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe retornar 401 Unauthorized\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores"
+							]
+						}
+					}
+				},
+				{
+					"name": "Caso 403 - CLIENTE intentando acceder a /api/operadores",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe retornar 403 Forbidden cuando el rol no tiene la autoridad\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores"
+							]
+						}
+					}
+				},
+				{
+					"name": "Caso 403 - OPERADOR intentando crear Tipo de Habitación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe retornar 403 Forbidden para operador en catálogo\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Penthouse Prohibido\",\n    \"descripcion\": \"Prueba de no autorizado\",\n    \"imagenUrl\": \"/images/suite-1.webp\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tipos-habitacion",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tipos-habitacion"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		}
+	]
+}

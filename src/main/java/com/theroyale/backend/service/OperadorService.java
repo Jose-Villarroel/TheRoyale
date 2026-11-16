@@ -2,14 +2,19 @@ package com.theroyale.backend.service;
 
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Operador;
+import com.theroyale.backend.model.Role;
 import com.theroyale.backend.model.TipoOperador;
+import com.theroyale.backend.model.UserEntity;
 import com.theroyale.backend.repository.ItemConsumoRepository;
 import com.theroyale.backend.repository.OperadorRepository;
 import com.theroyale.backend.repository.PagoRepository;
+import com.theroyale.backend.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +32,12 @@ public class OperadorService {
 
     @Autowired
     private PagoRepository pagoRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<Operador> listarTodos() {
         return operadorRepository.findAllByOrderByNombreAsc();
@@ -75,6 +86,19 @@ public class OperadorService {
         if (operador.getTipo() == null) {
             operador.setTipo(TipoOperador.OPERADOR);
         }
+
+        if (operador.getUser() == null) {
+            Role rol = roleRepository.findByName("ROLE_OPERADOR")
+                    .orElseGet(() -> roleRepository.save(new Role("ROLE_OPERADOR")));
+            String rawPass = (operador.getPassword() != null && !operador.getPassword().isBlank()) ? operador.getPassword() : "123";
+            UserEntity user = UserEntity.builder()
+                    .username(email)
+                    .password(passwordEncoder.encode(rawPass))
+                    .roles(new ArrayList<>(List.of(rol)))
+                    .build();
+            operador.setUser(user);
+        }
+
         return operadorRepository.save(operador);
     }
 
@@ -95,6 +119,9 @@ public class OperadorService {
         // Password vacio = conservar el actual, igual que en ClienteService.actualizar
         if (!estaVacio(operadorActualizado.getPassword())) {
             existente.setPassword(operadorActualizado.getPassword());
+            if (existente.getUser() != null) {
+                existente.getUser().setPassword(passwordEncoder.encode(operadorActualizado.getPassword()));
+            }
         }
         if (operadorActualizado.getTipo() != null) {
             existente.setTipo(operadorActualizado.getTipo());

@@ -1,6 +1,15 @@
 package com.theroyale.backend.dto;
 
-// ===== Respuesta que espera la interfaz LoginResponse de auth.service.ts =====
-// No corresponde a ninguna entidad: Cliente no tiene "tipo" y Operador no tiene "apellido".
-public record LoginResponse(String tipo, Long id, String nombre, String apellido, String email) {
+// ===== Respuesta de autenticación para el frontend y clientes de API =====
+public record LoginResponse(
+        String tipo,
+        Long id,
+        String nombre,
+        String apellido,
+        String email,
+        String token
+) {
+    public LoginResponse(String tipo, Long id, String nombre, String apellido, String email) {
+        this(tipo, id, nombre, apellido, email, null);
+    }
 }

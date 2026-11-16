@@ -26,6 +26,8 @@ import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.Servicio;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.model.TipoOperador;
+import com.theroyale.backend.model.Role;
+import com.theroyale.backend.model.UserEntity;
 import com.theroyale.backend.repository.AdminRepository;
 import com.theroyale.backend.repository.ClienteRepository;
 import com.theroyale.backend.repository.CuentaRepository;
@@ -35,8 +37,11 @@ import com.theroyale.backend.repository.OperadorRepository;
 import com.theroyale.backend.repository.PlatoMenuRepository;
 import com.theroyale.backend.repository.ResenaRepository;
 import com.theroyale.backend.repository.ReservaRepository;
+import com.theroyale.backend.repository.RoleRepository;
 import com.theroyale.backend.repository.ServicioRepository;
 import com.theroyale.backend.repository.TipoHabitacionRepository;
+import com.theroyale.backend.repository.UserEntityRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.theroyale.backend.service.plan.PlanGenerado;
 import com.theroyale.backend.service.plan.PlanGenerado.BloqueGenerado;
 import com.theroyale.backend.service.plan.PlanGenerado.DiaGenerado;
@@ -100,8 +105,41 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private PlanVisitaService planVisitaService;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private UserEntityRepository userEntityRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private Role rolAdmin;
+    private Role rolOperador;
+    private Role rolCliente;
+
+    private void cargarRoles() {
+        rolAdmin = roleRepository.findByName("ROLE_ADMIN")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
+        rolOperador = roleRepository.findByName("ROLE_OPERADOR")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_OPERADOR")));
+        rolCliente = roleRepository.findByName("ROLE_CLIENTE")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_CLIENTE")));
+    }
+
+    private UserEntity registrarUsuario(String username, String rawPassword, Role rol) {
+        String pass = (rawPassword != null && !rawPassword.isBlank()) ? rawPassword : "123";
+        return userEntityRepository.findByUsername(username)
+                .orElseGet(() -> userEntityRepository.save(UserEntity.builder()
+                        .username(username)
+                        .password(passwordEncoder.encode(pass))
+                        .roles(new ArrayList<>(List.of(rol)))
+                        .build()));
+    }
+
     @Override
     public void run(String... args) throws Exception {
+        cargarRoles();
         cargarTiposHabitacion();
         cargarClientes();
         cargarHabitaciones();
@@ -360,13 +398,17 @@ public class DataLoader implements CommandLineRunner {
 
     // ===== 2 administradores: gestionan el catálogo y el personal, no la operación diaria =====
     private void cargarAdmins() {
-        adminRepository.save(Admin.builder()
+        Admin mono = Admin.builder()
                 .nombre("Mono").email("mono@theroyale.com").password("admin123")
-                .build());
+                .build();
+        mono.setUser(registrarUsuario(mono.getEmail(), "admin123", rolAdmin));
+        adminRepository.save(mono);
 
-        adminRepository.save(Admin.builder()
+        Admin mati = Admin.builder()
                 .nombre("Mati").email("mati@theroyale.com").password("admin123")
-                .build());
+                .build();
+        mati.setUser(registrarUsuario(mati.getEmail(), "admin123", rolAdmin));
+        adminRepository.save(mati);
     }
 
     // ===== 5 tipos de habitación =====
@@ -403,83 +445,88 @@ public class DataLoader implements CommandLineRunner {
     }
 
     // ===== 10 clientes =====
+    private void guardarCliente(Cliente cliente, String rawPassword) {
+        cliente.setUser(registrarUsuario(cliente.getEmail(), rawPassword, rolCliente));
+        clienteRepository.save(cliente);
+    }
+
     private void cargarClientes() {
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Carlos").apellido("Mendoza").cedula("1020304050").email("carlos.mendoza@email.com")
                 .password("pass1234").telefono("+1-555-0101").fechaRegistro(LocalDate.of(2025, 1, 15))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Ana").apellido("García").cedula("1020304051").email("ana.garcia@email.com")
                 .password("pass1234").telefono("+1-555-0102").fechaRegistro(LocalDate.of(2025, 2, 20))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Luis").apellido("Hernández").cedula("1020304052").email("luis.hernandez@email.com")
                 .password("pass1234").telefono("+1-555-0103").fechaRegistro(LocalDate.of(2025, 3, 5))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Sofia").apellido("Torres").cedula("1020304053").email("sofia.torres@email.com")
                 .password("pass1234").telefono("+1-555-0104").fechaRegistro(LocalDate.of(2025, 3, 18))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Miguel").apellido("Ramírez").cedula("1020304054").email("miguel.ramirez@email.com")
                 .password("pass1234").telefono("+1-555-0105").fechaRegistro(LocalDate.of(2025, 4, 2))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Isabella").apellido("López").cedula("1020304055").email("isabella.lopez@email.com")
                 .password("pass1234").telefono("+1-555-0106").fechaRegistro(LocalDate.of(2025, 4, 25))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Andrés").apellido("Martínez").cedula("1020304056").email("andres.martinez@email.com")
                 .password("pass1234").telefono("+1-555-0107").fechaRegistro(LocalDate.of(2025, 5, 10))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Valentina").apellido("Rodríguez").cedula("1020304057").email("valentina.rodriguez@email.com")
                 .password("pass1234").telefono("+1-555-0108").fechaRegistro(LocalDate.of(2025, 6, 1))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Jorge").apellido("Sánchez").cedula("1020304058").email("jorge.sanchez@email.com")
                 .password("pass1234").telefono("+1-555-0109").fechaRegistro(LocalDate.of(2025, 7, 14))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Camila").apellido("Díaz").cedula("1020304059").email("camila.diaz@email.com")
                 .password("pass1234").telefono("+1-555-0110").fechaRegistro(LocalDate.of(2025, 8, 22))
-                .build());
+                .build(), "pass1234");
 
         // ===== Huéspedes para probar el plan de visita (ver cargarReservasParaPlan) =====
         // Van al final para no mover los índices clientes.get(0..9) que usan las demás reservas.
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Daniel").apellido("Castro").cedula("1020304060").email("daniel.castro@email.com")
                 .password("pass1234").telefono("+1-555-0111").fechaRegistro(LocalDate.of(2025, 9, 3))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Lucía").apellido("Moreno").cedula("1020304061").email("lucia.moreno@email.com")
                 .password("pass1234").telefono("+1-555-0112").fechaRegistro(LocalDate.of(2025, 9, 18))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Mateo").apellido("Vargas").cedula("1020304062").email("mateo.vargas@email.com")
                 .password("pass1234").telefono("+1-555-0113").fechaRegistro(LocalDate.of(2025, 10, 2))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Elena").apellido("Ruiz").cedula("1020304063").email("elena.ruiz@email.com")
                 .password("pass1234").telefono("+1-555-0114").fechaRegistro(LocalDate.of(2025, 10, 20))
-                .build());
+                .build(), "pass1234");
 
-        clienteRepository.save(Cliente.builder()
+        guardarCliente(Cliente.builder()
                 .nombre("Tomás").apellido("Herrera").cedula("1020304064").email("tomas.herrera@email.com")
                 .password("pass1234").telefono("+1-555-0115").fechaRegistro(LocalDate.of(2025, 11, 1))
-                .build());
+                .build(), "pass1234");
     }
 
     // ===== 50 habitaciones (10 por cada uno de los 5 tipos) =====
@@ -662,31 +709,36 @@ public class DataLoader implements CommandLineRunner {
     }
 
     // ===== 5 operadores (personal del hotel; entran por /login y son redirigidos a /operator) =====
+    private void guardarOperador(Operador operador, String rawPassword) {
+        operador.setUser(registrarUsuario(operador.getEmail(), rawPassword, rolOperador));
+        operadorRepository.save(operador);
+    }
+
     private void cargarOperadores() {
-        operadorRepository.save(Operador.builder()
+        guardarOperador(Operador.builder()
                 .nombre("Laura Gomez").email("laura.gomez@theroyale.com")
                 .password("operator123").tipo(TipoOperador.OPERADOR)
-                .build());
+                .build(), "operator123");
 
-        operadorRepository.save(Operador.builder()
+        guardarOperador(Operador.builder()
                 .nombre("Pedro Ruiz").email("pedro.ruiz@theroyale.com")
                 .password("operator123").tipo(TipoOperador.OPERADOR)
-                .build());
+                .build(), "operator123");
 
-        operadorRepository.save(Operador.builder()
+        guardarOperador(Operador.builder()
                 .nombre("Maria Castillo").email("maria.castillo@theroyale.com")
                 .password("operator123").tipo(TipoOperador.OPERADOR)
-                .build());
+                .build(), "operator123");
 
-        operadorRepository.save(Operador.builder()
+        guardarOperador(Operador.builder()
                 .nombre("James Wright").email("james.wright@theroyale.com")
                 .password("operator123").tipo(TipoOperador.OPERADOR)
-                .build());
+                .build(), "operator123");
 
-        operadorRepository.save(Operador.builder()
+        guardarOperador(Operador.builder()
                 .nombre("Sofia Chen").email("sofia.chen@theroyale.com")
                 .password("operator123").tipo(TipoOperador.OPERADOR)
-                .build());
+                .build(), "operator123");
     }
 
     // ===== Reservas de ejemplo en todos los estados, con fechas relativas al dia de arranque =====

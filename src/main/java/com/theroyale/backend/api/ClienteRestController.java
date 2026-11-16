@@ -1,50 +1,58 @@
 package com.theroyale.backend.api;
 
+import com.theroyale.backend.dto.ClienteResponseDto;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// ===== API REST consumida por cliente.service.ts del frontend Angular =====
-// El password entra en los POST/PUT pero nunca sale: va marcado WRITE_ONLY en la entidad.
+// ===== API REST de gestión de clientes =====
 @RestController
 @RequestMapping("/api/clientes")
-@CrossOrigin(origins = "http://localhost:4200")
 public class ClienteRestController {
 
     @Autowired
     private ClienteService clienteService;
 
     @GetMapping
-    public List<Cliente> listar() {
-        return clienteService.listarTodos();
+    public List<ClienteResponseDto> listar() {
+        return clienteService.listarTodos().stream()
+                .map(ClienteResponseDto::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Cliente obtenerPorId(@PathVariable Long id) {
-        return clienteService.obtenerPorId(id);
+    public ClienteResponseDto obtenerPorId(@PathVariable Long id) {
+        return ClienteResponseDto.from(clienteService.obtenerPorId(id));
+    }
+
+    // Endpoint details basado en SecurityContextHolder (como en la clase del profesor)
+    @GetMapping("/details")
+    public ResponseEntity<ClienteResponseDto> obtenerDetalles() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return clienteService.buscarPorEmail(auth.getName())
+                .map(c -> ResponseEntity.ok(ClienteResponseDto.from(c)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PostMapping
-    public ResponseEntity<Cliente> crear(@RequestBody Cliente cliente) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.crear(cliente));
+    public ResponseEntity<ClienteResponseDto> crear(@RequestBody Cliente cliente) {
+        Cliente creado = clienteService.crear(cliente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ClienteResponseDto.from(creado));
     }
 
     @PutMapping("/{id}")
-    public Cliente actualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
-        return clienteService.actualizar(id, cliente);
+    public ClienteResponseDto actualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
+        return ClienteResponseDto.from(clienteService.actualizar(id, cliente));
     }
 
     @DeleteMapping("/{id}")
