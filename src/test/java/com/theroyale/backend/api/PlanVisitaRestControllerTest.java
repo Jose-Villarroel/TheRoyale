@@ -1,5 +1,6 @@
 package com.theroyale.backend.api;
 
+import com.theroyale.backend.security.UsuarioActualService;
 import com.theroyale.backend.dto.CuentaResponse;
 import com.theroyale.backend.dto.plan.AgregarBloqueRequest;
 import com.theroyale.backend.dto.plan.AjustarPlanRequest;
@@ -31,6 +32,7 @@ import com.theroyale.backend.service.plan.PlanVisitaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -64,6 +66,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         controllers = PlanVisitaRestController.class,
         excludeAutoConfiguration = ThymeleafAutoConfiguration.class
 )
+// addFilters = false: aquí se prueba la lógica del controlador; las reglas de acceso las cubre SecurityRulesTest
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class PlanVisitaRestControllerTest {
 
@@ -79,6 +83,10 @@ class PlanVisitaRestControllerTest {
 
     @MockBean
     private PlanVisitaService planVisitaService;
+
+    // Sin rol de cliente simulado: la validación del dueño no interviene (la cubre SecurityRulesTest)
+    @MockBean
+    private UsuarioActualService usuarioActualService;
 
     // ===== Estado =====
     @Test

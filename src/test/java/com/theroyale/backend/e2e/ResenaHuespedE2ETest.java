@@ -15,7 +15,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -25,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -106,26 +106,40 @@ class ResenaHuespedE2ETest {
     @Autowired
     private ResenaService resenaService;
 
+    // Navegador activo: los métodos de ayuda (clic, escribir, texto...) actúan sobre él
     private WebDriver driver;
     private WebDriverWait wait;
+    private final List<WebDriver> navegadores = new ArrayList<>();
 
     // ===== Se ejecuta antes de CADA prueba: abre un Chrome nuevo =====
     @BeforeEach
     void setUp() {
+        usar(abrirNavegador());
+    }
+
+    // ===== Cierra los navegadores al terminar, pase o falle la prueba =====
+    @AfterEach
+    void tearDown() {
+        navegadores.forEach(WebDriver::quit);
+        navegadores.clear();
+    }
+
+    // ===== Cada rol usa su propio Chrome, como dos personas en dos equipos =====
+    // El token vive en localStorage (guía de seguridad, §9.1), que comparten todas las pestañas del
+    // mismo navegador: dos sesiones no conviven en dos pestañas, pero sí en dos navegadores.
+    private WebDriver abrirNavegador() {
         ChromeOptions opciones = new ChromeOptions();
         opciones.addArguments("--disable-extensions");
         // opciones.addArguments("--headless=new"); // descomentar para correr sin ventana visible
-        driver = new ChromeDriver(opciones);
-        // Los datos llegan del backend después del HTML: cada interacción espera hasta 10 s
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriver navegador = new ChromeDriver(opciones);
+        navegadores.add(navegador);
+        return navegador;
     }
 
-    // ===== Cierra el navegador al terminar, pase o falle la prueba =====
-    @AfterEach
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
+    private void usar(WebDriver navegador) {
+        driver = navegador;
+        // Los datos llegan del backend después del HTML: cada interacción espera hasta 10 s
+        wait = new WebDriverWait(navegador, Duration.ofSeconds(10));
     }
 
     @Test
@@ -145,7 +159,7 @@ class ResenaHuespedE2ETest {
         assertThat(texto(RESENAS_VACIO)).startsWith("No reviews yet");
 
         // ===== Paso 2: el huésped inicia sesión y abre su historial de reservas =====
-        String pestanaHuesped = driver.getWindowHandle();
+        WebDriver navegadorHuesped = driver;
         iniciarSesion(HUESPED_EMAIL, HUESPED_PASSWORD, "/profile");
         driver.get(FRONT + "/my-reservations");
         clic(MIS_RESERVAS_TAB_HISTORIAL);
@@ -202,9 +216,9 @@ class ResenaHuespedE2ETest {
         // Privacidad (criterio 10): la página pública no muestra el email del autor
         assertThat(tarjeta).doesNotContain(HUESPED_EMAIL);
 
-        // ===== Paso 6: en otra pestaña entra el admin y abre la moderación de reseñas =====
-        // La sesión vive en sessionStorage, que es propio de cada pestaña: las dos conviven.
-        driver.switchTo().newWindow(WindowType.TAB);
+        // ===== Paso 6: en otro navegador entra el admin y abre la moderación de reseñas =====
+        // El token vive en localStorage, que es propio de cada navegador: las dos sesiones conviven.
+        usar(abrirNavegador());
         iniciarSesion(ADMIN_EMAIL, ADMIN_PASSWORD, "/admin/reservas");
         clic(NAV_ADMIN_RESENAS);
         wait.until(ExpectedConditions.urlContains("/admin/resenas"));
@@ -225,7 +239,7 @@ class ResenaHuespedE2ETest {
         assertThat(resenaService.resumen(tipoId).promedio()).isNull();
 
         // ===== Paso 8: al recargar /rooms/{tipo} la reseña ya no aparece: "No reviews yet" =====
-        driver.switchTo().window(pestanaHuesped);
+        usar(navegadorHuesped);
         driver.get(FRONT + "/rooms/" + tipoId);
         esperarVisible(RESENAS_ROOM);
         assertThat(texto(RESENAS_VACIO)).startsWith("No reviews yet");

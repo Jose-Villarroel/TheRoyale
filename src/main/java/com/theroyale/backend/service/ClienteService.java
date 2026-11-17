@@ -102,6 +102,8 @@ public class ClienteService {
             throw new IllegalArgumentException("A client with email " + email + " already exists.");
         }
 
+        sincronizarUsername(clienteExistente.getUser(), email);
+
         // La cedula identifica a la persona: no se reescribe desde el formulario de perfil
         clienteExistente.setNombre(clienteActualizado.getNombre());
         clienteExistente.setApellido(clienteActualizado.getApellido());
@@ -125,6 +127,18 @@ public class ClienteService {
         }
 
         clienteRepository.deleteById(id);
+    }
+
+    // ===== El email es el username del login: si cambia, el UserEntity cambia con él =====
+    // Sin esto el cliente seguiría entrando con el email viejo y el nuevo no serviría.
+    private void sincronizarUsername(UserEntity user, String email) {
+        if (user == null || email.equals(user.getUsername())) {
+            return;
+        }
+        if (Boolean.TRUE.equals(userEntityRepository.existsByUsername(email))) {
+            throw new IllegalArgumentException("The email " + email + " is already used by another account.");
+        }
+        user.setUsername(email);
     }
 
     private void validarCliente(Cliente cliente, boolean requierePassword) {

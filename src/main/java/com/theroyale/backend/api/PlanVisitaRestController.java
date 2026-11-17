@@ -9,6 +9,7 @@ import com.theroyale.backend.dto.plan.InterpretacionPlan;
 import com.theroyale.backend.dto.plan.InterpretarPlanRequest;
 import com.theroyale.backend.dto.plan.PlanVisitaResponse;
 import com.theroyale.backend.dto.plan.RegenerarDiaRequest;
+import com.theroyale.backend.security.UsuarioActualService;
 import com.theroyale.backend.service.plan.PlanVisitaService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 
 // ===== API del plan de visita con IA, consumida por plan-visita.service.ts del frontend =====
-// Las rutas cuelgan de la reserva, como CuentaRestController. Mientras no haya JWT, clienteId viaja
-// en la petición y PlanVisitaService valida que la reserva sea suya (403). Los errores salen como
+// Las rutas cuelgan de la reserva, como CuentaRestController. Solo las usa ROLE_CLIENTE (SecurityConfig);
+// el clienteId de la petición debe ser el del token (UsuarioActualService) y PlanVisitaService valida
+// además que la reserva sea de ese cliente (403). Los errores salen como
 // { status, message } por ApiExceptionHandler: 400, 403, 404, 409, 429, 502 y 503.
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -36,6 +38,9 @@ public class PlanVisitaRestController {
 
     @Autowired
     private PlanVisitaService planVisitaService;
+
+    @Autowired
+    private UsuarioActualService usuarioActualService;
 
     // false si no hay GEMINI_API_KEY: el front muestra "The planner is unavailable right now"
     @GetMapping("/api/plan/estado")
@@ -47,22 +52,26 @@ public class PlanVisitaRestController {
     @PostMapping("/api/reservas/{reservaId}/plan/interpretar")
     public InterpretacionPlan interpretar(@PathVariable Long reservaId, @RequestBody InterpretarPlanRequest solicitud,
                                           HttpServletRequest peticion) {
+        usuarioActualService.exigirClientePropio(solicitud == null ? null : solicitud.clienteId());
         return planVisitaService.interpretar(reservaId, solicitud, peticion.getRemoteAddr());
     }
 
     @PostMapping("/api/reservas/{reservaId}/plan")
     public ResponseEntity<PlanVisitaResponse> generar(@PathVariable Long reservaId,
                                                       @RequestBody GenerarPlanRequest solicitud) {
+        usuarioActualService.exigirClientePropio(solicitud == null ? null : solicitud.clienteId());
         return ResponseEntity.status(HttpStatus.CREATED).body(planVisitaService.generar(reservaId, solicitud));
     }
 
     @GetMapping("/api/reservas/{reservaId}/plan")
     public PlanVisitaResponse obtener(@PathVariable Long reservaId, @RequestParam Long clienteId) {
+        usuarioActualService.exigirClientePropio(clienteId);
         return planVisitaService.obtener(reservaId, clienteId);
     }
 
     @PostMapping("/api/reservas/{reservaId}/plan/ajustar")
     public PlanVisitaResponse ajustar(@PathVariable Long reservaId, @RequestBody AjustarPlanRequest solicitud) {
+        usuarioActualService.exigirClientePropio(solicitud == null ? null : solicitud.clienteId());
         return planVisitaService.ajustar(reservaId, solicitud);
     }
 
@@ -70,18 +79,21 @@ public class PlanVisitaRestController {
     public PlanVisitaResponse regenerarDia(@PathVariable Long reservaId,
                                            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
                                            @RequestBody RegenerarDiaRequest solicitud) {
+        usuarioActualService.exigirClientePropio(solicitud == null ? null : solicitud.clienteId());
         return planVisitaService.regenerarDia(reservaId, fecha, solicitud);
     }
 
     @PostMapping("/api/reservas/{reservaId}/plan/bloques/{bloqueId}/agregar-a-cuenta")
     public ResponseEntity<CuentaResponse> agregarACuenta(@PathVariable Long reservaId, @PathVariable String bloqueId,
                                                          @RequestBody AgregarBloqueRequest solicitud) {
+        usuarioActualService.exigirClientePropio(solicitud == null ? null : solicitud.clienteId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(planVisitaService.agregarACuenta(reservaId, bloqueId, solicitud));
     }
 
     @DeleteMapping("/api/reservas/{reservaId}/plan")
     public ResponseEntity<Void> eliminar(@PathVariable Long reservaId, @RequestParam Long clienteId) {
+        usuarioActualService.exigirClientePropio(clienteId);
         planVisitaService.eliminar(reservaId, clienteId);
         return ResponseEntity.noContent().build();
     }

@@ -29,6 +29,7 @@ public class UserEntity {
     @Column(nullable = false, length = 255)
     private String password;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "user_roles",

@@ -2,7 +2,10 @@ package com.theroyale.backend.api;
 
 import com.theroyale.backend.dto.CrearReservaRequest;
 import com.theroyale.backend.dto.ReservaResponse;
+import com.theroyale.backend.errors.AccesoDenegadoException;
 import com.theroyale.backend.model.EstadoReserva;
+import com.theroyale.backend.model.Reserva;
+import com.theroyale.backend.security.UsuarioActualService;
 import com.theroyale.backend.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,13 +33,18 @@ public class ReservaRestController {
     @Autowired
     private ReservaService reservaService;
 
+    @Autowired
+    private UsuarioActualService usuarioActualService;
+
     // ===== Todas las reservas; con ?estado= se filtra por estado =====
     // Con ?clienteId= se devuelven solo las de ese cliente, y ?activas= las separa
     // entre vigentes (true) e historial (false) para el portal del huesped.
+    // Un CLIENTE solo puede pedir las suyas: clienteId es obligatorio y debe ser el de su token (403 si no).
     @GetMapping
     public List<ReservaResponse> listar(@RequestParam(required = false) EstadoReserva estado,
                                 @RequestParam(required = false) Long clienteId,
                                 @RequestParam(required = false) Boolean activas) {
+        usuarioActualService.exigirClientePropio(clienteId);
         var reservas = clienteId != null
                 ? reservaService.listarPorCliente(clienteId, activas)
                 : reservaService.listar(estado);
@@ -53,12 +61,16 @@ public class ReservaRestController {
 
     @GetMapping("/{id}")
     public ReservaResponse obtenerPorId(@PathVariable Long id) {
-        return ReservaResponse.from(reservaService.obtenerPorId(id));
+        Reserva reserva = reservaService.obtenerPorId(id);
+        exigirReservaPropia(reserva);
+        return ReservaResponse.from(reserva);
     }
 
     // ===== Crea una reserva: el sistema asigna una habitación libre del tipo pedido =====
+    // Un CLIENTE solo reserva a su nombre: el clienteId del cuerpo debe ser el de su token
     @PostMapping
     public ResponseEntity<ReservaResponse> crear(@RequestBody CrearReservaRequest solicitud) {
+        usuarioActualService.exigirClientePropio(solicitud == null ? null : solicitud.clienteId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservaResponse.from(reservaService.crear(solicitud)));
     }
@@ -66,6 +78,10 @@ public class ReservaRestController {
     // ===== Reescribe la reserva con los datos nuevos, solo si hay disponibilidad =====
     @PutMapping("/{id}")
     public ReservaResponse modificar(@PathVariable Long id, @RequestBody CrearReservaRequest solicitud) {
+        if (usuarioActualService.esSoloCliente()) {
+            exigirReservaPropia(reservaService.obtenerPorId(id));
+            usuarioActualService.exigirClientePropio(solicitud == null ? null : solicitud.clienteId());
+        }
         return ReservaResponse.from(reservaService.modificar(id, solicitud));
     }
 
@@ -77,8 +93,12 @@ public class ReservaRestController {
         return ReservaResponse.from(reservaService.confirmar(id));
     }
 
+    // El operador cancela cualquiera; el cliente solo las suyas (403 si es ajena)
     @PostMapping("/{id}/cancelar")
     public ReservaResponse cancelar(@PathVariable Long id) {
+        if (usuarioActualService.esSoloCliente()) {
+            exigirReservaPropia(reservaService.obtenerPorId(id));
+        }
         return ReservaResponse.from(reservaService.cancelar(id));
     }
 
@@ -97,5 +117,16 @@ public class ReservaRestController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         reservaService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // ===== Un CLIENTE solo ve, modifica o cancela reservas a su nombre (403 si es ajena) =====
+    private void exigirReservaPropia(Reserva reserva) {
+        if (!usuarioActualService.esSoloCliente()) {
+            return;
+        }
+        Long clientePropio = usuarioActualService.obtenerClienteActual().getId();
+        if (reserva.getCliente() == null || !reserva.getCliente().getId().equals(clientePropio)) {
+            throw new AccesoDenegadoException("You can only access your own reservations.");
+        }
     }
 }

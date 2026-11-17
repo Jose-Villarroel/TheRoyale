@@ -2,6 +2,7 @@ package com.theroyale.backend.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theroyale.backend.dto.CrearReservaRequest;
+import com.theroyale.backend.errors.AccesoDenegadoException;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.EstadoHabitacion;
@@ -9,10 +10,12 @@ import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.TipoHabitacion;
+import com.theroyale.backend.security.UsuarioActualService;
 import com.theroyale.backend.service.ReservaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -29,8 +32,10 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -46,6 +51,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         controllers = ReservaRestController.class,
         excludeAutoConfiguration = ThymeleafAutoConfiguration.class
 )
+// addFilters = false: aquí se prueba la lógica del controlador; las reglas de acceso las cubre SecurityRulesTest
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class ReservaRestControllerTest {
 
@@ -60,6 +67,10 @@ class ReservaRestControllerTest {
 
     @MockBean
     private ReservaService reservaService;
+
+    // Sin rol de cliente simulado (esSoloCliente() = false): se comporta como operador o admin
+    @MockBean
+    private UsuarioActualService usuarioActualService;
 
     // ===== 1. POST: crear =====
     @Test
@@ -146,6 +157,45 @@ class ReservaRestControllerTest {
         mockMvc.perform(delete("/api/reservas/1"))
                 .andExpect(status().isNoContent());
         verify(reservaService).eliminar(1L);
+    }
+
+    // ===== 6. Dueño: un cliente solo ve y cancela sus propias reservas =====
+    @Test
+    void reservaController_listar_clienteConIdAjeno_retorna403() throws Exception {
+        // Arrange: el token es del cliente 1 y pide las reservas del cliente 2
+        doThrow(new AccesoDenegadoException("You can only access your own data."))
+                .when(usuarioActualService).exigirClientePropio(2L);
+
+        // Act & Assert
+        mockMvc.perform(get("/api/reservas").param("clienteId", "2"))
+                .andExpect(status().isForbidden());
+        verify(reservaService, never()).listarPorCliente(any(), any());
+    }
+
+    @Test
+    void reservaController_listar_clienteConSuId_retorna200() throws Exception {
+        // Arrange
+        when(usuarioActualService.esSoloCliente()).thenReturn(true);
+        when(usuarioActualService.obtenerClienteActual()).thenReturn(Cliente.builder().id(1L).build());
+        when(reservaService.listarPorCliente(1L, null)).thenReturn(List.of(crearReserva(1L, 2)));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/reservas").param("clienteId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)));
+    }
+
+    @Test
+    void reservaController_cancelar_reservaAjena_retorna403() throws Exception {
+        // Arrange: la reserva 1 es del cliente 1 y quien cancela es el cliente 2
+        when(usuarioActualService.esSoloCliente()).thenReturn(true);
+        when(usuarioActualService.obtenerClienteActual()).thenReturn(Cliente.builder().id(2L).build());
+        when(reservaService.obtenerPorId(1L)).thenReturn(crearReserva(1L, 2));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/reservas/1/cancelar"))
+                .andExpect(status().isForbidden());
+        verify(reservaService, never()).cancelar(any());
     }
 
     // Reserva completa porque ReservaResponse lee los datos de su cliente, habitación y tipo

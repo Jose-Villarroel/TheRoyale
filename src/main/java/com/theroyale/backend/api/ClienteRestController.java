@@ -2,6 +2,7 @@ package com.theroyale.backend.api;
 
 import com.theroyale.backend.dto.ClienteResponseDto;
 import com.theroyale.backend.model.Cliente;
+import com.theroyale.backend.security.UsuarioActualService;
 import com.theroyale.backend.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,9 @@ public class ClienteRestController {
     @Autowired
     private ClienteService clienteService;
 
+    @Autowired
+    private UsuarioActualService usuarioActualService;
+
     @GetMapping
     public List<ClienteResponseDto> listar() {
         return clienteService.listarTodos().stream()
@@ -27,8 +31,10 @@ public class ClienteRestController {
                 .toList();
     }
 
+    // Un CLIENTE solo puede ver su propio perfil (403 si pide otro id)
     @GetMapping("/{id}")
     public ClienteResponseDto obtenerPorId(@PathVariable Long id) {
+        usuarioActualService.exigirClientePropio(id);
         return ClienteResponseDto.from(clienteService.obtenerPorId(id));
     }
 
@@ -50,8 +56,10 @@ public class ClienteRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ClienteResponseDto.from(creado));
     }
 
+    // Un CLIENTE solo edita su propio perfil; el admin edita cualquiera
     @PutMapping("/{id}")
     public ClienteResponseDto actualizar(@PathVariable Long id, @RequestBody Cliente cliente) {
+        usuarioActualService.exigirClientePropio(id);
         return ClienteResponseDto.from(clienteService.actualizar(id, cliente));
     }
 
