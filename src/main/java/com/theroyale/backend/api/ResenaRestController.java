@@ -4,6 +4,7 @@ import com.theroyale.backend.dto.CrearResenaRequest;
 import com.theroyale.backend.dto.ResenaResponse;
 import com.theroyale.backend.dto.ResumenResenasResponse;
 import com.theroyale.backend.model.Resena;
+import com.theroyale.backend.security.UsuarioActualService;
 import com.theroyale.backend.service.ResenaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,9 @@ public class ResenaRestController {
 
     @Autowired
     private ResenaService resenaService;
+
+    @Autowired
+    private UsuarioActualService usuarioActualService;
 
     // ===== Listados según los parámetros, en este orden de precedencia =====
     // 1. incluirOcultas=true -> moderación del admin: todas (visibles y ocultas), las más recientes
@@ -77,6 +81,8 @@ public class ResenaRestController {
     // ===== El huésped reseña una estadía FINALIZADA suya =====
     @PostMapping
     public ResponseEntity<ResenaResponse> crear(@RequestBody CrearResenaRequest solicitud) {
+        // El autor sale del token: el clienteId del cuerpo debe ser el del cliente autenticado
+        usuarioActualService.exigirClientePropio(solicitud == null ? null : solicitud.clienteId());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ResenaResponse.from(resenaService.crear(solicitud)));
     }
@@ -84,12 +90,14 @@ public class ResenaRestController {
     // ===== El autor edita estrellas, título y comentario (reservaId del cuerpo se ignora) =====
     @PutMapping("/{id}")
     public ResenaResponse actualizar(@PathVariable Long id, @RequestBody CrearResenaRequest cambios) {
+        usuarioActualService.exigirClientePropio(cambios == null ? null : cambios.clienteId());
         return ResenaResponse.from(resenaService.actualizar(id, cambios));
     }
 
-    // ===== El autor elimina su reseña; clienteId identifica al autor mientras no haya JWT =====
+    // ===== El autor elimina su reseña; el clienteId debe ser el del token =====
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id, @RequestParam Long clienteId) {
+        usuarioActualService.exigirClientePropio(clienteId);
         resenaService.eliminar(id, clienteId);
         return ResponseEntity.noContent().build();
     }

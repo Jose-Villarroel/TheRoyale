@@ -1,5 +1,6 @@
 package com.theroyale.backend.security;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,28 +37,46 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas
+                        // El streaming SSE del chat termina en un despacho ASYNC: no se vuelve a autorizar
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
+
+                        // ===== Rutas públicas =====
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/images/**", "/css/**", "/js/**", "/favicon.ico", "/", "/error").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/tipos-habitacion/**", "/api/habitaciones/**", "/api/servicios/**", "/api/disponibilidad/**", "/api/resenas/**", "/api/platos-menu/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tipos-habitacion/**", "/api/habitaciones/**", "/api/servicios/**", "/api/disponibilidad/**", "/api/resenas/**", "/api/menu/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll() // Registro público de cliente
-                        
-                        // Rutas de administración
-                        .requestMatchers("/api/operadores/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/clientes/**").hasAuthority("ROLE_ADMIN")
+                        // El concierge atiende a visitantes y clientes; LimiteMensajesService ya limita por IP
+                        .requestMatchers("/api/chat/**").permitAll()
 
-                        // Rutas de operador
+                        // ===== Rutas de administración (catálogo, clientes y moderación) =====
+                        .requestMatchers("/api/operadores/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/menu/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/menu/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/menu/**", "/api/clientes/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/clientes").hasAuthority("ROLE_ADMIN") // Solo la lista, no /{id} ni /details
+                        .requestMatchers(HttpMethod.POST, "/api/resenas/*/ocultar", "/api/resenas/*/mostrar").hasAuthority("ROLE_ADMIN")
+
+                        // ===== Rutas de operador =====
                         .requestMatchers("/api/reservas/buscar-habitacion").hasAnyAuthority("ROLE_OPERADOR", "ROLE_ADMIN")
                         .requestMatchers("/api/reservas/*/cuenta/**").hasAnyAuthority("ROLE_OPERADOR", "ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/reservas/*/check-in", "/api/reservas/*/check-out").hasAnyAuthority("ROLE_OPERADOR", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/reservas/*/check-in", "/api/reservas/*/check-out", "/api/reservas/*/confirmar").hasAuthority("ROLE_OPERADOR")
+                        // "*" es un solo segmento: no alcanza a DELETE /api/reservas/{id}/plan
+                        .requestMatchers(HttpMethod.DELETE, "/api/reservas/*").hasAuthority("ROLE_OPERADOR")
 
-                        // Rutas de cliente y generales autenticadas
+                        // ===== Rutas de cliente y generales autenticadas =====
+                        // Reseñas y plan de visita son del huésped; el controlador valida que el clienteId sea el del token
+                        .requestMatchers(HttpMethod.POST, "/api/resenas").hasAuthority("ROLE_CLIENTE")
+                        .requestMatchers(HttpMethod.PUT, "/api/resenas/*").hasAuthority("ROLE_CLIENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/resenas/*").hasAuthority("ROLE_CLIENTE")
+                        .requestMatchers("/api/reservas/*/plan/**").hasAuthority("ROLE_CLIENTE")
+                        // El cliente edita su perfil (solo el suyo, lo valida ClienteRestController) y el admin cualquiera
+                        .requestMatchers(HttpMethod.PUT, "/api/clientes/*").hasAnyAuthority("ROLE_CLIENTE", "ROLE_ADMIN")
+                        // El cliente solo puede cancelar las suyas: lo valida ReservaRestController
+                        .requestMatchers(HttpMethod.POST, "/api/reservas/*/cancelar").hasAnyAuthority("ROLE_CLIENTE", "ROLE_OPERADOR")
                         .requestMatchers(HttpMethod.POST, "/api/reservas").hasAnyAuthority("ROLE_CLIENTE", "ROLE_OPERADOR", "ROLE_ADMIN")
-                        .requestMatchers("/api/clientes/**", "/api/reservas/**", "/api/chat/**", "/api/plan-visita/**").authenticated()
+                        .requestMatchers("/api/clientes/**", "/api/reservas/**").authenticated()
 
                         .anyRequest().authenticated()
                 );

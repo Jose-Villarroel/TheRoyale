@@ -16,7 +16,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WindowType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -28,6 +27,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -117,26 +117,40 @@ class EstadiaOperadorE2ETest {
     @Autowired
     private ReservaService reservaService;
 
+    // Navegador activo: los métodos de ayuda (clic, escribir, texto...) actúan sobre él
     private WebDriver driver;
     private WebDriverWait wait;
+    private final List<WebDriver> navegadores = new ArrayList<>();
 
     // ===== Se ejecuta antes de CADA prueba: abre un Chrome nuevo =====
     @BeforeEach
     void setUp() {
+        usar(abrirNavegador());
+    }
+
+    // ===== Cierra los navegadores al terminar, pase o falle la prueba =====
+    @AfterEach
+    void tearDown() {
+        navegadores.forEach(WebDriver::quit);
+        navegadores.clear();
+    }
+
+    // ===== Cada rol usa su propio Chrome, como dos personas en dos equipos =====
+    // El token vive en localStorage (guía de seguridad, §9.1), que comparten todas las pestañas del
+    // mismo navegador: dos sesiones no conviven en dos pestañas, pero sí en dos navegadores.
+    private WebDriver abrirNavegador() {
         ChromeOptions opciones = new ChromeOptions();
         opciones.addArguments("--disable-extensions");
         // opciones.addArguments("--headless=new"); // descomentar para correr sin ventana visible
-        driver = new ChromeDriver(opciones);
-        // Los datos llegan del backend después del HTML: cada interacción espera hasta 10 s
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriver navegador = new ChromeDriver(opciones);
+        navegadores.add(navegador);
+        return navegador;
     }
 
-    // ===== Cierra el navegador al terminar, pase o falle la prueba =====
-    @AfterEach
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
+    private void usar(WebDriver navegador) {
+        driver = navegador;
+        // Los datos llegan del backend después del HTML: cada interacción espera hasta 10 s
+        wait = new WebDriverWait(navegador, Duration.ofSeconds(10));
     }
 
     @Test
@@ -146,7 +160,7 @@ class EstadiaOperadorE2ETest {
         BigDecimal precioDos = precioServicio(SERVICIO_DOS);
 
         // ===== Paso 1: el huésped ya registrado inicia sesión =====
-        String pestanaHuesped = driver.getWindowHandle();
+        WebDriver navegadorHuesped = driver;
         iniciarSesion(HUESPED_EMAIL, HUESPED_PASSWORD, "/profile");
 
         // ===== Paso 2: revisa sus próximas reservas y encuentra la que aún no ha iniciado =====
@@ -156,11 +170,11 @@ class EstadiaOperadorE2ETest {
                 .as("la reserva que el huésped hizo tiempo atrás sigue sin iniciar")
                 .isEqualTo("CONFIRMADA");
 
-        // ===== Paso 3: en otra pestaña entra el operador =====
-        // La sesión vive en sessionStorage (ver auth.service.ts), que es propio de cada pestaña:
-        // por eso las dos sesiones conviven sin pisarse. El paso 7 lo vuelve a comprobar.
-        driver.switchTo().newWindow(WindowType.TAB);
-        String pestanaOperador = driver.getWindowHandle();
+        // ===== Paso 3: en otro navegador entra el operador =====
+        // El token vive en localStorage, propio de cada navegador: por eso las dos sesiones
+        // conviven sin pisarse. El paso 7 lo vuelve a comprobar.
+        WebDriver navegadorOperador = abrirNavegador();
+        usar(navegadorOperador);
         iniciarSesion(OPERADOR_EMAIL, OPERADOR_PASSWORD, "/operator/reservas");
 
         // ===== Paso 4: va al perfil de reservas y abre la del huésped =====
@@ -194,16 +208,16 @@ class EstadiaOperadorE2ETest {
         assertThat(monto(CUENTA_TOTAL_CONSUMOS)).isEqualByComparingTo(totalEsperado);
         assertThat(monto(CUENTA_SALDO)).isEqualByComparingTo(totalEsperado);
 
-        // ===== Paso 7: el huésped, en su pestaña, ve que su estadía ya empezó =====
-        driver.switchTo().window(pestanaHuesped);
+        // ===== Paso 7: el huésped, en su navegador, ve que su estadía ya empezó =====
+        usar(navegadorHuesped);
         driver.get(FRONT + "/my-reservations");
         assertThat(driver.getCurrentUrl())
-                .as("la sesión del huésped sigue viva: sessionStorage es propio de cada pestaña")
+                .as("la sesión del huésped sigue viva: localStorage es propio de cada navegador")
                 .contains("/my-reservations");
         wait.until(condicion -> texto(By.id("mi-reserva-estado-" + reservaId)).equals("EN_CURSO"));
 
         // ===== Paso 8: termina la estadía; el operador cobra todo el saldo pendiente =====
-        driver.switchTo().window(pestanaOperador);
+        usar(navegadorOperador);
 
         // "Pay full balance" copia el saldo al campo de monto: es donde se comprueba que lo que se
         // va a cobrar es exactamente lo que se debe, antes de registrar el pago.
@@ -248,7 +262,7 @@ class EstadiaOperadorE2ETest {
         assertThat(habitacion.getEstado()).isEqualTo(EstadoHabitacion.DISPONIBLE);
 
         // ===== Paso 12: para el huésped la reserva pasó de sus reservas activas a su historial =====
-        driver.switchTo().window(pestanaHuesped);
+        usar(navegadorHuesped);
         driver.get(FRONT + "/my-reservations");
         esperarVisible(MIS_RESERVAS_TAB_HISTORIAL);
         wait.until(condicion -> driver.findElements(By.id("mi-reserva-" + reservaId)).isEmpty());

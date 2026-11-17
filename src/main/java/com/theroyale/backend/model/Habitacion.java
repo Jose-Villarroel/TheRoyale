@@ -28,6 +28,7 @@ public class Habitacion {
     @Column(nullable = false, unique = true, length = 10)
     private String numero;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tipo_habitacion_id", nullable = false)
     private TipoHabitacion tipoHabitacion;

@@ -9,6 +9,7 @@ import com.theroyale.backend.repository.ItemConsumoRepository;
 import com.theroyale.backend.repository.OperadorRepository;
 import com.theroyale.backend.repository.PagoRepository;
 import com.theroyale.backend.repository.RoleRepository;
+import com.theroyale.backend.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ public class OperadorService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private UserEntityRepository userEntityRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -114,6 +118,8 @@ public class OperadorService {
             throw new IllegalArgumentException("An operator with email " + email + " already exists.");
         }
 
+        sincronizarUsername(existente.getUser(), email);
+
         existente.setNombre(operadorActualizado.getNombre());
         existente.setEmail(email);
         // Password vacio = conservar el actual, igual que en ClienteService.actualizar
@@ -141,6 +147,18 @@ public class OperadorService {
         }
 
         operadorRepository.deleteById(id);
+    }
+
+    // ===== El email es el username del login: si cambia, el UserEntity cambia con él =====
+    // Igual que en ClienteService: sin esto el operador seguiría entrando con el email viejo.
+    private void sincronizarUsername(UserEntity user, String email) {
+        if (user == null || email.equals(user.getUsername())) {
+            return;
+        }
+        if (Boolean.TRUE.equals(userEntityRepository.existsByUsername(email))) {
+            throw new IllegalArgumentException("The email " + email + " is already used by another account.");
+        }
+        user.setUsername(email);
     }
 
     private void validarOperador(Operador operador, boolean requierePassword) {

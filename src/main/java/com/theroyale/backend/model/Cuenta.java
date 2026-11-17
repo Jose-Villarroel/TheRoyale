@@ -25,6 +25,7 @@ public class Cuenta {
 
     // El "unique = true" en la columna FK es lo que en JPA convierte una relación
     // que técnicamente podría ser muchos-a-uno en una relación real 1 a 1.
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reserva_id", nullable = false, unique = true)
     private Reserva reserva;

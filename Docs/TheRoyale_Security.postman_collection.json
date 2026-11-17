@@ -2,12 +2,13 @@
 	"info": {
 		"_postman_id": "b1a2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
 		"name": "The Royale - Seguridad & Endpoints",
-		"description": "Colección completa de pruebas para los endpoints de The Royale Hotel con Autenticación JWT, Control de Acceso por Roles (RBAC), y verificación de DTOs limpios.",
+		"description": "Colección completa de la API REST de The Royale (67 endpoints) con autenticación JWT y control de acceso por roles. Usar con el entorno \"The Royale - Local\" y ejecutar en orden (\"Run collection\") contra un backend recién arrancado: la carpeta 0 inicia sesión con cada rol (token_admin, token_operador, token_cliente, token_sofia) y cada petición usa el token de su rol. Los datos que se crean se borran al final de su carpeta. Las fechas (hoy_N = hoy + N días) se calculan antes de cada petición. Usuarios de prueba: admin mono@theroyale.com / admin123, operador laura.gomez@theroyale.com / operator123, clientes daniel.castro@email.com y sofia.torres@email.com / pass1234.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "1. Autenticación & JWT",
+			"name": "0. Login y datos base",
+			"description": "Público. Inicia sesión con un usuario de cada rol (admin, operador y dos clientes) y captura ids del catálogo y de las reservas de ejemplo que usan las carpetas siguientes. Ejecutar siempre primero.",
 			"item": [
 				{
 					"name": "Login - Admin (Mono)",
@@ -20,17 +21,21 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"var data = pm.response.json();",
-									"if (data.token) {",
-									"    pm.environment.set(\"jwt_token\", data.token);",
-									"    pm.environment.set(\"user_role\", data.tipo);",
-									"    console.log(\"Token guardado para ADMIN:\", data.token);",
-									"}"
+									"pm.test(\"Devuelve token y tipo ADMIN\", function () {",
+									"    pm.expect(data.token).to.be.a(\"string\").and.not.empty;",
+									"    pm.expect(data.tipo).to.eql(\"ADMIN\");",
+									"});",
+									"pm.environment.set(\"token_admin\", data.token);",
+									"pm.environment.set(\"adminId\", data.id);"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -40,7 +45,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"mono@theroyale.com\",\n    \"password\": \"admin123\"\n}"
+							"raw": "{\n    \"email\": \"{{email_admin}}\",\n    \"password\": \"{{password_admin}}\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/auth/login",
@@ -52,7 +57,8 @@
 								"auth",
 								"login"
 							]
-						}
+						},
+						"description": "Público (sin token). Inicia sesión como ADMIN (mono@theroyale.com) y guarda el JWT en `token_admin` y el id en `adminId`."
 					}
 				},
 				{
@@ -66,17 +72,21 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"var data = pm.response.json();",
-									"if (data.token) {",
-									"    pm.environment.set(\"jwt_token\", data.token);",
-									"    pm.environment.set(\"user_role\", data.tipo);",
-									"    console.log(\"Token guardado para OPERADOR:\", data.token);",
-									"}"
+									"pm.test(\"Devuelve token y tipo OPERADOR\", function () {",
+									"    pm.expect(data.token).to.be.a(\"string\").and.not.empty;",
+									"    pm.expect(data.tipo).to.eql(\"OPERADOR\");",
+									"});",
+									"pm.environment.set(\"token_operador\", data.token);",
+									"pm.environment.set(\"operadorId\", data.id);"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -86,7 +96,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"laura.gomez@theroyale.com\",\n    \"password\": \"operator123\"\n}"
+							"raw": "{\n    \"email\": \"{{email_operador}}\",\n    \"password\": \"{{password_operador}}\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/auth/login",
@@ -98,11 +108,12 @@
 								"auth",
 								"login"
 							]
-						}
+						},
+						"description": "Público (sin token). Inicia sesión como OPERADOR (laura.gomez@theroyale.com) y guarda el JWT en `token_operador` y el id en `operadorId`."
 					}
 				},
 				{
-					"name": "Login - Cliente (Carlos)",
+					"name": "Login - Cliente (Daniel)",
 					"event": [
 						{
 							"listen": "test",
@@ -112,17 +123,21 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"var data = pm.response.json();",
-									"if (data.token) {",
-									"    pm.environment.set(\"jwt_token\", data.token);",
-									"    pm.environment.set(\"user_role\", data.tipo);",
-									"    console.log(\"Token guardado para CLIENTE:\", data.token);",
-									"}"
+									"pm.test(\"Devuelve token y tipo CLIENTE\", function () {",
+									"    pm.expect(data.token).to.be.a(\"string\").and.not.empty;",
+									"    pm.expect(data.tipo).to.eql(\"CLIENTE\");",
+									"});",
+									"pm.environment.set(\"token_cliente\", data.token);",
+									"pm.environment.set(\"clienteId\", data.id);"
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -132,7 +147,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"carlos.mendoza@email.com\",\n    \"password\": \"pass1234\"\n}"
+							"raw": "{\n    \"email\": \"{{email_cliente}}\",\n    \"password\": \"{{password_cliente}}\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/auth/login",
@@ -144,18 +159,274 @@
 								"auth",
 								"login"
 							]
-						}
+						},
+						"description": "Público (sin token). Inicia sesión como CLIENTE (daniel.castro@email.com) y guarda el JWT en `token_cliente` y el id en `clienteId`."
 					}
 				},
 				{
-					"name": "Perfil Actual (/api/auth/me)",
+					"name": "Login - Cliente (Sofia, dueña del plan de ejemplo)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Devuelve token y tipo CLIENTE\", function () {",
+									"    pm.expect(data.token).to.be.a(\"string\").and.not.empty;",
+									"    pm.expect(data.tipo).to.eql(\"CLIENTE\");",
+									"});",
+									"pm.environment.set(\"token_sofia\", data.token);",
+									"pm.environment.set(\"sofiaId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email_sofia}}\",\n    \"password\": \"{{password_cliente}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Público (sin token). Inicia sesión como CLIENTE (sofia.torres@email.com), dueña de la reserva 703 con el plan de visita de ejemplo y guarda el JWT en `token_sofia` y el id en `sofiaId`."
+					}
+				},
+				{
+					"name": "Datos base - Tipos de habitación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"var normal = data.find(t => t.nombre === \"Normal\");",
+									"var vip = data.find(t => t.nombre === \"VIP\");",
+									"pm.test(\"Existen los tipos Normal y VIP\", function () { pm.expect(normal).to.exist; pm.expect(vip).to.exist; });",
+									"pm.environment.set(\"tipoNormalId\", normal.id);",
+									"pm.environment.set(\"tipoVipId\", vip.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tipos-habitacion",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tipos-habitacion"
+							]
+						},
+						"description": "Público. Guarda los ids de los tipos Normal (`tipoNormalId`) y VIP (`tipoVipId`)."
+					}
+				},
+				{
+					"name": "Datos base - Servicio del catálogo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"var wellness = data.find(s => s.nombre === \"Wellness\") || data[0];",
+									"pm.test(\"Hay servicios\", function () { pm.expect(wellness).to.exist; });",
+									"pm.environment.set(\"servicioCatalogoId\", wellness.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/servicios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"servicios"
+							]
+						},
+						"description": "Público. Guarda el id del servicio Wellness (`servicioCatalogoId`), que se carga en la cuenta."
+					}
+				},
+				{
+					"name": "Datos base - Reserva de Daniel (707)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"var r = data.find(x => x.habitacionNumero === \"707\");",
+									"pm.test(\"Daniel tiene la reserva de la 707\", function () { pm.expect(r).to.exist; });",
+									"pm.environment.set(\"reservaDanielPlanId\", r.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas?clienteId={{clienteId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{clienteId}}"
+								}
+							]
+						},
+						"description": "CLIENTE (Daniel). Guarda su reserva CONFIRMADA de la 707, sin plan (`reservaDanielPlanId`)."
+					}
+				},
+				{
+					"name": "Datos base - Reserva de Sofia (703)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"var r = data.find(x => x.habitacionNumero === \"703\" && x.estado === \"CONFIRMADA\");",
+									"pm.test(\"Sofia tiene la reserva confirmada de la 703\", function () { pm.expect(r).to.exist; });",
+									"pm.environment.set(\"reservaSofiaId\", r.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_sofia}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas?clienteId={{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{sofiaId}}"
+								}
+							]
+						},
+						"description": "CLIENTE (Sofia). Guarda su reserva CONFIRMADA de la 703, que trae el plan de ejemplo (`reservaSofiaId`)."
+					}
+				}
+			]
+		},
+		{
+			"name": "1. Autenticación",
+			"description": "POST /api/auth/login es público (ver carpeta 0). GET /api/auth/me devuelve el perfil del usuario del token: cualquier rol autenticado.",
+			"item": [
+				{
+					"name": "Perfil actual - Cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es el cliente de la sesión y no expone la contraseña\", function () {",
+									"    pm.expect(data.email).to.eql(pm.environment.get(\"email_cliente\"));",
+									"    pm.expect(data).to.not.have.property(\"password\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
 									"type": "string"
 								}
 							]
@@ -172,32 +443,22 @@
 								"auth",
 								"me"
 							]
-						}
+						},
+						"description": "CLIENTE. Devuelve el perfil del dueño del token, sin contraseña."
 					}
-				}
-			]
-		},
-		{
-			"name": "2. Clientes (DTOs Limpios)",
-			"item": [
+				},
 				{
-					"name": "Listar Clientes (DTO sin contraseñas)",
+					"name": "Perfil actual - Operador",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code 200\", function () {",
+									"pm.test(\"Status code es 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
-									"pm.test(\"No retorna contraseñas ni reservas anidadas\", function () {",
-									"    var data = pm.response.json();",
-									"    pm.expect(data).to.be.an('array');",
-									"    if (data.length > 0) {",
-									"        pm.expect(data[0].password).to.be.undefined;",
-									"        pm.expect(data[0].reservas).to.be.undefined;",
-									"    }",
-									"});"
+									"var data = pm.response.json();",
+									"pm.test(\"Es el operador de la sesión\", function () { pm.expect(data.email).to.eql(pm.environment.get(\"email_operador\")); });"
 								],
 								"type": "text/javascript"
 							}
@@ -209,7 +470,114 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "OPERADOR. Devuelve el perfil del operador del token."
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Clientes",
+			"description": "Registro público (POST). Listar y eliminar: solo ADMIN. Ver un cliente, /details y editar: cualquier usuario autenticado. Crea un cliente de prueba y lo borra al final.",
+			"item": [
+				{
+					"name": "Registrar cliente (público)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var ts = Date.now();",
+									"pm.environment.set(\"nuevoClienteEmail\", \"postman.\" + ts + \"@example.com\");",
+									"pm.environment.set(\"nuevoClienteCedula\", \"PM\" + ts);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"No expone la contraseña\", function () { pm.expect(data).to.not.have.property(\"password\"); });",
+									"pm.environment.set(\"nuevoClienteId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Postman\",\n    \"apellido\": \"Prueba\",\n    \"email\": \"{{nuevoClienteEmail}}\",\n    \"password\": \"{{password_cliente}}\",\n    \"cedula\": \"{{nuevoClienteCedula}}\",\n    \"telefono\": \"+1-555-0199\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes"
+							]
+						},
+						"description": "Público (sin token). Registro de un cliente nuevo; guarda `nuevoClienteId`. Email y cédula únicos por ejecución."
+					}
+				},
+				{
+					"name": "Listar clientes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es una lista\", function () { pm.expect(data).to.be.an(\"array\").and.not.empty; });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
 									"type": "string"
 								}
 							]
@@ -225,18 +593,78 @@
 								"api",
 								"clientes"
 							]
-						}
+						},
+						"description": "ADMIN. Lista todos los clientes (DTO sin contraseñas)."
 					}
 				},
 				{
-					"name": "Detalle del Cliente Autenticado (/details)",
+					"name": "Obtener cliente por id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es el cliente pedido\", function () { pm.expect(String(data.id)).to.eql(String(pm.environment.get(\"clienteId\"))); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes/{{clienteId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"{{clienteId}}"
+							]
+						},
+						"description": "Autenticado (aquí CLIENTE consultando su propio id)."
+					}
+				},
+				{
+					"name": "Detalles del cliente autenticado (/details)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es el cliente de la sesión\", function () { pm.expect(data.email).to.eql(pm.environment.get(\"email_cliente\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
 									"type": "string"
 								}
 							]
@@ -253,12 +681,148 @@
 								"clientes",
 								"details"
 							]
-						}
+						},
+						"description": "CLIENTE. Perfil del cliente sacado del token (SecurityContextHolder)."
 					}
 				},
 				{
-					"name": "Crear Cliente (Registro)",
+					"name": "Actualizar cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Apellido actualizado\", function () { pm.expect(data.apellido).to.eql(\"Editado\"); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Postman\",\n    \"apellido\": \"Editado\",\n    \"email\": \"{{nuevoClienteEmail}}\",\n    \"telefono\": \"+1-555-0198\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes/{{nuevoClienteId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"{{nuevoClienteId}}"
+							]
+						},
+						"description": "Autenticado (aquí ADMIN). Edita el cliente de prueba; la cédula no cambia."
+					}
+				},
+				{
+					"name": "Eliminar cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes/{{nuevoClienteId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"{{nuevoClienteId}}"
+							]
+						},
+						"description": "ADMIN. Borra el cliente de prueba (no tiene reservas)."
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Operadores",
+			"description": "Solo ADMIN en todas las operaciones. Crea un operador de prueba y lo borra al final.",
+			"item": [
+				{
+					"name": "Crear operador",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"nuevoOperadorEmail\", \"postman.op.\" + Date.now() + \"@theroyale.com\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.environment.set(\"nuevoOperadorId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -268,34 +832,45 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"nombre\": \"Estudiante\",\n    \"apellido\": \"Prueba\",\n    \"email\": \"estudiante.prueba@email.com\",\n    \"password\": \"pass1234\",\n    \"cedula\": \"999888777\",\n    \"telefono\": \"+573001234567\"\n}"
+							"raw": "{\n    \"nombre\": \"Postman Operador\",\n    \"email\": \"{{nuevoOperadorEmail}}\",\n    \"password\": \"{{password_operador}}\",\n    \"tipo\": \"OPERADOR\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/clientes",
+							"raw": "{{baseUrl}}/api/operadores",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"clientes"
+								"operadores"
 							]
-						}
+						},
+						"description": "ADMIN. Guarda `nuevoOperadorId`."
 					}
-				}
-			]
-		},
-		{
-			"name": "3. Operadores (Solo ADMIN)",
-			"item": [
+				},
 				{
-					"name": "Listar Operadores",
+					"name": "Listar operadores",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es una lista\", function () { pm.expect(data).to.be.an(\"array\").and.not.empty; });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_admin}}",
 									"type": "string"
 								}
 							]
@@ -311,18 +886,188 @@
 								"api",
 								"operadores"
 							]
-						}
+						},
+						"description": "ADMIN."
 					}
 				},
 				{
-					"name": "Crear Operador",
+					"name": "Obtener operador por id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es el operador creado\", function () { pm.expect(data.email).to.eql(pm.environment.get(\"nuevoOperadorEmail\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores/{{nuevoOperadorId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores",
+								"{{nuevoOperadorId}}"
+							]
+						},
+						"description": "ADMIN."
+					}
+				},
+				{
+					"name": "Actualizar operador",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Nombre actualizado\", function () { pm.expect(data.nombre).to.eql(\"Postman Operador Editado\"); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Postman Operador Editado\",\n    \"email\": \"{{nuevoOperadorEmail}}\",\n    \"password\": \"\",\n    \"tipo\": \"OPERADOR\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores/{{nuevoOperadorId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores",
+								"{{nuevoOperadorId}}"
+							]
+						},
+						"description": "ADMIN. Password vacío = conserva el actual."
+					}
+				},
+				{
+					"name": "Eliminar operador",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores/{{nuevoOperadorId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores",
+								"{{nuevoOperadorId}}"
+							]
+						},
+						"description": "ADMIN. Borra el operador de prueba (no tiene cargos ni pagos)."
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Tipos de habitación",
+			"description": "GET público. POST, PUT y DELETE: solo ADMIN. Crea un tipo de prueba (sin habitaciones) y lo borra.",
+			"item": [
+				{
+					"name": "Crear tipo de habitación",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"nuevoTipoNombre\", \"Postman Type \" + Date.now());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.environment.set(\"nuevoTipoId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
 									"type": "string"
 								}
 							]
@@ -336,28 +1081,42 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"nombre\": \"Carlos Operador\",\n    \"email\": \"carlos.operador@theroyale.com\",\n    \"password\": \"operator123\",\n    \"tipo\": \"OPERADOR\"\n}"
+							"raw": "{\n    \"nombre\": \"{{nuevoTipoNombre}}\",\n    \"descripcion\": \"Tipo creado por la colección de Postman\",\n    \"imagenUrl\": \"/images/rooms/normal.jpg\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/operadores",
+							"raw": "{{baseUrl}}/api/tipos-habitacion",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"operadores"
+								"tipos-habitacion"
 							]
-						}
+						},
+						"description": "ADMIN. Guarda `nuevoTipoId`."
 					}
-				}
-			]
-		},
-		{
-			"name": "4. Habitaciones & Tipos",
-			"item": [
+				},
 				{
-					"name": "Listar Tipos de Habitación (Público)",
+					"name": "Listar tipos de habitación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Incluye el tipo creado\", function () { pm.expect(data.map(t => t.id)).to.include(pm.environment.get(\"nuevoTipoId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -369,35 +1128,181 @@
 								"api",
 								"tipos-habitacion"
 							]
-						}
+						},
+						"description": "Público (sin token)."
 					}
 				},
 				{
-					"name": "Listar Habitaciones (Público)",
+					"name": "Obtener tipo por id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es el tipo creado\", function () { pm.expect(data.nombre).to.eql(pm.environment.get(\"nuevoTipoNombre\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/habitaciones",
+							"raw": "{{baseUrl}}/api/tipos-habitacion/{{nuevoTipoId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"habitaciones"
+								"tipos-habitacion",
+								"{{nuevoTipoId}}"
 							]
-						}
+						},
+						"description": "Público (sin token)."
 					}
 				},
 				{
-					"name": "Crear Habitación (Solo ADMIN)",
+					"name": "Actualizar tipo de habitación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Descripción actualizada\", function () { pm.expect(data.descripcion).to.eql(\"Descripción editada desde Postman\"); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"{{nuevoTipoNombre}}\",\n    \"descripcion\": \"Descripción editada desde Postman\",\n    \"imagenUrl\": \"/images/rooms/normal.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tipos-habitacion/{{nuevoTipoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tipos-habitacion",
+								"{{nuevoTipoId}}"
+							]
+						},
+						"description": "ADMIN."
+					}
+				},
+				{
+					"name": "Eliminar tipo de habitación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tipos-habitacion/{{nuevoTipoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tipos-habitacion",
+								"{{nuevoTipoId}}"
+							]
+						},
+						"description": "ADMIN. Borra el tipo de prueba (no tiene habitaciones)."
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Habitaciones",
+			"description": "GET público. POST, PUT y DELETE: solo ADMIN. Crea una habitación de prueba en el tipo Normal y la borra.",
+			"item": [
+				{
+					"name": "Crear habitación",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"habitacionNumero\", \"PM\" + (Date.now() % 1000000));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.environment.set(\"habitacionId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
 									"type": "string"
 								}
 							]
@@ -411,7 +1316,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"numero\": \"901\",\n    \"tipoHabitacionId\": 1,\n    \"precio\": 250.0,\n    \"estado\": \"DISPONIBLE\"\n}"
+							"raw": "{\n    \"numero\": \"{{habitacionNumero}}\",\n    \"precio\": 150,\n    \"estado\": \"MANTENIMIENTO\",\n    \"tipoHabitacionId\": {{tipoNormalId}}\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/habitaciones",
@@ -422,17 +1327,272 @@
 								"api",
 								"habitaciones"
 							]
+						},
+						"description": "ADMIN. Guarda `habitacionId`. El número es único por ejecución."
+					}
+				},
+				{
+					"name": "Listar habitaciones por tipo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Incluye la habitación creada\", function () { pm.expect(data.map(h => h.id)).to.include(pm.environment.get(\"habitacionId\")); });"
+								],
+								"type": "text/javascript"
+							}
 						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/habitaciones?tipoHabitacionId={{tipoNormalId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"habitaciones"
+							],
+							"query": [
+								{
+									"key": "tipoHabitacionId",
+									"value": "{{tipoNormalId}}"
+								}
+							]
+						},
+						"description": "Público (sin token). Filtra con ?tipoHabitacionId."
+					}
+				},
+				{
+					"name": "Obtener habitación por id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es la habitación creada\", function () { pm.expect(data.numero).to.eql(pm.environment.get(\"habitacionNumero\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/habitaciones/{{habitacionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"habitaciones",
+								"{{habitacionId}}"
+							]
+						},
+						"description": "Público (sin token)."
+					}
+				},
+				{
+					"name": "Actualizar habitación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Precio actualizado\", function () { pm.expect(data.precio).to.eql(175); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"numero\": \"{{habitacionNumero}}\",\n    \"precio\": 175,\n    \"estado\": \"DESHABILITADA\",\n    \"tipoHabitacionId\": {{tipoNormalId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/habitaciones/{{habitacionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"habitaciones",
+								"{{habitacionId}}"
+							]
+						},
+						"description": "ADMIN."
+					}
+				},
+				{
+					"name": "Eliminar habitación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/habitaciones/{{habitacionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"habitaciones",
+								"{{habitacionId}}"
+							]
+						},
+						"description": "ADMIN. Borra la habitación de prueba (no tiene reservas)."
 					}
 				}
 			]
 		},
 		{
-			"name": "5. Servicios (DTOs Limpios)",
+			"name": "6. Servicios",
+			"description": "GET público. POST, PUT y DELETE: solo ADMIN. Crea un servicio de prueba y lo borra.",
 			"item": [
 				{
-					"name": "Listar Servicios (Público)",
+					"name": "Crear servicio",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"servicioNombre\", \"Postman Service \" + Date.now());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.environment.set(\"servicioId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"{{servicioNombre}}\",\n    \"descripcion\": \"Servicio creado por la colección de Postman\",\n    \"precio\": 25,\n    \"imagenUrl\": \"/images/services/concierge.jpg\",\n    \"caracteristicas\": [\n        \"Prueba\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/servicios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"servicios"
+							]
+						},
+						"description": "ADMIN. Guarda `servicioId`."
+					}
+				},
+				{
+					"name": "Listar servicios",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Incluye el servicio creado\", function () { pm.expect(data.map(s => s.id)).to.include(pm.environment.get(\"servicioId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -444,23 +1604,563 @@
 								"api",
 								"servicios"
 							]
-						}
+						},
+						"description": "Público (sin token)."
 					}
-				}
-			]
-		},
-		{
-			"name": "6. Reservas & Operaciones",
-			"item": [
+				},
 				{
-					"name": "Listar Reservas (Autenticado)",
+					"name": "Obtener servicio por id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es el servicio creado\", function () { pm.expect(data.nombre).to.eql(pm.environment.get(\"servicioNombre\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/servicios/{{servicioId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"servicios",
+								"{{servicioId}}"
+							]
+						},
+						"description": "Público (sin token)."
+					}
+				},
+				{
+					"name": "Actualizar servicio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Precio actualizado\", function () { pm.expect(data.precio).to.eql(30); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"{{servicioNombre}}\",\n    \"descripcion\": \"Servicio editado desde Postman\",\n    \"precio\": 30,\n    \"imagenUrl\": \"/images/services/concierge.jpg\",\n    \"caracteristicas\": [\n        \"Prueba\"\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/servicios/{{servicioId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"servicios",
+								"{{servicioId}}"
+							]
+						},
+						"description": "ADMIN."
+					}
+				},
+				{
+					"name": "Eliminar servicio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/servicios/{{servicioId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"servicios",
+								"{{servicioId}}"
+							]
+						},
+						"description": "ADMIN. Borra el servicio de prueba (sin consumos)."
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Disponibilidad",
+			"description": "Público (sin token).",
+			"item": [
+				{
+					"name": "Consultar disponibilidad por fechas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Devuelve todos los tipos\", function () { pm.expect(data).to.be.an(\"array\").and.not.empty; });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/disponibilidad?fechaInicio={{hoy_30}}&fechaFin={{hoy_32}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"disponibilidad"
+							],
+							"query": [
+								{
+									"key": "fechaInicio",
+									"value": "{{hoy_30}}"
+								},
+								{
+									"key": "fechaFin",
+									"value": "{{hoy_32}}"
+								}
+							]
+						},
+						"description": "Público. Habitaciones libres de cada tipo entre dos fechas (relativas a hoy)."
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Menú de restaurantes",
+			"description": "GET público. POST, PUT y DELETE: solo ADMIN. Crea un plato de prueba y lo borra.",
+			"item": [
+				{
+					"name": "Listar menú",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Hay platos\", function () { pm.expect(data).to.be.an(\"array\").and.not.empty; });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/menu",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"menu"
+							]
+						},
+						"description": "Público (sin token)."
+					}
+				},
+				{
+					"name": "Crear plato",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"platoNombre\", \"Postman Dish \" + (Date.now() % 100000));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.environment.set(\"platoId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"{{platoNombre}}\",\n    \"descripcion\": \"Plato creado por la colección de Postman\",\n    \"precio\": 18.5,\n    \"restaurante\": \"SIGNATURE_RESTAURANT\",\n    \"categoria\": \"PRINCIPAL\",\n    \"etiquetas\": [\n        \"VEGETARIANO\"\n    ],\n    \"disponible\": true,\n    \"imagenUrl\": \"/images/menu/plato.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/menu",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"menu"
+							]
+						},
+						"description": "ADMIN. Guarda `platoId`."
+					}
+				},
+				{
+					"name": "Listar menú filtrado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Incluye el plato creado\", function () { pm.expect(data.map(p => p.id)).to.include(pm.environment.get(\"platoId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/menu?restaurante=SIGNATURE_RESTAURANT&categoria=PRINCIPAL&soloDisponibles=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"menu"
+							],
+							"query": [
+								{
+									"key": "restaurante",
+									"value": "SIGNATURE_RESTAURANT"
+								},
+								{
+									"key": "categoria",
+									"value": "PRINCIPAL"
+								},
+								{
+									"key": "soloDisponibles",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Público. Filtros ?restaurante, ?categoria y ?soloDisponibles."
+					}
+				},
+				{
+					"name": "Obtener plato por id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es el plato creado\", function () { pm.expect(data.nombre).to.eql(pm.environment.get(\"platoNombre\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/menu/{{platoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"menu",
+								"{{platoId}}"
+							]
+						},
+						"description": "Público (sin token)."
+					}
+				},
+				{
+					"name": "Actualizar plato",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Queda no disponible\", function () { pm.expect(data.disponible).to.eql(false); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"{{platoNombre}}\",\n    \"descripcion\": \"Plato creado por la colección de Postman\",\n    \"precio\": 21,\n    \"restaurante\": \"SIGNATURE_RESTAURANT\",\n    \"categoria\": \"PRINCIPAL\",\n    \"etiquetas\": [\n        \"VEGETARIANO\"\n    ],\n    \"disponible\": false,\n    \"imagenUrl\": \"/images/menu/plato.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/menu/{{platoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"menu",
+								"{{platoId}}"
+							]
+						},
+						"description": "ADMIN."
+					}
+				},
+				{
+					"name": "Eliminar plato",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/menu/{{platoId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"menu",
+								"{{platoId}}"
+							]
+						},
+						"description": "ADMIN."
+					}
+				}
+			]
+		},
+		{
+			"name": "9. Reservas",
+			"description": "Crear: CLIENTE, OPERADOR o ADMIN. Listar: autenticado (un CLIENTE debe pasar su propio clienteId). Confirmar, check-in, check-out y eliminar: solo OPERADOR. Buscar por habitación: OPERADOR o ADMIN. Cancelar: OPERADOR o el CLIENTE dueño. Ciclo completo con una reserva VIP que empieza hoy (se usa luego en Reseñas y se borra allí) y otra futura que se cancela y se borra.",
+			"item": [
+				{
+					"name": "Crear reserva (hoy)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Estado PENDIENTE\", function () { pm.expect(pm.response.json().estado).to.eql(\"PENDIENTE\"); });",
+									"pm.environment.set(\"reservaId\", data.id);",
+									"pm.environment.set(\"reservaHabitacionNumero\", data.habitacionNumero);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{clienteId}},\n    \"tipoHabitacionId\": {{tipoVipId}},\n    \"fechaInicio\": \"{{hoy_0}}\",\n    \"fechaFin\": \"{{hoy_2}}\",\n    \"cantidadPersonas\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							]
+						},
+						"description": "CLIENTE. Reserva VIP para hoy; el sistema asigna la habitación. Guarda `reservaId`."
+					}
+				},
+				{
+					"name": "Listar todas las reservas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Incluye la reserva creada\", function () { pm.expect(data.map(r => r.id)).to.include(pm.environment.get(\"reservaId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
 									"type": "string"
 								}
 							]
@@ -476,18 +2176,34 @@
 								"api",
 								"reservas"
 							]
-						}
+						},
+						"description": "ADMIN (también OPERADOR)."
 					}
 				},
 				{
-					"name": "Buscar Habitación por Número (Operador)",
+					"name": "Listar reservas por estado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Todas están PENDIENTE\", function () { data.forEach(r => pm.expect(r.estado).to.eql(\"PENDIENTE\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_operador}}",
 									"type": "string"
 								}
 							]
@@ -495,7 +2211,295 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/reservas/buscar-habitacion?numero=101",
+							"raw": "{{baseUrl}}/api/reservas?estado=PENDIENTE",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							],
+							"query": [
+								{
+									"key": "estado",
+									"value": "PENDIENTE"
+								}
+							]
+						},
+						"description": "OPERADOR. Filtro ?estado=PENDIENTE."
+					}
+				},
+				{
+					"name": "Listar mis reservas activas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Incluye la reserva creada\", function () { pm.expect(data.map(r => r.id)).to.include(pm.environment.get(\"reservaId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas?clienteId={{clienteId}}&activas=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{clienteId}}"
+								},
+								{
+									"key": "activas",
+									"value": "true"
+								}
+							]
+						},
+						"description": "CLIENTE con su propio clienteId (?clienteId=<suyo>&activas=true)."
+					}
+				},
+				{
+					"name": "Obtener reserva por id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es la reserva creada\", function () { pm.expect(data.id).to.eql(pm.environment.get(\"reservaId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaId}}"
+							]
+						},
+						"description": "Autenticado (aquí CLIENTE)."
+					}
+				},
+				{
+					"name": "Modificar reserva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"2 huéspedes y nueva salida\", function () { pm.expect(data.cantidadPersonas).to.eql(2); pm.expect(data.fechaFin).to.eql(pm.collectionVariables.get(\"hoy_3\")); });",
+									"pm.environment.set(\"reservaHabitacionNumero\", data.habitacionNumero);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{clienteId}},\n    \"tipoHabitacionId\": {{tipoVipId}},\n    \"fechaInicio\": \"{{hoy_0}}\",\n    \"fechaFin\": \"{{hoy_3}}\",\n    \"cantidadPersonas\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaId}}"
+							]
+						},
+						"description": "Autenticado (aquí CLIENTE). Cambia fechas y huéspedes; solo PENDIENTE o CONFIRMADA."
+					}
+				},
+				{
+					"name": "Confirmar reserva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Estado CONFIRMADA\", function () { pm.expect(pm.response.json().estado).to.eql(\"CONFIRMADA\"); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaId}}/confirmar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaId}}",
+								"confirmar"
+							]
+						},
+						"description": "OPERADOR. PENDIENTE -> CONFIRMADA y abre la cuenta."
+					}
+				},
+				{
+					"name": "Check-in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Estado EN_CURSO\", function () { pm.expect(pm.response.json().estado).to.eql(\"EN_CURSO\"); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaId}}/check-in",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaId}}",
+								"check-in"
+							]
+						},
+						"description": "OPERADOR. CONFIRMADA -> EN_CURSO (la llegada es hoy)."
+					}
+				},
+				{
+					"name": "Buscar reserva activa por número de habitación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es la reserva en curso\", function () { pm.expect(data.id).to.eql(pm.environment.get(\"reservaId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/buscar-habitacion?numero={{reservaHabitacionNumero}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -507,57 +2511,24 @@
 							"query": [
 								{
 									"key": "numero",
-									"value": "101"
+									"value": "{{reservaHabitacionNumero}}"
 								}
 							]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "7. Pruebas de Seguridad (401 & 403)",
-			"item": [
-				{
-					"name": "Caso 401 - Petición sin Token a Endpoint Protegido",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Debe retornar 401 Unauthorized\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/operadores",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"operadores"
-							]
-						}
+						},
+						"description": "OPERADOR o ADMIN. Encuentra la reserva en curso por el número de su habitación."
 					}
 				},
 				{
-					"name": "Caso 403 - CLIENTE intentando acceder a /api/operadores",
+					"name": "Check-out",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Debe retornar 403 Forbidden cuando el rol no tiene la autoridad\", function () {",
-									"    pm.response.to.have.status(403);",
-									"});"
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Estado FINALIZADA\", function () { pm.expect(pm.response.json().estado).to.eql(\"FINALIZADA\"); });"
 								],
 								"type": "text/javascript"
 							}
@@ -569,35 +2540,40 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_operador}}",
 									"type": "string"
 								}
 							]
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/operadores",
+							"raw": "{{baseUrl}}/api/reservas/{{reservaId}}/check-out",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"operadores"
+								"reservas",
+								"{{reservaId}}",
+								"check-out"
 							]
-						}
+						},
+						"description": "OPERADOR. EN_CURSO -> FINALIZADA (saldo en cero)."
 					}
 				},
 				{
-					"name": "Caso 403 - OPERADOR intentando crear Tipo de Habitación",
+					"name": "Crear reserva futura (para cancelar)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Debe retornar 403 Forbidden para operador en catálogo\", function () {",
-									"    pm.response.to.have.status(403);",
-									"});"
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.environment.set(\"reservaCancelarId\", data.id);"
 								],
 								"type": "text/javascript"
 							}
@@ -609,7 +2585,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_token}}",
+									"value": "{{token_cliente}}",
 									"type": "string"
 								}
 							]
@@ -623,27 +2599,2943 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"nombre\": \"Penthouse Prohibido\",\n    \"descripcion\": \"Prueba de no autorizado\",\n    \"imagenUrl\": \"/images/suite-1.webp\"\n}"
+							"raw": "{\n    \"clienteId\": {{clienteId}},\n    \"tipoHabitacionId\": {{tipoVipId}},\n    \"fechaInicio\": \"{{hoy_30}}\",\n    \"fechaFin\": \"{{hoy_32}}\",\n    \"cantidadPersonas\": 1\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/tipos-habitacion",
+							"raw": "{{baseUrl}}/api/reservas",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"tipos-habitacion"
+								"reservas"
 							]
+						},
+						"description": "CLIENTE. Reserva VIP dentro de 30 días. Guarda `reservaCancelarId`."
+					}
+				},
+				{
+					"name": "Cancelar mi reserva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Estado CANCELADA\", function () { pm.expect(pm.response.json().estado).to.eql(\"CANCELADA\"); });"
+								],
+								"type": "text/javascript"
+							}
 						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCancelarId}}/cancelar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCancelarId}}",
+								"cancelar"
+							]
+						},
+						"description": "CLIENTE dueño (el OPERADOR también puede). Solo PENDIENTE o CONFIRMADA con llegada posterior a hoy."
+					}
+				},
+				{
+					"name": "Eliminar reserva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCancelarId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCancelarId}}"
+							]
+						},
+						"description": "OPERADOR. Borra la reserva cancelada (y su cuenta, reseña y plan si los tuviera)."
+					}
+				}
+			]
+		},
+		{
+			"name": "10. Cuenta de la reserva",
+			"description": "OPERADOR o ADMIN. Crea y confirma una reserva propia (la cuenta nace al confirmar), carga y quita un consumo, paga el saldo y borra la reserva.",
+			"item": [
+				{
+					"name": "Preparación - Crear reserva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.environment.set(\"reservaCuentaId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{clienteId}},\n    \"tipoHabitacionId\": {{tipoVipId}},\n    \"fechaInicio\": \"{{hoy_25}}\",\n    \"fechaFin\": \"{{hoy_27}}\",\n    \"cantidadPersonas\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							]
+						},
+						"description": "CLIENTE. Reserva VIP dentro de 25 días. Guarda `reservaCuentaId`."
+					}
+				},
+				{
+					"name": "Preparación - Confirmar reserva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Estado CONFIRMADA\", function () { pm.expect(pm.response.json().estado).to.eql(\"CONFIRMADA\"); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCuentaId}}/confirmar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCuentaId}}",
+								"confirmar"
+							]
+						},
+						"description": "OPERADOR. Abre la cuenta."
+					}
+				},
+				{
+					"name": "Obtener cuenta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Cuenta abierta y sin saldo\", function () { pm.expect(data.estado).to.eql(\"ABIERTA\"); pm.expect(Number(data.saldo)).to.eql(0); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCuentaId}}/cuenta",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCuentaId}}",
+								"cuenta"
+							]
+						},
+						"description": "OPERADOR o ADMIN."
+					}
+				},
+				{
+					"name": "Agregar consumo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Tiene un consumo\", function () { pm.expect(data.items).to.have.lengthOf(1); });",
+									"pm.environment.set(\"itemId\", data.items[0].id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"servicioId\": {{servicioCatalogoId}},\n    \"cantidad\": 1,\n    \"operadorId\": {{operadorId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCuentaId}}/cuenta/consumos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCuentaId}}",
+								"cuenta",
+								"consumos"
+							]
+						},
+						"description": "OPERADOR o ADMIN. Carga 1 unidad del servicio Wellness. Guarda `itemId`."
+					}
+				},
+				{
+					"name": "Eliminar consumo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Sin consumos\", function () { pm.expect(data.items).to.have.lengthOf(0); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCuentaId}}/cuenta/consumos/{{itemId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCuentaId}}",
+								"cuenta",
+								"consumos",
+								"{{itemId}}"
+							]
+						},
+						"description": "OPERADOR o ADMIN. Quita el cargo (no pagado)."
+					}
+				},
+				{
+					"name": "Agregar consumo (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Hay saldo pendiente\", function () { pm.expect(Number(data.saldo)).to.be.above(0); });",
+									"pm.environment.set(\"saldoCuenta\", data.saldo);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"servicioId\": {{servicioCatalogoId}},\n    \"cantidad\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCuentaId}}/cuenta/consumos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCuentaId}}",
+								"cuenta",
+								"consumos"
+							]
+						},
+						"description": "ADMIN. Vuelve a cargar el servicio para luego pagarlo. Guarda `saldoCuenta`."
+					}
+				},
+				{
+					"name": "Registrar pago",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Saldo en cero y consumos pagados\", function () { pm.expect(Number(data.saldo)).to.eql(0); data.items.forEach(i => pm.expect(i.pagado).to.eql(true)); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"monto\": {{saldoCuenta}},\n    \"metodoPago\": \"CARD\",\n    \"operadorId\": {{operadorId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCuentaId}}/cuenta/pagos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCuentaId}}",
+								"cuenta",
+								"pagos"
+							]
+						},
+						"description": "OPERADOR o ADMIN. Paga el saldo completo con tarjeta (CASH, CARD o TRANSFER)."
+					}
+				},
+				{
+					"name": "Limpieza - Eliminar reserva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaCuentaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaCuentaId}}"
+							]
+						},
+						"description": "OPERADOR. Borra la reserva con su cuenta, consumos y pagos."
+					}
+				}
+			]
+		},
+		{
+			"name": "11. Reseñas",
+			"description": "GET público. Crear, editar y borrar: el CLIENTE autor (sobre una estadía FINALIZADA suya). Ocultar y mostrar: solo ADMIN. Usa la reserva finalizada en la carpeta 9 y la borra al terminar.",
+			"item": [
+				{
+					"name": "Listar reseñas de un tipo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Todas visibles\", function () { data.forEach(r => pm.expect(r.visible).to.eql(true)); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas?tipoHabitacionId={{tipoVipId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas"
+							],
+							"query": [
+								{
+									"key": "tipoHabitacionId",
+									"value": "{{tipoVipId}}"
+								}
+							]
+						},
+						"description": "Público (sin token). Solo las visibles del tipo."
+					}
+				},
+				{
+					"name": "Resumen de un tipo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es el tipo pedido\", function () { pm.expect(data.tipoHabitacionId).to.eql(pm.environment.get(\"tipoVipId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/resumen?tipoHabitacionId={{tipoVipId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"resumen"
+							],
+							"query": [
+								{
+									"key": "tipoHabitacionId",
+									"value": "{{tipoVipId}}"
+								}
+							]
+						},
+						"description": "Público (sin token)."
+					}
+				},
+				{
+					"name": "Resumen de todos los tipos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Un resumen por tipo\", function () { pm.expect(data).to.be.an(\"array\").and.not.empty; });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/resumen",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"resumen"
+							]
+						},
+						"description": "Público (sin token)."
+					}
+				},
+				{
+					"name": "Crear reseña",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.environment.set(\"resenaId\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reservaId\": {{reservaId}},\n    \"clienteId\": {{clienteId}},\n    \"calificacion\": 5,\n    \"titulo\": \"Great stay\",\n    \"comentario\": \"Review created by the Postman collection.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas"
+							]
+						},
+						"description": "CLIENTE autor de la estadía FINALIZADA. Guarda `resenaId`."
+					}
+				},
+				{
+					"name": "Obtener reseña por id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Es la reseña creada\", function () { pm.expect(data.id).to.eql(pm.environment.get(\"resenaId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/{{resenaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"{{resenaId}}"
+							]
+						},
+						"description": "Público (sin token)."
+					}
+				},
+				{
+					"name": "Listar mis reseñas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Incluye la reseña creada\", function () { pm.expect(data.map(r => r.id)).to.include(pm.environment.get(\"resenaId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas?clienteId={{clienteId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{clienteId}}"
+								}
+							]
+						},
+						"description": "CLIENTE. ?clienteId=<suyo> (incluye ocultas)."
+					}
+				},
+				{
+					"name": "Editar reseña",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Calificación actualizada\", function () { pm.expect(data.calificacion).to.eql(4); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{clienteId}},\n    \"calificacion\": 4,\n    \"titulo\": \"Very good stay\",\n    \"comentario\": \"Review edited by the Postman collection.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/{{resenaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"{{resenaId}}"
+							]
+						},
+						"description": "CLIENTE autor."
+					}
+				},
+				{
+					"name": "Ocultar reseña",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Queda oculta\", function () { pm.expect(data.visible).to.eql(false); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/{{resenaId}}/ocultar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"{{resenaId}}",
+								"ocultar"
+							]
+						},
+						"description": "ADMIN (moderación)."
+					}
+				},
+				{
+					"name": "Listar para moderación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Incluye la reseña oculta\", function () { pm.expect(data.map(r => r.id)).to.include(pm.environment.get(\"resenaId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas?incluirOcultas=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas"
+							],
+							"query": [
+								{
+									"key": "incluirOcultas",
+									"value": "true"
+								}
+							]
+						},
+						"description": "ADMIN. ?incluirOcultas=true devuelve visibles y ocultas."
+					}
+				},
+				{
+					"name": "Mostrar reseña",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Vuelve a ser visible\", function () { pm.expect(data.visible).to.eql(true); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/{{resenaId}}/mostrar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"{{resenaId}}",
+								"mostrar"
+							]
+						},
+						"description": "ADMIN (moderación)."
+					}
+				},
+				{
+					"name": "Eliminar reseña",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/{{resenaId}}?clienteId={{clienteId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"{{resenaId}}"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{clienteId}}"
+								}
+							]
+						},
+						"description": "CLIENTE autor (?clienteId=<suyo>)."
+					}
+				},
+				{
+					"name": "Limpieza - Eliminar reserva finalizada",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaId}}"
+							]
+						},
+						"description": "OPERADOR. Borra la reserva del ciclo de la carpeta 9."
+					}
+				}
+			]
+		},
+		{
+			"name": "12. Plan de visita",
+			"description": "Rutas bajo /api/reservas/{id}/plan: cualquier usuario autenticado; el servicio exige que clienteId sea el dueño de la reserva (aquí cada CLIENTE usa la suya). GET /api/plan/estado: autenticado. Las peticiones que generan con IA requieren GEMINI_API_KEY. Al final se borra el plan de ejemplo de Sofia (vuelve al reiniciar el backend, la base es H2 en memoria).",
+			"item": [
+				{
+					"name": "Estado del planificador",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Trae disponible\", function () { pm.expect(data.disponible).to.be.a(\"boolean\"); });",
+									"pm.environment.set(\"plan_disponible\", String(data.disponible));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/plan/estado",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"plan",
+								"estado"
+							]
+						},
+						"description": "Autenticado (aquí CLIENTE). disponible=false si no hay GEMINI_API_KEY. Guarda `plan_disponible`."
+					}
+				},
+				{
+					"name": "Obtener plan (Sofia, plan de ejemplo)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"var bloque = data.dias.flatMap(d => d.bloques).find(b => b.tipo === \"SERVICIO_HOTEL\" && b.agregable);",
+									"pm.test(\"Tiene días y un servicio del hotel agregable\", function () { pm.expect(data.dias).to.not.be.empty; pm.expect(bloque).to.exist; });",
+									"pm.environment.set(\"bloqueServicioId\", bloque.id);",
+									"pm.environment.set(\"planFecha\", data.dias[data.dias.length - 1].fecha);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_sofia}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/plan?clienteId={{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"plan"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{sofiaId}}"
+								}
+							]
+						},
+						"description": "CLIENTE dueño (Sofia). Guarda un bloque de servicio del hotel (`bloqueServicioId`) y un día futuro del plan (`planFecha`)."
+					}
+				},
+				{
+					"name": "Interpretar descripción del viaje [requiere GEMINI_API_KEY]",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Requiere GEMINI_API_KEY. Para no gastar cuota, si el planificador está disponible la petición se",
+									"// salta, salvo que la variable ejecutar_gemini valga \"true\". Sin clave el backend responde 503.",
+									"if (String(pm.environment.get(\"plan_disponible\")) === \"true\" && String(pm.environment.get(\"ejecutar_gemini\")) !== \"true\") {",
+									"    console.log(\"Se salta \" + pm.info.requestName + \": llamaría a Gemini (pon ejecutar_gemini=true para probarla)\");",
+									"    pm.execution.skipRequest();",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status es uno de 200/503\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,503]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{clienteId}},\n    \"descripcion\": \"We love museums and good food, with a relaxed pace.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaDanielPlanId}}/plan/interpretar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaDanielPlanId}}",
+								"plan",
+								"interpretar"
+							]
+						},
+						"description": "CLIENTE dueño (Daniel, reserva 707). Requiere GEMINI_API_KEY: sin clave responde 503 (se acepta); con clave se salta salvo que `ejecutar_gemini` sea \"true\"."
+					}
+				},
+				{
+					"name": "Generar plan [requiere GEMINI_API_KEY]",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Requiere GEMINI_API_KEY. Para no gastar cuota, si el planificador está disponible la petición se",
+									"// salta, salvo que la variable ejecutar_gemini valga \"true\". Sin clave el backend responde 503.",
+									"if (String(pm.environment.get(\"plan_disponible\")) === \"true\" && String(pm.environment.get(\"ejecutar_gemini\")) !== \"true\") {",
+									"    console.log(\"Se salta \" + pm.info.requestName + \": llamaría a Gemini (pon ejecutar_gemini=true para probarla)\");",
+									"    pm.execution.skipRequest();",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status es uno de 201/503\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201,503]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{clienteId}},\n    \"preferencias\": {\n        \"intereses\": [\n            \"MUSEOS\",\n            \"GASTRONOMIA\"\n        ],\n        \"ritmo\": \"EQUILIBRADO\",\n        \"presupuesto\": \"MODERADO\",\n        \"dieta\": [],\n        \"movilidadReducida\": false,\n        \"conNinos\": false,\n        \"notas\": \"\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaDanielPlanId}}/plan",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaDanielPlanId}}",
+								"plan"
+							]
+						},
+						"description": "CLIENTE dueño (Daniel, reserva 707). Requiere GEMINI_API_KEY: sin clave responde 503 (se acepta); con clave se salta salvo que `ejecutar_gemini` sea \"true\"."
+					}
+				},
+				{
+					"name": "Ajustar plan [requiere GEMINI_API_KEY]",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Requiere GEMINI_API_KEY. Para no gastar cuota, si el planificador está disponible la petición se",
+									"// salta, salvo que la variable ejecutar_gemini valga \"true\". Sin clave el backend responde 503.",
+									"if (String(pm.environment.get(\"plan_disponible\")) === \"true\" && String(pm.environment.get(\"ejecutar_gemini\")) !== \"true\") {",
+									"    console.log(\"Se salta \" + pm.info.requestName + \": llamaría a Gemini (pon ejecutar_gemini=true para probarla)\");",
+									"    pm.execution.skipRequest();",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status es uno de 200/503\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,503]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_sofia}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{sofiaId}},\n    \"indicacion\": \"More outdoor activities, please.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/plan/ajustar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"plan",
+								"ajustar"
+							]
+						},
+						"description": "CLIENTE dueño (Sofia). Requiere GEMINI_API_KEY: sin clave responde 503 (se acepta); con clave se salta salvo que `ejecutar_gemini` sea \"true\"."
+					}
+				},
+				{
+					"name": "Regenerar un día [requiere GEMINI_API_KEY]",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Requiere GEMINI_API_KEY. Para no gastar cuota, si el planificador está disponible la petición se",
+									"// salta, salvo que la variable ejecutar_gemini valga \"true\". Sin clave el backend responde 503.",
+									"if (String(pm.environment.get(\"plan_disponible\")) === \"true\" && String(pm.environment.get(\"ejecutar_gemini\")) !== \"true\") {",
+									"    console.log(\"Se salta \" + pm.info.requestName + \": llamaría a Gemini (pon ejecutar_gemini=true para probarla)\");",
+									"    pm.execution.skipRequest();",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status es uno de 200/503\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200,503]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_sofia}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{sofiaId}},\n    \"indicacion\": \"Something calmer.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/plan/dias/{{planFecha}}/regenerar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"plan",
+								"dias",
+								"{{planFecha}}",
+								"regenerar"
+							]
+						},
+						"description": "CLIENTE dueño (Sofia). Requiere GEMINI_API_KEY: sin clave responde 503 (se acepta); con clave se salta salvo que `ejecutar_gemini` sea \"true\"."
+					}
+				},
+				{
+					"name": "Agregar bloque a la cuenta (\"Add to my stay\")",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"var item = data.items.reduce((a, b) => (a.id > b.id ? a : b));",
+									"pm.environment.set(\"planItemId\", item.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_sofia}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"clienteId\": {{sofiaId}}\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/plan/bloques/{{bloqueServicioId}}/agregar-a-cuenta",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"plan",
+								"bloques",
+								"{{bloqueServicioId}}",
+								"agregar-a-cuenta"
+							]
+						},
+						"description": "CLIENTE dueño (Sofia). Carga el servicio del bloque en la cuenta abierta de la 703. Guarda `planItemId`. No usa Gemini."
+					}
+				},
+				{
+					"name": "Limpieza - Quitar el cargo agregado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"El cargo ya no está\", function () { pm.expect(data.items.map(i => i.id)).to.not.include(pm.environment.get(\"planItemId\")); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/cuenta/consumos/{{planItemId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"cuenta",
+								"consumos",
+								"{{planItemId}}"
+							]
+						},
+						"description": "OPERADOR. Elimina de la cuenta de la 703 el consumo que agregó el plan."
+					}
+				},
+				{
+					"name": "Eliminar plan (Sofia)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 204\", function () {",
+									"    pm.response.to.have.status(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_sofia}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/plan?clienteId={{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"plan"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{sofiaId}}"
+								}
+							]
+						},
+						"description": "CLIENTE dueño (Sofia). Borra el plan de ejemplo: vuelve a sembrarse al reiniciar el backend. Por eso esta carpeta pasa entera solo una vez por arranque."
+					}
+				}
+			]
+		},
+		{
+			"name": "13. Chat (Royale Concierge)",
+			"description": "Público: atiende a visitantes y clientes (con o sin token). El POST responde text/event-stream y llama a Gemini.",
+			"item": [
+				{
+					"name": "Estado del chat",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Trae disponible\", function () { pm.expect(data.disponible).to.be.a(\"boolean\"); });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/estado",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"estado"
+							]
+						},
+						"description": "Público (sin token). disponible=false si no hay GEMINI_API_KEY."
+					}
+				},
+				{
+					"name": "Enviar mensaje",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Ruta pública: ni 401 ni 403\", function () {",
+									"    pm.expect(pm.response.code).to.not.be.oneOf([401, 403]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mensaje\": \"\",\n    \"historial\": []\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/chat",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat"
+							]
+						},
+						"description": "Público (sin token). El mensaje va vacío a propósito para no llamar a Gemini: responde 400 (o 503 sin clave). Lo que se comprueba es que la ruta es pública (ni 401 ni 403). Para probar el chat de verdad, escribe un mensaje: responde 200 con un stream SSE."
+					}
+				}
+			]
+		},
+		{
+			"name": "14. Seguridad (401/403)",
+			"description": "Casos negativos: cada uno lleva su propio token (o ninguno), así que no dependen de las carpetas de recursos, solo de la carpeta 0. 401 = sin autenticar o token inválido; 403 = autenticado sin el rol o sin ser el dueño. Ninguno modifica datos.",
+			"item": [
+				{
+					"name": "401 - Sin token en ruta protegida",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							]
+						},
+						"description": "Sin token. GET /api/reservas exige autenticación."
+					}
+				},
+				{
+					"name": "401 - Token inválido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "token-invalido",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes"
+							]
+						},
+						"description": "Token mal formado. GET /api/clientes debe responder 401."
+					}
+				},
+				{
+					"name": "401 - Login con contraseña incorrecta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email_cliente}}\",\n    \"password\": \"wrong-password\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Público. Credenciales erróneas."
+					}
+				},
+				{
+					"name": "403 - Cliente contra ruta de admin (listar clientes)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes"
+							]
+						},
+						"description": "CLIENTE. GET /api/clientes es solo ADMIN."
+					}
+				},
+				{
+					"name": "403 - Cliente contra ruta de admin (operadores)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores"
+							]
+						},
+						"description": "CLIENTE. /api/operadores es solo ADMIN."
+					}
+				},
+				{
+					"name": "403 - Cliente contra ruta de operador (buscar habitación)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/buscar-habitacion?numero=701",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"buscar-habitacion"
+							],
+							"query": [
+								{
+									"key": "numero",
+									"value": "701"
+								}
+							]
+						},
+						"description": "CLIENTE. Buscar por habitación es de OPERADOR o ADMIN."
+					}
+				},
+				{
+					"name": "403 - Cliente haciendo check-in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/check-in",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"check-in"
+							]
+						},
+						"description": "CLIENTE. El check-in es solo de OPERADOR."
+					}
+				},
+				{
+					"name": "403 - Cliente creando un plato",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Should not exist\",\n    \"descripcion\": \"Plato creado por la colección de Postman\",\n    \"precio\": 10,\n    \"restaurante\": \"SIGNATURE_RESTAURANT\",\n    \"categoria\": \"PRINCIPAL\",\n    \"etiquetas\": [\n        \"VEGETARIANO\"\n    ],\n    \"disponible\": true,\n    \"imagenUrl\": \"/images/menu/plato.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/menu",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"menu"
+							]
+						},
+						"description": "CLIENTE. POST /api/menu es solo ADMIN."
+					}
+				},
+				{
+					"name": "403 - Operador contra ruta de admin (operadores)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operadores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"operadores"
+							]
+						},
+						"description": "OPERADOR. /api/operadores es solo ADMIN."
+					}
+				},
+				{
+					"name": "403 - Operador ocultando una reseña",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/1/ocultar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"1",
+								"ocultar"
+							]
+						},
+						"description": "OPERADOR. La moderación de reseñas es solo ADMIN."
+					}
+				},
+				{
+					"name": "403 - Admin haciendo check-in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/check-in",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"check-in"
+							]
+						},
+						"description": "ADMIN. El check-in es solo de OPERADOR (roles separados)."
+					}
+				},
+				{
+					"name": "403 - Cliente pidiendo reservas de otro cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas?clienteId={{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{sofiaId}}"
+								}
+							]
+						},
+						"description": "CLIENTE (Daniel) con ?clienteId de Sofia."
+					}
+				},
+				{
+					"name": "403 - Cliente listando todas las reservas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							]
+						},
+						"description": "CLIENTE sin clienteId: un cliente solo puede pedir las suyas."
+					}
+				},
+				{
+					"name": "403 - Cliente cancelando una reserva ajena",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/cancelar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"cancelar"
+							]
+						},
+						"description": "CLIENTE (Daniel) sobre la reserva 703 de Sofia."
+					}
+				},
+				{
+					"name": "403 - Cliente reservando a nombre de otro cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas"
+							]
+						},
+						"description": "CLIENTE (Daniel) envía clienteId de Sofia. El clienteId que llega en la petición no se confía: debe ser el del token (UsuarioActualService.exigirClientePropio).",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clienteId\": {{sofiaId}},\n  \"tipoHabitacionId\": {{tipoVipId}},\n  \"fechaInicio\": \"{{hoy_30}}\",\n  \"fechaFin\": \"{{hoy_32}}\",\n  \"cantidadPersonas\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "403 - Cliente viendo el perfil de otro cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes/{{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"{{sofiaId}}"
+							]
+						},
+						"description": "CLIENTE (Daniel) pide el perfil de Sofia. Solo puede ver el suyo (o usar /api/clientes/details)."
+					}
+				},
+				{
+					"name": "403 - Cliente editando el perfil de otro cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes/{{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"{{sofiaId}}"
+							]
+						},
+						"description": "CLIENTE (Daniel) intenta editar a Sofia. Solo puede editar su propio perfil; el ADMIN edita cualquiera.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Sofia\",\n  \"apellido\": \"Torres\",\n  \"email\": \"{{email_sofia}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "403 - Cliente creando una reseña como otro cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas"
+							]
+						},
+						"description": "CLIENTE (Daniel) firma una reseña con el clienteId de Sofia. El clienteId que llega en la petición no se confía: debe ser el del token (UsuarioActualService.exigirClientePropio).",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reservaId\": {{reservaSofiaId}},\n  \"clienteId\": {{sofiaId}},\n  \"calificacion\": 1,\n  \"titulo\": \"Fake\",\n  \"comentario\": \"Fake review\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "403 - Cliente borrando una reseña como otro cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas/1?clienteId={{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas",
+								"1"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{sofiaId}}"
+								}
+							]
+						},
+						"description": "CLIENTE (Daniel) borra una reseña enviando el clienteId de Sofia. El clienteId que llega en la petición no se confía: debe ser el del token (UsuarioActualService.exigirClientePropio)."
+					}
+				},
+				{
+					"name": "403 - Cliente viendo el plan de otro cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/plan?clienteId={{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"plan"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{sofiaId}}"
+								}
+							]
+						},
+						"description": "CLIENTE (Daniel) pide el plan de visita de Sofia. El clienteId que llega en la petición no se confía: debe ser el del token (UsuarioActualService.exigirClientePropio)."
+					}
+				},
+				{
+					"name": "403 - Cliente borrando el plan de otro cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_cliente}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/plan?clienteId={{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"plan"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{sofiaId}}"
+								}
+							]
+						},
+						"description": "CLIENTE (Daniel) intenta borrar el plan de Sofia. El clienteId que llega en la petición no se confía: debe ser el del token (UsuarioActualService.exigirClientePropio)."
+					}
+				},
+				{
+					"name": "403 - Operador creando una reseña",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/resenas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"resenas"
+							]
+						},
+						"description": "OPERADOR: las reseñas son solo del huésped (POST/PUT/DELETE /api/resenas exigen ROLE_CLIENTE).",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reservaId\": {{reservaSofiaId}},\n  \"clienteId\": {{sofiaId}},\n  \"calificacion\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "403 - Operador viendo un plan de visita",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservas/{{reservaSofiaId}}/plan?clienteId={{sofiaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservas",
+								"{{reservaSofiaId}}",
+								"plan"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{sofiaId}}"
+								}
+							]
+						},
+						"description": "OPERADOR: el plan de visita es solo del huésped (/api/reservas/*/plan/** exige ROLE_CLIENTE)."
+					}
+				},
+				{
+					"name": "403 - Operador editando un cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_operador}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/clientes/{{clienteId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"clientes",
+								"{{clienteId}}"
+							]
+						},
+						"description": "OPERADOR: editar clientes es del propio cliente o del ADMIN.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Daniel\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "200 - Menú público sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/menu",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"menu"
+							]
+						},
+						"description": "Sin token. GET /api/menu es público."
+					}
+				},
+				{
+					"name": "200 - Habitaciones públicas sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/habitaciones",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"habitaciones"
+							]
+						},
+						"description": "Sin token. GET /api/habitaciones es público."
+					}
+				},
+				{
+					"name": "200 - Estado del chat sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code es 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/estado",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"estado"
+							]
+						},
+						"description": "Sin token. /api/chat/** es público."
 					}
 				}
 			]
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Fechas relativas a hoy (zona horaria local, la misma del backend): hoy_0, hoy_2, ..., hoy_32",
+					"function fecha(dias) {",
+					"    const d = new Date();",
+					"    d.setDate(d.getDate() + dias);",
+					"    return d.getFullYear() + \"-\" + String(d.getMonth() + 1).padStart(2, \"0\") + \"-\" + String(d.getDate()).padStart(2, \"0\");",
+					"}",
+					"[0,2,3,25,27,30,32].forEach(n => pm.collectionVariables.set(\"hoy_\" + n, fecha(n)));"
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"key": "baseUrl",
-			"value": "http://localhost:8080"
+			"key": "hoy_0",
+			"value": ""
+		},
+		{
+			"key": "hoy_2",
+			"value": ""
+		},
+		{
+			"key": "hoy_3",
+			"value": ""
+		},
+		{
+			"key": "hoy_25",
+			"value": ""
+		},
+		{
+			"key": "hoy_27",
+			"value": ""
+		},
+		{
+			"key": "hoy_30",
+			"value": ""
+		},
+		{
+			"key": "hoy_32",
+			"value": ""
 		}
 	]
 }

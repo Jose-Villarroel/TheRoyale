@@ -1,5 +1,6 @@
 package com.theroyale.backend.api;
 
+import com.theroyale.backend.security.UsuarioActualService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theroyale.backend.dto.CrearResenaRequest;
 import com.theroyale.backend.dto.ResumenResenasResponse;
@@ -16,6 +17,7 @@ import com.theroyale.backend.service.ResenaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -54,6 +56,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         controllers = ResenaRestController.class,
         excludeAutoConfiguration = ThymeleafAutoConfiguration.class
 )
+// addFilters = false: aquí se prueba la lógica del controlador; las reglas de acceso las cubre SecurityRulesTest
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class ResenaRestControllerTest {
 
@@ -67,6 +71,10 @@ class ResenaRestControllerTest {
 
     @MockBean
     private ResenaService resenaService;
+
+    // Sin rol de cliente simulado: la validación del dueño no interviene (la cubre SecurityRulesTest)
+    @MockBean
+    private UsuarioActualService usuarioActualService;
 
     // ===== POST: crear =====
     @Test
