@@ -11,6 +11,7 @@ import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.repository.ReservaRepository;
+import com.theroyale.backend.service.precio.PrecioService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -53,6 +54,9 @@ class ReservaServiceTest {
     @Mock
     private TipoHabitacionService tipoHabitacionService;
 
+    @Mock
+    private PrecioService precioService;
+
     @InjectMocks
     private ReservaService reservaService;
 
@@ -69,6 +73,8 @@ class ReservaServiceTest {
         when(habitacionRepository.buscarDisponibles(eq(1L), eq(INICIO), eq(FIN), anyCollection(), anyCollection(), isNull()))
                 .thenReturn(List.of(primera, segunda));
         when(reservaRepository.save(any(Reserva.class))).thenAnswer(invocacion -> invocacion.getArgument(0));
+        // Con un precio especial aprobado, la reserva guarda el promedio que calcula PrecioService
+        when(precioService.precioPromedio(primera, INICIO, FIN)).thenReturn(BigDecimal.valueOf(250.0));
 
         // Act
         Reserva creada = reservaService.crear(new CrearReservaRequest(1L, 1L, INICIO, FIN, 2));
@@ -76,7 +82,7 @@ class ReservaServiceTest {
         // Assert
         assertThat(creada.getEstado()).isEqualTo(EstadoReserva.PENDIENTE);
         assertThat(creada.getHabitacion()).isSameAs(primera);
-        assertThat(creada.getPrecioNocheAcordado()).isEqualByComparingTo(BigDecimal.valueOf(200.0));
+        assertThat(creada.getPrecioNocheAcordado()).isEqualByComparingTo(BigDecimal.valueOf(250.0));
     }
 
     // ===== Regla: la reserva se crea si y solo si hay habitaciones disponibles =====

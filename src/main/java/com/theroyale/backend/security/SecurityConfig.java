@@ -55,8 +55,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/chat/**").permitAll()
 
                         // ===== Rutas de administración (catálogo, clientes y moderación) =====
-                        // El dashboard de direccion expone ingresos, caja y saldos de los huespedes:
-                        // es la informacion mas sensible del sistema y solo la ve el administrador.
+                        // Bajo /api/admin/** viven el dashboard de direccion (ingresos, caja y saldos
+                        // de los huespedes) y el pronostico de ocupacion con sus recomendaciones de
+                        // precio: la informacion mas sensible del sistema, solo para el administrador.
                         // Esta regla debe ir ANTES de anyRequest(), que solo exige estar autenticado.
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/operadores/**").hasAuthority("ROLE_ADMIN")

@@ -17,6 +17,7 @@ import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.repository.HabitacionRepository;
 import com.theroyale.backend.service.plan.PlanVisitaService;
+import com.theroyale.backend.service.precio.PrecioService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -59,6 +60,10 @@ public class ReservaService {
     // ReservaRepository (como ResenaService), así que tampoco hay ciclo de dependencias.
     @Autowired
     private PlanVisitaService planVisitaService;
+
+    // Precio por noche con los precios especiales que aprobó el admin (sin ellos, el precio base)
+    @Autowired
+    private PrecioService precioService;
 
       // Habitaciones que no se pueden usar sin importar las fechas
     private static final List<EstadoHabitacion> ESTADOS_HABITACION_NO_UTILIZABLES =
@@ -117,14 +122,15 @@ public class ReservaService {
                     tipo.getId(), inicio, fin,
                     ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES, null);
 
+            // Precio promedio por noche de esas fechas, con los precios que haya aprobado el admin
             BigDecimal precioDesde = libres.stream()
-                    .map(habitacion -> BigDecimal.valueOf(habitacion.getPrecio()))
+                    .map(habitacion -> precioService.precioPromedio(habitacion, inicio, fin))
                     .min(Comparator.naturalOrder())
                     .orElse(null);
 
             disponibilidad.add(new DisponibilidadTipoResponse(
                     tipo.getId(), tipo.getNombre(), tipo.getDescripcion(), tipo.getImagenUrl(),
-                    libres.size(), precioDesde));
+                    libres.size(), precioDesde, precioService.etiqueta(tipo.getId(), inicio, fin)));
         }
         return disponibilidad;
     }
@@ -146,7 +152,8 @@ public class ReservaService {
                 .fechaFin(solicitud.fechaFin())
                 .estado(EstadoReserva.PENDIENTE)
                 .cantidadPersonas(solicitud.cantidadPersonas())
-                .precioNocheAcordado(BigDecimal.valueOf(habitacion.getPrecio()))
+                // Promedio por noche con los precios aprobados: queda congelado en la reserva
+                .precioNocheAcordado(precioService.precioPromedio(habitacion, solicitud.fechaInicio(), solicitud.fechaFin()))
                 .fechaCreacion(LocalDateTime.now())
                 .build();
 
@@ -178,7 +185,7 @@ public class ReservaService {
         reserva.setFechaInicio(nuevos.fechaInicio());
         reserva.setFechaFin(nuevos.fechaFin());
         reserva.setCantidadPersonas(nuevos.cantidadPersonas());
-        reserva.setPrecioNocheAcordado(BigDecimal.valueOf(habitacion.getPrecio()));
+        reserva.setPrecioNocheAcordado(precioService.precioPromedio(habitacion, nuevos.fechaInicio(), nuevos.fechaFin()));
 
         return reservaRepository.save(reserva);
     }
