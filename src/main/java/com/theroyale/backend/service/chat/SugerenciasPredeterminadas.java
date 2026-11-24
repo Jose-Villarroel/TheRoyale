@@ -1,27 +1,22 @@
 package com.theroyale.backend.service.chat;
 
-import java.text.Normalizer;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 // ===== Sugerencias de respaldo cuando el modelo no escribió la línea [[SUGERENCIAS: ...]] =====
-// Se eligen de forma determinista según la herramienta usada en la respuesta, en español si el
-// mensaje del cliente parece español y en inglés en cualquier otro caso.
+// Se eligen de forma determinista según la herramienta usada en la respuesta, y en el idioma de la
+// petición: el Locale lo resuelve AcceptHeaderLocaleResolver (I18nConfig) a partir de Accept-Language.
+//
+// Antes el idioma se adivinaba con una lista de palabras españolas sobre el mensaje del huésped
+// ("hola", "precio", "gracias"...). Eso fallaba con mensajes cortos o con palabras compartidas por
+// los dos idiomas, y además no coincidía con el idioma que el huésped eligió en la interfaz.
 final class SugerenciasPredeterminadas {
-
-    private static final Set<String> PALABRAS_ESPANOL = Set.of(
-            "hola", "que", "hay", "tienen", "tiene", "para", "habitacion", "habitaciones", "precio", "precios",
-            "quiero", "cuanto", "cuesta", "gracias", "platos", "comida", "noche", "noches", "puedo", "donde",
-            "como", "cual", "cuales", "disponible", "disponibilidad", "reservar", "una", "los", "las", "del",
-            "por", "favor", "buenas", "buenos", "dias", "tardes", "mascotas", "ninos", "desayuno", "veganos");
 
     private SugerenciasPredeterminadas() {
     }
 
-    static List<String> para(Set<String> herramientasUsadas, String mensajeCliente) {
-        boolean espanol = pareceEspanol(mensajeCliente);
+    static List<String> para(java.util.Set<String> herramientasUsadas, Locale idioma) {
+        boolean espanol = esEspanol(idioma);
         if (herramientasUsadas.contains(HerramientasChatService.CONSULTAR_DISPONIBILIDAD)) {
             return espanol
                     ? List.of("Ver el menú del restaurante", "¿Qué ofrece el spa?", "Política de cancelación")
@@ -37,15 +32,8 @@ final class SugerenciasPredeterminadas {
                 : List.of("Check room availability", "Show the dining menu", "Hotel services");
     }
 
-    static boolean pareceEspanol(String texto) {
-        if (texto == null || texto.isBlank()) {
-            return false;
-        }
-        if (texto.contains("¿") || texto.contains("¡") || texto.toLowerCase(Locale.ROOT).contains("ñ")) {
-            return true;
-        }
-        String sinTildes = Normalizer.normalize(texto.toLowerCase(Locale.ROOT), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
-        return Arrays.stream(sinTildes.split("[^a-z]+")).anyMatch(PALABRAS_ESPANOL::contains);
+    // Cualquier variante regional ("es", "es-CO", "es-419") cuenta como español; el resto, inglés
+    static boolean esEspanol(Locale idioma) {
+        return idioma != null && "es".equalsIgnoreCase(idioma.getLanguage());
     }
 }

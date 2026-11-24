@@ -19,6 +19,7 @@ import com.theroyale.backend.dto.plan.RegenerarDiaRequest;
 import com.theroyale.backend.errors.AccesoDenegadoException;
 import com.theroyale.backend.errors.LimiteExcedidoException;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.errors.ServicioNoDisponibleException;
 import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.EtiquetaPlato;
@@ -34,6 +35,7 @@ import com.theroyale.backend.service.plan.fuentes.ClimaDia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,9 +76,10 @@ public class PlanVisitaService {
     public static final int MAXIMO_INTERESES = 5;
     public static final int MAXIMO_DIETAS = 3;
 
-    static final String SIN_PLAN = "No plan yet for this reservation.";
-    static final String NO_ES_SUYA = "This reservation does not belong to you.";
-    static final String SIN_GEMINI = GeneradorPlanService.MENSAJE_NO_DISPONIBLE;
+    // Codigos del contrato (docs/i18n-codigos-error.md); el texto sale de messages[_es].properties
+    static final String SIN_PLAN = "plan.no-encontrado";
+    static final String NO_ES_SUYA = "plan.reserva-ajena";
+    static final String SIN_GEMINI = GeneradorPlanService.CODIGO_NO_DISPONIBLE;
 
     private static final List<EstadoReserva> ESTADOS_PLANIFICABLES =
             List.of(EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA, EstadoReserva.EN_CURSO);
@@ -133,12 +136,11 @@ public class PlanVisitaService {
     // Usa el límite por IP del chat, no el de 5 generaciones por día.
     public InterpretacionPlan interpretar(Long reservaId, InterpretarPlanRequest solicitud, String ip) {
         if (solicitud == null || solicitud.clienteId() == null) {
-            throw new IllegalArgumentException("Some required data is missing to read your description.");
+            throw ReglaNegocioException.badRequest("plan.datos-requeridos-interpretar");
         }
         String descripcion = solicitud.descripcion() == null ? "" : solicitud.descripcion().trim();
         if (descripcion.length() < DESCRIPCION_MINIMA || descripcion.length() > DESCRIPCION_MAXIMA) {
-            throw new IllegalArgumentException("Tell us about your trip in " + DESCRIPCION_MINIMA + " to "
-                    + DESCRIPCION_MAXIMA + " characters.");
+            throw ReglaNegocioException.badRequest("plan.descripcion-longitud", DESCRIPCION_MINIMA, DESCRIPCION_MAXIMA);
         }
         Reserva reserva = reservaPlanificable(reservaId, solicitud.clienteId());
         exigirGemini();
@@ -149,10 +151,10 @@ public class PlanVisitaService {
     // ===== POST /plan: genera el plan o reemplaza el que haya =====
     public PlanVisitaResponse generar(Long reservaId, GenerarPlanRequest solicitud) {
         if (solicitud == null || solicitud.clienteId() == null || solicitud.preferencias() == null) {
-            throw new IllegalArgumentException("Some required data is missing to build your plan.");
+            throw ReglaNegocioException.badRequest("plan.datos-requeridos-generar");
         }
         PreferenciasPlan preferencias = validarPreferencias(solicitud.preferencias());
-        String descripcion = textoOpcional(solicitud.descripcion(), DESCRIPCION_MAXIMA, "Your description");
+        String descripcion = textoOpcional(solicitud.descripcion(), DESCRIPCION_MAXIMA, "plan.descripcion-longitud");
         List<EntendidoItem> entendido = solicitud.entendido() == null ? List.of()
                 : solicitud.entendido().stream().filter(Objects::nonNull).limit(5).toList();
 
@@ -186,11 +188,11 @@ public class PlanVisitaService {
     // ===== POST /plan/ajustar: rehace el plan entero con la indicación y el plan actual como contexto =====
     public PlanVisitaResponse ajustar(Long reservaId, AjustarPlanRequest solicitud) {
         if (solicitud == null || solicitud.clienteId() == null) {
-            throw new IllegalArgumentException("Some required data is missing to adjust your plan.");
+            throw ReglaNegocioException.badRequest("plan.datos-requeridos-ajustar");
         }
         String indicacion = solicitud.indicacion() == null ? "" : solicitud.indicacion().trim();
         if (indicacion.isEmpty() || indicacion.length() > INDICACION_MAXIMA) {
-            throw new IllegalArgumentException("Tell the concierge what to change in 1 to " + INDICACION_MAXIMA + " characters.");
+            throw ReglaNegocioException.badRequest("plan.ajuste-longitud", 1, INDICACION_MAXIMA);
         }
         Reserva reserva = reservaPlanificable(reservaId, solicitud.clienteId());
         PlanVisita plan = planExistente(reservaId);
@@ -216,17 +218,18 @@ public class PlanVisitaService {
     // ===== POST /plan/dias/{fecha}/regenerar: cambia solo ese día y deja los demás iguales =====
     public PlanVisitaResponse regenerarDia(Long reservaId, LocalDate fecha, RegenerarDiaRequest solicitud) {
         if (solicitud == null || solicitud.clienteId() == null || fecha == null) {
-            throw new IllegalArgumentException("Some required data is missing to rebuild this day.");
+            throw ReglaNegocioException.badRequest("plan.datos-requeridos-regenerar");
         }
-        String indicacion = textoOpcional(solicitud.indicacion(), INDICACION_MAXIMA, "The instruction");
+        String indicacion = textoOpcional(solicitud.indicacion(), INDICACION_MAXIMA, "plan.ajuste-longitud");
         Reserva reserva = reservaPlanificable(reservaId, solicitud.clienteId());
         PlanVisita plan = planExistente(reservaId);
         ContenidoPlan actual = leerContenido(plan);
         if (actual.dias().stream().noneMatch(dia -> dia.fecha().equals(fecha))) {
-            throw new IllegalArgumentException("That day is not part of your plan.");
+            throw ReglaNegocioException.badRequest("plan.dia-fuera-del-plan");
         }
         if (fecha.isBefore(LocalDate.now(reloj))) {
-            throw new IllegalArgumentException("That day has already passed.");
+            // El contrato le da 409 (regla de la estadia), no 400
+            throw ReglaNegocioException.conflict("plan.dia-pasado");
         }
         exigirGemini();
         exigirCupo(plan);
@@ -262,7 +265,7 @@ public class PlanVisitaService {
     // ===== POST /plan/bloques/{bloqueId}/agregar-a-cuenta ("Add to my stay") =====
     public CuentaResponse agregarACuenta(Long reservaId, String bloqueId, AgregarBloqueRequest solicitud) {
         if (solicitud == null || solicitud.clienteId() == null) {
-            throw new IllegalArgumentException("Some required data is missing to add this to your stay.");
+            throw ReglaNegocioException.badRequest("plan.datos-requeridos-agregar");
         }
         reservaPropia(reservaId, solicitud.clienteId());
         ContenidoPlan contenido = leerContenido(planExistente(reservaId));
@@ -270,9 +273,9 @@ public class PlanVisitaService {
                 .flatMap(dia -> dia.bloques().stream())
                 .filter(b -> b.id().equals(bloqueId))
                 .findFirst()
-                .orElseThrow(() -> new RecursoNoEncontradoException("Plan item not found: " + bloqueId));
+                .orElseThrow(() -> RecursoNoEncontradoException.conCodigo("plan.bloque-no-encontrado", bloqueId));
         if (bloque.tipo() != TipoBloque.SERVICIO_HOTEL || bloque.servicioId() == null) {
-            throw new IllegalArgumentException("Only hotel services can be added to your stay.");
+            throw ReglaNegocioException.badRequest("plan.solo-servicios-hotel");
         }
         // Operador null: CuentaService usa el predeterminado. 409 si la cuenta no está abierta (PENDIENTE)
         return cuentaService.agregarConsumo(reservaId, bloque.servicioId(), 1, null);
@@ -314,7 +317,7 @@ public class PlanVisitaService {
         try {
             pronostico = contextoPlanService.pronosticoNws(hoy, hasta);
         } catch (RuntimeException ex) {
-            log.warn("No se pudo actualizar el clima de los planes: {}", ex.getMessage());
+            log.warn("Could not refresh the weather of the visit plans: {}", ex.getMessage());
             return;
         }
 
@@ -347,7 +350,7 @@ public class PlanVisitaService {
                 planVisitaRepository.save(plan);
             }
         }
-        log.info("Clima actualizado en {} planes de visita", planes.size());
+        log.info("Weather refreshed in {} visit plans", planes.size());
     }
 
     // ===== Plan de ejemplo ya validado (DataLoader), sin claves ni internet =====
@@ -372,12 +375,12 @@ public class PlanVisitaService {
     // ===== Reglas de la reserva =====
     private Reserva reservaPropia(Long reservaId, Long clienteId) {
         if (clienteId == null) {
-            throw new IllegalArgumentException("Some required data is missing.");
+            throw ReglaNegocioException.badRequest("plan.cliente-requerido");
         }
         Reserva reserva = reservaRepository.findById(reservaId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada: " + reservaId));
+                .orElseThrow(() -> RecursoNoEncontradoException.conCodigo("reserva.no-encontrada", reservaId));
         if (reserva.getCliente() == null || !reserva.getCliente().getId().equals(clienteId)) {
-            throw new AccesoDenegadoException(NO_ES_SUYA);
+            throw AccesoDenegadoException.conCodigo(NO_ES_SUYA);
         }
         return reserva;
     }
@@ -385,32 +388,31 @@ public class PlanVisitaService {
     private Reserva reservaPlanificable(Long reservaId, Long clienteId) {
         Reserva reserva = reservaPropia(reservaId, clienteId);
         if (!ESTADOS_PLANIFICABLES.contains(reserva.getEstado())) {
-            throw new IllegalStateException("Only pending, confirmed or in-progress reservations can have a visit plan.");
+            throw ReglaNegocioException.conflict("plan.estado-reserva-invalido");
         }
         if (reserva.getNoches() > MAXIMO_NOCHES) {
-            throw new IllegalArgumentException("Visit plans are available for stays of up to " + MAXIMO_NOCHES + " nights.");
+            throw ReglaNegocioException.conflict("plan.estadia-demasiado-larga", MAXIMO_NOCHES);
         }
         if (reserva.getFechaFin().isBefore(LocalDate.now(reloj))) {
-            throw new IllegalStateException("This stay has already ended.");
+            throw ReglaNegocioException.conflict("plan.estadia-terminada");
         }
         return reserva;
     }
 
     private PlanVisita planExistente(Long reservaId) {
         return planVisitaRepository.findByReservaId(reservaId)
-                .orElseThrow(() -> new RecursoNoEncontradoException(SIN_PLAN));
+                .orElseThrow(() -> RecursoNoEncontradoException.conCodigo(SIN_PLAN));
     }
 
     private void exigirGemini() {
         if (!estaDisponible()) {
-            throw new ServicioNoDisponibleException(SIN_GEMINI);
+            throw ServicioNoDisponibleException.conCodigo(SIN_GEMINI);
         }
     }
 
     private void exigirCupo(PlanVisita plan) {
         if (generacionesUsadasHoy(plan) >= propiedades.getMaxGeneracionesDia()) {
-            throw new LimiteExcedidoException("You have reached today's limit of " + propiedades.getMaxGeneracionesDia()
-                    + " plans for this stay. Try again tomorrow.");
+            throw LimiteExcedidoException.conCodigo("plan.limite-diario", propiedades.getMaxGeneracionesDia());
         }
     }
 
@@ -437,33 +439,35 @@ public class PlanVisitaService {
     PreferenciasPlan validarPreferencias(PreferenciasPlan p) {
         if (p.intereses() == null || p.intereses().isEmpty() || p.intereses().size() > MAXIMO_INTERESES
                 || p.intereses().stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Choose between 1 and " + MAXIMO_INTERESES + " interests.");
+            throw ReglaNegocioException.badRequest("plan.intereses-rango", 1, MAXIMO_INTERESES);
         }
         if (new HashSet<>(p.intereses()).size() != p.intereses().size()) {
-            throw new IllegalArgumentException("Each interest can be chosen only once.");
+            throw ReglaNegocioException.badRequest("plan.intereses-repetidos");
         }
         if (p.ritmo() == null) {
-            throw new IllegalArgumentException("Choose a pace for your days.");
+            throw ReglaNegocioException.badRequest("plan.ritmo-requerido");
         }
         if (p.presupuesto() == null) {
-            throw new IllegalArgumentException("Choose a budget.");
+            throw ReglaNegocioException.badRequest("plan.presupuesto-requerido");
         }
         List<EtiquetaPlato> dieta = p.dieta() == null ? List.of() : p.dieta();
         if (dieta.size() > MAXIMO_DIETAS || dieta.stream().anyMatch(Objects::isNull) || !DIETAS_PERMITIDAS.containsAll(dieta)
                 || new HashSet<>(dieta).size() != dieta.size()) {
-            throw new IllegalArgumentException("Diet options are VEGANO, VEGETARIANO and SIN_GLUTEN, each at most once.");
+            throw ReglaNegocioException.badRequest("plan.dieta-invalida");
         }
-        String notas = textoOpcional(p.notas(), NOTAS_MAXIMAS, "Notes");
+        String notas = textoOpcional(p.notas(), NOTAS_MAXIMAS, "plan.notas-longitud");
         return new PreferenciasPlan(List.copyOf(p.intereses()), p.ritmo(), p.presupuesto(), List.copyOf(dieta),
                 p.movilidadReducida(), p.conNinos(), notas);
     }
 
-    private static String textoOpcional(String texto, int maximo, String campo) {
+    // El codigo decide el mensaje (plan.descripcion-longitud, plan.ajuste-longitud o
+    // plan.notas-longitud): un nombre de campo en ingles dentro del texto no se podria traducir.
+    private static String textoOpcional(String texto, int maximo, String codigo) {
         if (texto == null || texto.trim().isEmpty()) {
             return null;
         }
         if (texto.trim().length() > maximo) {
-            throw new IllegalArgumentException(campo + " cannot exceed " + maximo + " characters.");
+            throw ReglaNegocioException.badRequest(codigo, 1, maximo);
         }
         return texto.trim();
     }
@@ -542,7 +546,8 @@ public class PlanVisitaService {
         try {
             return objectMapper.readValue(plan.getContenido(), ContenidoPlan.class);
         } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("The saved plan could not be read.", ex);
+            // 502: el JSON guardado lo escribio el propio backend, el huesped no puede arreglarlo
+            throw ReglaNegocioException.de(HttpStatus.BAD_GATEWAY, ex, "plan.ilegible");
         }
     }
 
@@ -550,7 +555,7 @@ public class PlanVisitaService {
         try {
             return objectMapper.readValue(plan.getPreferencias(), PreferenciasPlan.class);
         } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("The saved preferences could not be read.", ex);
+            throw ReglaNegocioException.de(HttpStatus.BAD_GATEWAY, ex, "plan.preferencias-ilegibles");
         }
     }
 
@@ -558,7 +563,7 @@ public class PlanVisitaService {
         try {
             return objectMapper.writeValueAsString(valor);
         } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("No se pudo guardar el plan", ex);
+            throw new IllegalStateException("The plan could not be saved.", ex);
         }
     }
 }

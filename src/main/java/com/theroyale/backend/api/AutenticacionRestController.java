@@ -6,6 +6,8 @@ import com.theroyale.backend.dto.GoogleUserInfo;
 import com.theroyale.backend.dto.LoginRequest;
 import com.theroyale.backend.dto.LoginResponse;
 import com.theroyale.backend.dto.OperadorResponseDto;
+import com.theroyale.backend.errors.AccesoDenegadoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Admin;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.Operador;
@@ -69,8 +71,16 @@ public class AutenticacionRestController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // Los errores salen por ApiExceptionHandler, con su codigo del contrato
+    // (docs/i18n-codigos-error.md) y el mensaje en el idioma del Accept-Language.
     @PostMapping("/login")
     public ResponseEntity<?> iniciarSesion(@RequestBody LoginRequest credenciales) {
+        if (credenciales == null || credenciales.email() == null || credenciales.email().isBlank()) {
+            throw ReglaNegocioException.badRequest("auth.email-requerido");
+        }
+        if (credenciales.password() == null || credenciales.password().isEmpty()) {
+            throw ReglaNegocioException.badRequest("auth.password-requerido");
+        }
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(credenciales.email().trim(), credenciales.password())
@@ -101,19 +111,21 @@ public class AutenticacionRestController {
 
             return ResponseEntity.ok(new LoginResponse("USER", 0L, email, "", email, token));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contraseña incorrectos");
+            // Un mismo error para "no existe" y "contrasena equivocada": no se revela cual de los dos
+            throw ReglaNegocioException.de(HttpStatus.UNAUTHORIZED, "auth.credenciales-invalidas");
         }
     }
 
     @PostMapping("/google")
     public ResponseEntity<?> iniciarSesionConGoogle(@RequestBody GoogleLoginRequest request) {
+        // Token ausente, invalido o expirado: para el huesped es el mismo problema, un solo codigo
         if (request == null || request.idToken() == null || request.idToken().isBlank()) {
-            return ResponseEntity.badRequest().body("El token de Google es requerido");
+            throw ReglaNegocioException.de(HttpStatus.UNAUTHORIZED, "auth.google-token-invalido");
         }
 
         Optional<GoogleUserInfo> userInfoOpt = googleAuthService.verificarToken(request.idToken());
         if (userInfoOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token de Google inválido o expirado");
+            throw ReglaNegocioException.de(HttpStatus.UNAUTHORIZED, "auth.google-token-invalido");
         }
 
         GoogleUserInfo userInfo = userInfoOpt.get();
@@ -121,8 +133,7 @@ public class AutenticacionRestController {
 
         // 1. RESTRICCIÓN: Exclusivo para clientes / huéspedes
         if (adminRepository.findByEmailIgnoreCase(email).isPresent() || operadorRepository.findByEmail(email).isPresent()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("El inicio de sesión con Google está habilitado únicamente para huéspedes (clientes). Administradores y operadores deben ingresar con sus credenciales.");
+            throw AccesoDenegadoException.conCodigo("auth.solo-huespedes");
         }
 
         // 2. Buscar o auto-registrar Cliente

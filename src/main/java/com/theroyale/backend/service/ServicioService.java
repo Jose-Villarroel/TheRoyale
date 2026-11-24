@@ -37,7 +37,7 @@ public class ServicioService implements InterfaceService {
     @Override
     public Servicio buscarPorId(Long id) {
         return servicioRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Servicio no encontrado: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Service not found: " + id));
     }
 
     // Al editar se copian solo los campos editables sobre la entidad existente:

@@ -458,7 +458,7 @@ class DashboardServiceIntegrationTest {
         // Act & Assert
         assertThatThrownBy(() -> dashboardService.ingresosSerie(DESDE, HASTA, "trimestre"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("agrupación");
+                .hasMessageContaining("dia, semana or mes");
     }
 
     // ===== Utilidades de armado =====

@@ -38,18 +38,18 @@ public class ClienteHttpFuente {
                     .exchange((peticion, respuesta) -> {
                         String texto = new String(respuesta.getBody().readAllBytes(), StandardCharsets.UTF_8);
                         if (respuesta.getStatusCode().isError()) {
-                            throw new FuenteNoDisponibleException(nombreFuente + " respondió "
+                            throw new FuenteNoDisponibleException(nombreFuente + " answered "
                                     + respuesta.getStatusCode().value() + ": " + recortar(texto));
                         }
                         return texto;
                     });
         } catch (RestClientException ex) {
-            throw new FuenteNoDisponibleException("No se pudo consultar " + nombreFuente + ": " + ocultarClaves(ex.getMessage()));
+            throw new FuenteNoDisponibleException(nombreFuente + " could not be queried: " + ocultarClaves(ex.getMessage()));
         }
         try {
             return objectMapper.readTree(cuerpo);
         } catch (IOException ex) {
-            throw new FuenteNoDisponibleException(nombreFuente + " devolvió un JSON ilegible.", ex);
+            throw new FuenteNoDisponibleException(nombreFuente + " returned unreadable JSON.", ex);
         }
     }
 

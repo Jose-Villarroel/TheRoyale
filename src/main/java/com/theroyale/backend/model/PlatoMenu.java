@@ -67,4 +67,15 @@ public class PlatoMenu {
 
     @Column(length = 255)
     private String imagenUrl;
+
+    // ===== Versión en español del contenido que ve el huésped (EN es el idioma base) =====
+    // Nullables a propósito: si están vacíos, los DTO de respuesta caen al valor en inglés. Hoy solo
+    // se siembran desde DataLoader; el panel de administración todavía no tiene formulario para
+    // editarlos (ver docs/i18n-glosario.md: los nombres propios no se traducen y se quedan en null).
+
+    @Column(length = 100)
+    private String nombreEs;
+
+    @Column(length = 500)
+    private String descripcionEs;
 }

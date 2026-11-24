@@ -73,7 +73,7 @@ public class HistoricoOcupacionService {
                         .build());
             }
         } catch (IOException ex) {
-            throw new UncheckedIOException("No se pudo leer el historial " + recurso, ex);
+            throw new UncheckedIOException("The occupancy history " + recurso + " could not be read.", ex);
         }
         reservaHistoricaRepository.saveAll(reservas);
         ocupacionService.olvidarHistorico();

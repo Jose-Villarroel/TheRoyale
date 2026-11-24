@@ -126,7 +126,7 @@ public class ReservaRestController {
         }
         Long clientePropio = usuarioActualService.obtenerClienteActual().getId();
         if (reserva.getCliente() == null || !reserva.getCliente().getId().equals(clientePropio)) {
-            throw new AccesoDenegadoException("You can only access your own reservations.");
+            throw AccesoDenegadoException.conCodigo("reserva.ajena");
         }
     }
 }

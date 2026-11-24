@@ -54,10 +54,10 @@ public class UsuarioActualService {
     public Cliente obtenerClienteActual() {
         String email = obtenerEmail();
         if (email == null) {
-            throw new AccesoDenegadoException("You must sign in as a client.");
+            throw AccesoDenegadoException.conCodigo("auth.sesion-cliente-requerida");
         }
         return clienteService.buscarPorEmail(email)
-                .orElseThrow(() -> new AccesoDenegadoException("No client is associated with the current user."));
+                .orElseThrow(() -> AccesoDenegadoException.conCodigo("auth.sin-cliente-asociado"));
     }
 
     // ===== Un cliente solo actúa sobre sus propios datos: el clienteId debe ser el de su token =====
@@ -68,7 +68,7 @@ public class UsuarioActualService {
             return;
         }
         if (clienteId == null || !clienteId.equals(obtenerClienteActual().getId())) {
-            throw new AccesoDenegadoException("You can only access your own data.");
+            throw AccesoDenegadoException.conCodigo("auth.datos-ajenos");
         }
     }
 

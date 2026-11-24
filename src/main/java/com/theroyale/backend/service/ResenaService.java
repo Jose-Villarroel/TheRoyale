@@ -4,6 +4,7 @@ import com.theroyale.backend.dto.CrearResenaRequest;
 import com.theroyale.backend.dto.ResumenResenasResponse;
 import com.theroyale.backend.errors.AccesoDenegadoException;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.EstadoReserva;
 import com.theroyale.backend.model.Resena;
 import com.theroyale.backend.model.Reserva;
@@ -56,7 +57,7 @@ public class ResenaService {
 
     public Resena obtenerPorId(Long id) {
         return resenaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Review not found: " + id));
+                .orElseThrow(() -> RecursoNoEncontradoException.conCodigo("resena.no-encontrada", id));
     }
 
     // Público: solo las visibles del tipo, de la más reciente a la más antigua (RN-8)
@@ -135,24 +136,24 @@ public class ResenaService {
     @Transactional
     public Resena crear(CrearResenaRequest solicitud) {
         if (solicitud == null || solicitud.reservaId() == null || solicitud.clienteId() == null) {
-            throw new IllegalArgumentException("Some required data is missing to create the review.");
+            throw ReglaNegocioException.badRequest("resena.datos-requeridos-crear");
         }
         validarContenido(solicitud);
 
         Reserva reserva = reservaRepository.findById(solicitud.reservaId())
-                .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada: " + solicitud.reservaId()));
+                .orElseThrow(() -> RecursoNoEncontradoException.conCodigo("reserva.no-encontrada", solicitud.reservaId()));
 
         // RN-2
         if (reserva.getCliente() == null || !reserva.getCliente().getId().equals(solicitud.clienteId())) {
-            throw new AccesoDenegadoException("This reservation does not belong to you.");
+            throw AccesoDenegadoException.conCodigo("resena.reserva-ajena");
         }
         // RN-1
         if (reserva.getEstado() != EstadoReserva.FINALIZADA) {
-            throw new IllegalStateException("Only completed stays can be reviewed.");
+            throw ReglaNegocioException.conflict("resena.solo-finalizadas");
         }
         // RN-3
         if (resenaRepository.existsByReservaId(reserva.getId())) {
-            throw new IllegalStateException("This reservation already has a review.");
+            throw ReglaNegocioException.conflict("resena.ya-existe");
         }
 
         // RN-6: el tipo se copia de la reserva en este momento; si luego la habitación cambia de tipo,
@@ -178,7 +179,7 @@ public class ResenaService {
     @Transactional
     public Resena actualizar(Long id, CrearResenaRequest cambios) {
         if (cambios == null || cambios.clienteId() == null) {
-            throw new IllegalArgumentException("Some required data is missing to update the review.");
+            throw ReglaNegocioException.badRequest("resena.datos-requeridos-actualizar");
         }
         validarContenido(cambios);
 
@@ -234,7 +235,7 @@ public class ResenaService {
     // RN-7: solo el autor edita o elimina
     private void exigirAutor(Resena resena, Long clienteId) {
         if (clienteId == null || resena.getCliente() == null || !resena.getCliente().getId().equals(clienteId)) {
-            throw new AccesoDenegadoException("Only the author can edit or delete this review.");
+            throw AccesoDenegadoException.conCodigo("resena.solo-autor");
         }
     }
 
@@ -244,20 +245,18 @@ public class ResenaService {
 
         String comentario = datos.comentario() == null ? "" : datos.comentario().trim();
         if (comentario.length() < COMENTARIO_MINIMO || comentario.length() > COMENTARIO_MAXIMO) {
-            throw new IllegalArgumentException("The comment is required and must be between "
-                    + COMENTARIO_MINIMO + " and " + COMENTARIO_MAXIMO + " characters.");
+            throw ReglaNegocioException.badRequest("resena.comentario-longitud", COMENTARIO_MINIMO, COMENTARIO_MAXIMO);
         }
 
         String titulo = limpiarTitulo(datos.titulo());
         if (titulo != null && titulo.length() > TITULO_MAXIMO) {
-            throw new IllegalArgumentException("The title cannot exceed " + TITULO_MAXIMO + " characters.");
+            throw ReglaNegocioException.badRequest("resena.titulo-longitud", TITULO_MAXIMO);
         }
     }
 
     private void validarCalificacion(Integer calificacion) {
         if (calificacion == null || calificacion < CALIFICACION_MINIMA || calificacion > CALIFICACION_MAXIMA) {
-            throw new IllegalArgumentException("The rating must be a whole number between "
-                    + CALIFICACION_MINIMA + " and " + CALIFICACION_MAXIMA + ".");
+            throw ReglaNegocioException.badRequest("resena.calificacion-rango", CALIFICACION_MINIMA, CALIFICACION_MAXIMA);
         }
     }
 

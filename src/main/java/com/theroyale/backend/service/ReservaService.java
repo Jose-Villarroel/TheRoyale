@@ -1,6 +1,7 @@
 package com.theroyale.backend.service;
 
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Cuenta;
 import com.theroyale.backend.model.EstadoCuenta;
 import com.theroyale.backend.model.EstadoHabitacion;
@@ -9,10 +10,12 @@ import com.theroyale.backend.model.Habitacion;
 import com.theroyale.backend.model.Reserva;
 import com.theroyale.backend.repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.theroyale.backend.dto.CrearReservaRequest;
 import com.theroyale.backend.dto.DisponibilidadTipoResponse;
+import com.theroyale.backend.dto.TextoPorIdioma;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.repository.HabitacionRepository;
@@ -26,6 +29,7 @@ import java.util.Comparator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 // ===== Ciclo de vida de una reserva gestionado por el operador =====
 // PENDIENTE -> CONFIRMADA (se abre la cuenta) -> EN_CURSO (check-in) -> FINALIZADA (check-out);
@@ -98,7 +102,7 @@ public class ReservaService {
 
     public Reserva obtenerPorId(Long id) {
         return reservaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada: " + id));
+                .orElseThrow(() -> RecursoNoEncontradoException.conCodigo("reserva.no-encontrada", id));
     }
 
     // Busca la reserva activa (CONFIRMADA o EN_CURSO) de una habitacion dado su numero.
@@ -116,6 +120,7 @@ public class ReservaService {
     public List<DisponibilidadTipoResponse> consultarDisponibilidad(LocalDate inicio, LocalDate fin) {
         validarRangoFechas(inicio, fin);
 
+        Locale idioma = LocaleContextHolder.getLocale();
         List<DisponibilidadTipoResponse> disponibilidad = new ArrayList<>();
         for (TipoHabitacion tipo : tipoHabitacionService.listarTodos()) {
             List<Habitacion> libres = habitacionRepository.buscarDisponibles(
@@ -128,8 +133,12 @@ public class ReservaService {
                     .min(Comparator.naturalOrder())
                     .orElse(null);
 
+            // El nombre y la descripcion salen en el idioma de la peticion, con respaldo al ingles
             disponibilidad.add(new DisponibilidadTipoResponse(
-                    tipo.getId(), tipo.getNombre(), tipo.getDescripcion(), tipo.getImagenUrl(),
+                    tipo.getId(),
+                    TextoPorIdioma.elegir(idioma, tipo.getNombre(), tipo.getNombreEs()),
+                    TextoPorIdioma.elegir(idioma, tipo.getDescripcion(), tipo.getDescripcionEs()),
+                    tipo.getImagenUrl(),
                     libres.size(), precioDesde, precioService.etiqueta(tipo.getId(), inicio, fin)));
         }
         return disponibilidad;
@@ -166,13 +175,13 @@ public class ReservaService {
     @Transactional
     public Reserva modificar(Long id, CrearReservaRequest nuevos) {
         Reserva reserva = obtenerPorId(id);
-        exigirEstado(reserva, "modify", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
+        exigirEstado(reserva, "reserva.modificar.estado-invalido", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
 
         if (nuevos == null || nuevos.tipoHabitacionId() == null || nuevos.cantidadPersonas() == null) {
-            throw new IllegalArgumentException("Some required data is missing to modify the reservation.");
+            throw ReglaNegocioException.badRequest("reserva.datos-requeridos-modificar");
         }
         if (nuevos.cantidadPersonas() < 1) {
-            throw new IllegalArgumentException("The number of guests must be at least 1.");
+            throw ReglaNegocioException.badRequest("reserva.huespedes-minimo");
         }
         validarRangoFechas(nuevos.fechaInicio(), nuevos.fechaFin());
 
@@ -193,7 +202,7 @@ public class ReservaService {
     @Transactional
     public Reserva confirmar(Long id) {
         Reserva reserva = obtenerPorId(id);
-        exigirEstado(reserva, "confirmar", EstadoReserva.PENDIENTE);
+        exigirEstadoOperador(reserva, "confirmar", EstadoReserva.PENDIENTE);
 
         reserva.setEstado(EstadoReserva.CONFIRMADA);
         Reserva guardada = reservaRepository.save(reserva);
@@ -206,19 +215,17 @@ public class ReservaService {
     @Transactional
     public Reserva cancelar(Long id) {
         Reserva reserva = obtenerPorId(id);
-        exigirEstado(reserva, "cancel", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
+        exigirEstado(reserva, "reserva.cancelar.estado-invalido", EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA);
 
         // Una estadia que ya empezo (o empieza hoy) se cierra con check-out, no se cancela
         if (!reserva.getFechaInicio().isAfter(LocalDate.now())) {
-            throw new IllegalStateException("Cannot cancel: the arrival date (" + reserva.getFechaInicio()
-                    + ") is not after today.");
+            throw ReglaNegocioException.conflict("reserva.cancelar.fecha-pasada", reserva.getFechaInicio());
         }
 
         Cuenta cuenta = cuentaService.buscarPorReserva(id).orElse(null);
         if (cuenta != null) {
             if (cuenta.getSaldo().signum() != 0) {
-                throw new IllegalStateException("Cannot cancel: the account has an outstanding balance of "
-                        + cuenta.getSaldo() + ". Remove the charges or register a payment first.");
+                throw ReglaNegocioException.conflict("reserva.cancelar.saldo-pendiente", cuenta.getSaldo());
             }
             cuenta.setEstado(EstadoCuenta.CERRADA);
         }
@@ -230,7 +237,7 @@ public class ReservaService {
     @Transactional
     public Reserva hacerCheckIn(Long id) {
         Reserva reserva = obtenerPorId(id);
-        exigirEstado(reserva, "check in", EstadoReserva.CONFIRMADA);
+        exigirEstadoOperador(reserva, "check in", EstadoReserva.CONFIRMADA);
 
         if (reserva.getFechaInicio().isAfter(LocalDate.now())) {
             throw new IllegalStateException("Check-in cannot be done before the arrival date (" + reserva.getFechaInicio() + ").");
@@ -252,10 +259,10 @@ public class ReservaService {
     @Transactional
     public Reserva hacerCheckOut(Long id) {
         Reserva reserva = obtenerPorId(id);
-        exigirEstado(reserva, "check out", EstadoReserva.EN_CURSO);
+        exigirEstadoOperador(reserva, "check out", EstadoReserva.EN_CURSO);
 
         Cuenta cuenta = cuentaService.buscarPorReserva(id)
-                .orElseThrow(() -> new IllegalStateException("This reservation has no associated account."));
+                .orElseThrow(() -> ReglaNegocioException.conflict("reserva.sin-cuenta"));
         if (cuenta.getSaldo().signum() != 0) {
             throw new IllegalStateException("Cannot check out: the account has an outstanding balance of " + cuenta.getSaldo() + ".");
         }
@@ -290,8 +297,7 @@ public class ReservaService {
                 ESTADOS_HABITACION_NO_UTILIZABLES, ESTADOS_RESERVA_BLOQUEANTES, reservaIdExcluida);
 
         if (disponibles.isEmpty()) {
-            throw new IllegalStateException("No " + tipo.getNombre() + " rooms are available from "
-                    + inicio + " to " + fin + ".");
+            throw ReglaNegocioException.conflict("reserva.sin-disponibilidad", tipo.getNombre(), inicio, fin);
         }
         return disponibles.get(0);
     }
@@ -303,10 +309,10 @@ public class ReservaService {
                 || solicitud.fechaInicio() == null
                 || solicitud.fechaFin() == null
                 || solicitud.cantidadPersonas() == null) {
-            throw new IllegalArgumentException("Some required data is missing to create the reservation.");
+            throw ReglaNegocioException.badRequest("reserva.datos-requeridos-crear");
         }
         if (solicitud.cantidadPersonas() < 1) {
-            throw new IllegalArgumentException("The number of guests must be at least 1.");
+            throw ReglaNegocioException.badRequest("reserva.huespedes-minimo");
         }
         validarRangoFechas(solicitud.fechaInicio(), solicitud.fechaFin());
     }
@@ -314,22 +320,37 @@ public class ReservaService {
     // Las mismas reglas de fechas valen para crear una reserva y para consultar disponibilidad
     private void validarRangoFechas(LocalDate inicio, LocalDate fin) {
         if (inicio == null || fin == null) {
-            throw new IllegalArgumentException("Both the check-in and check-out dates are required.");
+            throw ReglaNegocioException.badRequest("reserva.fechas-requeridas");
         }
         if (inicio.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("The check-in date cannot be in the past.");
+            throw ReglaNegocioException.badRequest("reserva.fecha-inicio-pasada");
         }
         if (!fin.isAfter(inicio)) {
-            throw new IllegalArgumentException("The check-out date must be after the check-in date.");
+            throw ReglaNegocioException.badRequest("reserva.fecha-fin-anterior");
         }
     }
 
-    private void exigirEstado(Reserva reserva, String accion, EstadoReserva... permitidos) {
+    // Variante del huesped: el codigo del contrato identifica la accion (cancelar o modificar) y el
+    // estado viaja como parametro, para que el mensaje se pueda traducir.
+    private void exigirEstado(Reserva reserva, String codigo, EstadoReserva... permitidos) {
+        if (!estaEn(reserva, permitidos)) {
+            throw ReglaNegocioException.conflict(codigo, reserva.getEstado());
+        }
+    }
+
+    // Variante del operador (confirmar, check-in, check-out): literal en ingles, sin codigo
+    private void exigirEstadoOperador(Reserva reserva, String accion, EstadoReserva... permitidos) {
+        if (!estaEn(reserva, permitidos)) {
+            throw new IllegalStateException("Cannot " + accion + " a reservation with status " + reserva.getEstado() + ".");
+        }
+    }
+
+    private boolean estaEn(Reserva reserva, EstadoReserva... permitidos) {
         for (EstadoReserva permitido : permitidos) {
             if (reserva.getEstado() == permitido) {
-                return;
+                return true;
             }
         }
-        throw new IllegalStateException("Cannot " + accion + " a reservation with status " + reserva.getEstado() + ".");
+        return false;
     }
 }

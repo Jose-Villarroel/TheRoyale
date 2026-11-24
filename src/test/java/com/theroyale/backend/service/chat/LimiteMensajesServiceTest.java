@@ -29,7 +29,8 @@ class LimiteMensajesServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> limite.registrar("10.0.0.1"))
                 .isInstanceOf(LimiteExcedidoException.class)
-                .hasMessage("Too many messages, please try again in a few minutes.");
+                .extracting(ex -> ((LimiteExcedidoException) ex).getCodigo())
+                .isEqualTo("chat.limite-mensajes");
     }
 
     @Test

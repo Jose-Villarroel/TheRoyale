@@ -107,7 +107,7 @@ public class NycOpenDataEventosClient implements EventosClient {
 
     static List<EventoCandidato> parsear(JsonNode respuesta) {
         if (!respuesta.isArray()) {
-            throw new FuenteNoDisponibleException("NYC Open Data no devolvió una lista de eventos.");
+            throw new FuenteNoDisponibleException("NYC Open Data did not return a list of events.");
         }
         List<EventoCandidato> eventos = new ArrayList<>();
         for (JsonNode fila : respuesta) {

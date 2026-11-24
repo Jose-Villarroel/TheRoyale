@@ -3,12 +3,14 @@ package com.theroyale.backend.service.chat;
 import com.theroyale.backend.config.GeminiProperties;
 import com.theroyale.backend.dto.ChatRequest;
 import com.theroyale.backend.dto.TurnoChatRequest;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.errors.ServicioNoDisponibleException;
 import com.theroyale.backend.service.chat.GeminiClient.LlamadaFuncion;
 import com.theroyale.backend.service.chat.GeminiClient.MensajeGemini;
 import com.theroyale.backend.service.chat.GeminiClient.ParteGemini;
 import com.theroyale.backend.service.chat.GeminiClient.SolicitudGemini;
 import com.theroyale.backend.service.chat.HerramientasChatService.ResultadoHerramienta;
+import org.springframework.context.MessageSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,10 +50,11 @@ public class ChatService {
     static final String ROL_USUARIO = "usuario";
     static final String ROL_ASISTENTE = "asistente";
 
-    static final String MENSAJE_OFFLINE = "The concierge is offline right now.";
-    static final String MENSAJE_ERROR = "The concierge could not finish the answer. Please try again in a moment.";
-    static final String RESPUESTA_VACIA = "I'm sorry, I couldn't prepare an answer this time. Please try again, "
-            + "or call our front desk at " + ContextoHotelService.TELEFONO_RECEPCION + ".";
+    // Codigos del contrato (docs/i18n-codigos-error.md); el texto sale de messages[_es].properties
+    static final String CODIGO_OFFLINE = "chat.no-disponible";
+    static final String CODIGO_ERROR = "chat.respuesta-incompleta";
+    // No es un error (no viaja en "codigo"): es texto del stream, por eso tiene su propia clave
+    static final String CLAVE_RESPUESTA_VACIA = "chat.respuesta-vacia";
 
     // ===== Nombres de los eventos SSE (contrato con chat.service.ts del front) =====
     public static final String EVENTO_TEXTO = "texto";
@@ -78,17 +82,20 @@ public class ChatService {
     private final HerramientasChatService herramientasChatService;
     private final LimiteMensajesService limiteMensajesService;
     private final TaskExecutor ejecutor;
+    private final MessageSource messageSource;
 
     public ChatService(GeminiClient geminiClient, GeminiProperties propiedades,
                        ContextoHotelService contextoHotelService, HerramientasChatService herramientasChatService,
                        LimiteMensajesService limiteMensajesService,
-                       @Qualifier("applicationTaskExecutor") TaskExecutor ejecutor) {
+                       @Qualifier("applicationTaskExecutor") TaskExecutor ejecutor,
+                       MessageSource messageSource) {
         this.geminiClient = geminiClient;
         this.propiedades = propiedades;
         this.contextoHotelService = contextoHotelService;
         this.herramientasChatService = herramientasChatService;
         this.limiteMensajesService = limiteMensajesService;
         this.ejecutor = ejecutor;
+        this.messageSource = messageSource;
     }
 
     public boolean estaDisponible() {
@@ -97,9 +104,11 @@ public class ChatService {
 
     // ===== Punto de entrada de POST /api/chat =====
     // Lo que lanza aquí (antes de devolver el emisor) llega al cliente como JSON {status, message}.
-    public SseEmitter iniciarConversacion(ChatRequest solicitud, String ip) {
+    // El idioma llega resuelto (AcceptHeaderLocaleResolver, ver I18nConfig) y se captura aqui: el
+    // stream corre en otro hilo y LocaleContextHolder no viaja con el, asi que hay que pasarlo.
+    public SseEmitter iniciarConversacion(ChatRequest solicitud, String ip, Locale idioma) {
         if (!estaDisponible()) {
-            throw new ServicioNoDisponibleException(MENSAJE_OFFLINE);
+            throw ServicioNoDisponibleException.conCodigo(CODIGO_OFFLINE);
         }
         ChatRequest preparada = prepararSolicitud(solicitud);
         limiteMensajesService.registrar(ip);
@@ -111,10 +120,10 @@ public class ChatService {
         SseEmitter emisor = new SseEmitter(timeoutMs);
         ejecutor.execute(() -> {
             try {
-                responder(preparada, (evento, datos) -> enviar(emisor, evento, datos));
+                responder(preparada, (evento, datos) -> enviar(emisor, evento, datos), idioma);
                 emisor.complete();
             } catch (ConexionCerradaException ex) {
-                log.debug("El cliente cerró el chat antes de terminar la respuesta");
+                log.debug("The client closed the chat before the answer was finished");
             }
         });
         return emisor;
@@ -125,11 +134,11 @@ public class ChatService {
     // mandar toda la conversación sin preocuparse. Turnos con texto vacío se descartan.
     public ChatRequest prepararSolicitud(ChatRequest solicitud) {
         if (solicitud == null || solicitud.mensaje() == null || solicitud.mensaje().isBlank()) {
-            throw new IllegalArgumentException("The message cannot be empty.");
+            throw ReglaNegocioException.badRequest("chat.mensaje-vacio");
         }
         String mensaje = solicitud.mensaje().trim();
         if (mensaje.length() > LARGO_MAXIMO_MENSAJE) {
-            throw new IllegalArgumentException("The message cannot exceed " + LARGO_MAXIMO_MENSAJE + " characters.");
+            throw ReglaNegocioException.badRequest("chat.mensaje-longitud", LARGO_MAXIMO_MENSAJE);
         }
 
         List<TurnoChatRequest> turnos = new ArrayList<>();
@@ -137,7 +146,7 @@ public class ChatService {
             for (TurnoChatRequest turno : solicitud.historial()) {
                 if (turno == null || turno.rol() == null
                         || !(ROL_USUARIO.equals(turno.rol()) || ROL_ASISTENTE.equals(turno.rol()))) {
-                    throw new IllegalArgumentException("Invalid role in the history: use \"usuario\" or \"asistente\".");
+                    throw ReglaNegocioException.badRequest("chat.rol-invalido");
                 }
                 if (turno.texto() == null || turno.texto().isBlank()) {
                     continue;
@@ -162,9 +171,9 @@ public class ChatService {
 
     // ===== Bucle de Gemini y herramientas; emite los eventos en orden =====
     // Recibe una solicitud ya preparada (prepararSolicitud). Es síncrono: en producción corre en el ejecutor.
-    public void responder(ChatRequest solicitud, EmisorChat emisor) {
+    public void responder(ChatRequest solicitud, EmisorChat emisor, Locale idioma) {
         try {
-            String instruccion = contextoHotelService.construirInstruccionSistema();
+            String instruccion = contextoHotelService.construirInstruccionSistema(idioma);
             List<Map<String, Object>> declaraciones = herramientasChatService.declaraciones();
             List<MensajeGemini> contenidos = convertirHistorial(solicitud);
             FiltroSugerencias filtro = new FiltroSugerencias();
@@ -206,12 +215,12 @@ public class ChatService {
 
             emitirTexto(emisor, filtro.finalizar());
             if (!filtro.huboTextoVisible()) {
-                emitirTexto(emisor, RESPUESTA_VACIA);
+                emitirTexto(emisor, mensaje(CLAVE_RESPUESTA_VACIA, idioma, ContextoHotelService.TELEFONO_RECEPCION));
             }
 
             List<String> sugerencias = filtro.sugerencias();
             if (sugerencias.size() < 2) {
-                sugerencias = SugerenciasPredeterminadas.para(herramientasUsadas, solicitud.mensaje());
+                sugerencias = SugerenciasPredeterminadas.para(herramientasUsadas, idioma);
             }
             emisor.emitir(EVENTO_SUGERENCIAS, Map.of("sugerencias", sugerencias));
             emisor.emitir(EVENTO_FIN, Map.of());
@@ -219,9 +228,15 @@ public class ChatService {
             throw ex;
         } catch (RuntimeException ex) {
             // El detalle (código HTTP de Gemini, etc.) solo va al log; al cliente un mensaje genérico
-            log.warn("Falló la respuesta del chat: {}", ex.getMessage());
-            emisor.emitir(EVENTO_ERROR, Map.of("message", MENSAJE_ERROR));
+            log.warn("The chat answer failed: {}", ex.getMessage());
+            // Aqui ya se respondio 200 y el stream esta abierto: el 502 del contrato no se puede
+            // mandar, asi que el codigo y su mensaje viajan dentro del evento SSE "error".
+            emisor.emitir(EVENTO_ERROR, Map.of("codigo", CODIGO_ERROR, "message", mensaje(CODIGO_ERROR, idioma)));
         }
+    }
+
+    private String mensaje(String clave, Locale idioma, Object... args) {
+        return messageSource.getMessage(clave, args, clave, idioma == null ? Locale.ENGLISH : idioma);
     }
 
     private List<MensajeGemini> convertirHistorial(ChatRequest solicitud) {

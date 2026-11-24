@@ -72,7 +72,7 @@ public class NwsClimaClient implements ClimaClient {
             JsonNode respuesta = http.obtenerJson(puntos, headers);
             JsonNode url = respuesta.path("properties").path("forecast");
             if (!url.isTextual()) {
-                throw new FuenteNoDisponibleException("NWS no devolvió la URL del pronóstico.");
+                throw new FuenteNoDisponibleException("NWS did not return the forecast URL.");
             }
             return url.asText();
         });
@@ -84,7 +84,7 @@ public class NwsClimaClient implements ClimaClient {
     static List<ClimaDia> parsearPronostico(JsonNode respuesta) {
         JsonNode periodos = respuesta.path("properties").path("periods");
         if (!periodos.isArray() || periodos.isEmpty()) {
-            throw new FuenteNoDisponibleException("NWS no devolvió periodos de pronóstico.");
+            throw new FuenteNoDisponibleException("NWS did not return any forecast periods.");
         }
 
         Map<LocalDate, JsonNode[]> porFecha = new LinkedHashMap<>();

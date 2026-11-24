@@ -1,6 +1,7 @@
 package com.theroyale.backend.service;
 
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.Role;
 import com.theroyale.backend.model.UserEntity;
@@ -49,7 +50,7 @@ public class ClienteService {
 
     public Cliente obtenerPorId(Long id) {
         return clienteRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado: " + id));
+                .orElseThrow(() -> RecursoNoEncontradoException.conCodigo("cliente.no-encontrado", id));
     }
 
     public Optional<Cliente> buscarPorEmail(String email) {
@@ -62,12 +63,12 @@ public class ClienteService {
 
         String email = normalizarEmail(cliente.getEmail());
         if (clienteRepository.findByEmailIgnoreCase(email).isPresent()) {
-            throw new IllegalArgumentException("A client with email " + email + " already exists.");
+            throw ReglaNegocioException.conflict("cliente.email-duplicado", email);
         }
 
         String cedula = normalizarCedula(cliente.getCedula());
         if (clienteRepository.findByCedula(cedula).isPresent()) {
-            throw new IllegalArgumentException("A client with ID number " + cedula + " already exists.");
+            throw ReglaNegocioException.conflict("cliente.cedula-duplicada", cedula);
         }
 
         cliente.setId(null);
@@ -99,7 +100,7 @@ public class ClienteService {
         String email = normalizarEmail(clienteActualizado.getEmail());
         Optional<Cliente> clienteConEmail = clienteRepository.findByEmailIgnoreCase(email);
         if (clienteConEmail.isPresent() && !clienteConEmail.get().getId().equals(id)) {
-            throw new IllegalArgumentException("A client with email " + email + " already exists.");
+            throw ReglaNegocioException.conflict("cliente.email-duplicado", email);
         }
 
         sincronizarUsername(clienteExistente.getUser(), email);
@@ -123,7 +124,7 @@ public class ClienteService {
     public void eliminar(Long id) {
         obtenerPorId(id);
         if (reservaRepository.existsByClienteId(id)) {
-            throw new IllegalStateException("Este cliente tiene reservas asociadas y no puede ser eliminado.");
+            throw ReglaNegocioException.conflict("cliente.tiene-reservas");
         }
 
         clienteRepository.deleteById(id);
@@ -136,26 +137,26 @@ public class ClienteService {
             return;
         }
         if (Boolean.TRUE.equals(userEntityRepository.existsByUsername(email))) {
-            throw new IllegalArgumentException("The email " + email + " is already used by another account.");
+            throw ReglaNegocioException.conflict("cliente.email-en-uso", email);
         }
         user.setUsername(email);
     }
 
     private void validarCliente(Cliente cliente, boolean requierePassword) {
         if (cliente == null) {
-            throw new IllegalArgumentException("Client is required.");
+            throw ReglaNegocioException.badRequest("cliente.requerido");
         }
 
         if (estaVacio(cliente.getNombre()) || estaVacio(cliente.getApellido()) || estaVacio(cliente.getEmail())) {
-            throw new IllegalArgumentException("First name, last name and email are required.");
+            throw ReglaNegocioException.badRequest("cliente.datos-requeridos");
         }
 
         if (requierePassword) {
             if (estaVacio(cliente.getPassword())) {
-                throw new IllegalArgumentException("Password is required.");
+                throw ReglaNegocioException.badRequest("cliente.password-requerido");
             }
             if (estaVacio(cliente.getCedula())) {
-                throw new IllegalArgumentException("ID number is required.");
+                throw ReglaNegocioException.badRequest("cliente.cedula-requerida");
             }
         }
     }

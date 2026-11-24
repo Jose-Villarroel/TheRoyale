@@ -4,6 +4,7 @@ import com.theroyale.backend.dto.CrearResenaRequest;
 import com.theroyale.backend.dto.ResumenResenasResponse;
 import com.theroyale.backend.errors.AccesoDenegadoException;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.EstadoHabitacion;
 import com.theroyale.backend.model.EstadoReserva;
@@ -107,8 +108,9 @@ class ResenaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> resenaService.crear(solicitudValida(12L, 8L)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Only completed stays can be reviewed.");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("resena.solo-finalizadas");
         verify(resenaRepository, never()).save(any());
     }
 
@@ -121,8 +123,9 @@ class ResenaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> resenaService.crear(solicitudValida(12L, 8L)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("This reservation already has a review.");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("resena.ya-existe");
         verify(resenaRepository, never()).save(any());
     }
 
@@ -135,7 +138,8 @@ class ResenaServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> resenaService.crear(solicitudValida(12L, 9L)))
                 .isInstanceOf(AccesoDenegadoException.class)
-                .hasMessage("This reservation does not belong to you.");
+                .extracting(ex -> ((AccesoDenegadoException) ex).getCodigo())
+                .isEqualTo("resena.reserva-ajena");
         verify(resenaRepository, never()).save(any());
     }
 
@@ -159,8 +163,9 @@ class ResenaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> resenaService.crear(solicitud))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("rating");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("resena.calificacion-rango");
         verifyNoInteractions(reservaRepository, resenaRepository);
     }
 
@@ -174,8 +179,9 @@ class ResenaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> resenaService.crear(solicitud))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("comment");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("resena.comentario-longitud");
         verifyNoInteractions(reservaRepository, resenaRepository);
     }
 
@@ -186,8 +192,9 @@ class ResenaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> resenaService.crear(solicitud))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("comment");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("resena.comentario-longitud");
         verifyNoInteractions(reservaRepository, resenaRepository);
     }
 
@@ -212,8 +219,9 @@ class ResenaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> resenaService.crear(solicitud))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("title");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("resena.titulo-longitud");
         verifyNoInteractions(reservaRepository, resenaRepository);
     }
 
@@ -364,7 +372,7 @@ class ResenaServiceTest {
     void resenaService_listarParaModeracion_calificacionInvalida_lanzaArgumentoInvalido() {
         // Act & Assert
         assertThatThrownBy(() -> resenaService.listarParaModeracion(null, 7))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReglaNegocioException.class);
         verifyNoInteractions(resenaRepository);
     }
 

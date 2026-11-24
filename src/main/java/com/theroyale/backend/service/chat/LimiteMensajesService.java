@@ -19,7 +19,7 @@ public class LimiteMensajesService {
 
     static final int MAXIMO_MENSAJES = 20;
     static final Duration VENTANA = Duration.ofMinutes(5);
-    static final String MENSAJE_LIMITE = "Too many messages, please try again in a few minutes.";
+    static final String CODIGO_LIMITE = "chat.limite-mensajes";
 
     // Por encima de este número de IPs se limpian las que ya no tienen mensajes en la ventana
     private static final int IPS_ANTES_DE_LIMPIAR = 10_000;
@@ -44,7 +44,7 @@ public class LimiteMensajesService {
         synchronized (marcas) {
             descartarVencidas(marcas, ahora);
             if (marcas.size() >= MAXIMO_MENSAJES) {
-                throw new LimiteExcedidoException(MENSAJE_LIMITE);
+                throw LimiteExcedidoException.conCodigo(CODIGO_LIMITE, MAXIMO_MENSAJES);
             }
             marcas.addLast(ahora);
         }

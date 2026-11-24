@@ -68,7 +68,7 @@ public class TicketmasterEventosClient implements EventosClient {
     @Override
     public List<EventoCandidato> buscar(LocalDate inicio, LocalDate fin) {
         if (!propiedades.getTicketmaster().tieneClave()) {
-            throw new FuenteNoDisponibleException("Ticketmaster está apagado: falta TICKETMASTER_API_KEY.");
+            throw new FuenteNoDisponibleException("Ticketmaster is switched off: TICKETMASTER_API_KEY is missing.");
         }
         return cache.obtener(inicio + ":" + fin, () -> parsear(http.obtenerJson(construirUri(inicio, fin), Map.of())));
     }
@@ -92,7 +92,7 @@ public class TicketmasterEventosClient implements EventosClient {
 
     static List<EventoCandidato> parsear(JsonNode respuesta) {
         if (respuesta.has("fault") || respuesta.has("errors")) {
-            throw new FuenteNoDisponibleException("Ticketmaster respondió con error.");
+            throw new FuenteNoDisponibleException("Ticketmaster answered with an error.");
         }
         List<EventoCandidato> eventos = new ArrayList<>();
         // Sin resultados Ticketmaster responde sin "_embedded" (solo "page"): no es un error

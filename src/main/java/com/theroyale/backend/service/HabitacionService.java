@@ -74,7 +74,7 @@ public class HabitacionService {
 
     public Habitacion obtenerPorId(Long id) {
         return habitacionRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Habitacion no encontrada: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Room not found: " + id));
     }
 
     // ===== Alta y edición desde la API REST: el tipo llega como id y se resuelve aquí =====
@@ -146,7 +146,7 @@ public class HabitacionService {
     public void eliminar(Long id) {
         Habitacion habitacion = obtenerPorId(id);
         if (reservaRepository.existsByHabitacionId(id)) {
-            throw new IllegalStateException("Esta habitacion tiene reservas asociadas y no puede ser eliminada.");
+            throw new IllegalStateException("This room has reservations and cannot be deleted.");
         }
 
         // Los admins son el lado dueno de la relacion: hay que quitarla antes de borrar

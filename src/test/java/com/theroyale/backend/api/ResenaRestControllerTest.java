@@ -6,6 +6,7 @@ import com.theroyale.backend.dto.CrearResenaRequest;
 import com.theroyale.backend.dto.ResumenResenasResponse;
 import com.theroyale.backend.errors.AccesoDenegadoException;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.EstadoHabitacion;
 import com.theroyale.backend.model.EstadoReserva;
@@ -111,21 +112,23 @@ class ResenaRestControllerTest {
     void resenaController_crear_datosInvalidos_retorna400() throws Exception {
         // Arrange
         when(resenaService.crear(any(CrearResenaRequest.class)))
-                .thenThrow(new IllegalArgumentException("The rating must be a whole number between 1 and 5."));
+                .thenThrow(ReglaNegocioException.badRequest("resena.calificacion-rango", 1, 5));
 
         // Act & Assert
         mockMvc.perform(post("/api/resenas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CrearResenaRequest(12L, 8L, 6, null, COMENTARIO))))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status", is(400)));
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.codigo", is("resena.calificacion-rango")))
+                .andExpect(jsonPath("$.message", is("The rating must be a whole number between 1 and 5.")));
     }
 
     @Test
     void resenaController_crear_reservaAjena_retorna403ConMensaje() throws Exception {
         // Arrange
         when(resenaService.crear(any(CrearResenaRequest.class)))
-                .thenThrow(new AccesoDenegadoException("This reservation does not belong to you."));
+                .thenThrow(AccesoDenegadoException.conCodigo("resena.reserva-ajena"));
 
         // Act & Assert
         mockMvc.perform(post("/api/resenas")
@@ -133,6 +136,7 @@ class ResenaRestControllerTest {
                         .content(objectMapper.writeValueAsString(new CrearResenaRequest(12L, 9L, 5, null, COMENTARIO))))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status", is(403)))
+                .andExpect(jsonPath("$.codigo", is("resena.reserva-ajena")))
                 .andExpect(jsonPath("$.message", is("This reservation does not belong to you.")));
     }
 
@@ -140,13 +144,14 @@ class ResenaRestControllerTest {
     void resenaController_crear_reservaNoFinalizada_retorna409ConMensaje() throws Exception {
         // Arrange
         when(resenaService.crear(any(CrearResenaRequest.class)))
-                .thenThrow(new IllegalStateException("Only completed stays can be reviewed."));
+                .thenThrow(ReglaNegocioException.conflict("resena.solo-finalizadas"));
 
         // Act & Assert
         mockMvc.perform(post("/api/resenas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CrearResenaRequest(1L, 8L, 5, null, COMENTARIO))))
                 .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.codigo", is("resena.solo-finalizadas")))
                 .andExpect(jsonPath("$.message", is("Only completed stays can be reviewed.")));
     }
 
@@ -203,11 +208,13 @@ class ResenaRestControllerTest {
     @Test
     void resenaController_obtenerPorId_inexistente_retorna404() throws Exception {
         // Arrange
-        when(resenaService.obtenerPorId(99L)).thenThrow(new RecursoNoEncontradoException("Review not found: 99"));
+        when(resenaService.obtenerPorId(99L))
+                .thenThrow(RecursoNoEncontradoException.conCodigo("resena.no-encontrada", 99L));
 
         // Act & Assert
         mockMvc.perform(get("/api/resenas/99"))
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.codigo", is("resena.no-encontrada")))
                 .andExpect(jsonPath("$.message", is("Review not found: 99")));
     }
 
@@ -264,7 +271,7 @@ class ResenaRestControllerTest {
     void resenaController_actualizar_porOtroCliente_retorna403() throws Exception {
         // Arrange
         when(resenaService.actualizar(eq(3L), any(CrearResenaRequest.class)))
-                .thenThrow(new AccesoDenegadoException("Only the author can edit or delete this review."));
+                .thenThrow(AccesoDenegadoException.conCodigo("resena.solo-autor"));
 
         // Act & Assert
         mockMvc.perform(put("/api/resenas/3")
@@ -288,7 +295,7 @@ class ResenaRestControllerTest {
     @Test
     void resenaController_eliminar_porOtroCliente_retorna403() throws Exception {
         // Arrange
-        doThrow(new AccesoDenegadoException("Only the author can edit or delete this review."))
+        doThrow(AccesoDenegadoException.conCodigo("resena.solo-autor"))
                 .when(resenaService).eliminar(3L, 9L);
 
         // Act & Assert
@@ -319,7 +326,8 @@ class ResenaRestControllerTest {
     @Test
     void resenaController_mostrar_inexistente_retorna404() throws Exception {
         // Arrange
-        when(resenaService.mostrar(99L)).thenThrow(new RecursoNoEncontradoException("Review not found: 99"));
+        when(resenaService.mostrar(99L))
+                .thenThrow(RecursoNoEncontradoException.conCodigo("resena.no-encontrada", 99L));
 
         // Act & Assert
         mockMvc.perform(post("/api/resenas/99/mostrar"))

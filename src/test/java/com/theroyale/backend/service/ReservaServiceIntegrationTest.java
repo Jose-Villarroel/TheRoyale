@@ -1,5 +1,6 @@
 package com.theroyale.backend.service;
 
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.dto.CrearResenaRequest;
 import com.theroyale.backend.dto.CrearReservaRequest;
 import com.theroyale.backend.model.Cliente;
@@ -120,8 +121,13 @@ class ReservaServiceIntegrationTest {
 
         // Act & Assert
         assertThatThrownBy(() -> reservaService.crear(solicitudDesdeHoy(2)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Suite");
+                .isInstanceOf(ReglaNegocioException.class)
+                .satisfies(ex -> {
+                    ReglaNegocioException regla = (ReglaNegocioException) ex;
+                    assertThat(regla.getCodigo()).isEqualTo("reserva.sin-disponibilidad");
+                    // El nombre del tipo es el primer parametro del mensaje: "No {0} rooms..."
+                    assertThat(regla.getArgs()[0]).isEqualTo("Suite");
+                });
     }
 
     // ===== Confirmar abre la cuenta de la reserva =====

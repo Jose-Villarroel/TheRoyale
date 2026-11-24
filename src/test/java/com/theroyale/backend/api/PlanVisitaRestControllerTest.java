@@ -17,6 +17,7 @@ import com.theroyale.backend.dto.plan.RegenerarDiaRequest;
 import com.theroyale.backend.errors.AccesoDenegadoException;
 import com.theroyale.backend.errors.LimiteExcedidoException;
 import com.theroyale.backend.errors.PlanNoConfiableException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
 import com.theroyale.backend.errors.ServicioNoDisponibleException;
 import com.theroyale.backend.model.EstadoCuenta;
@@ -138,22 +139,23 @@ class PlanVisitaRestControllerTest {
     void planVisitaController_generar_errores_retornanSuCodigo() throws Exception {
         // Arrange: cada llamada falla con un error distinto
         when(planVisitaService.generar(eq(12L), any(GenerarPlanRequest.class)))
-                .thenThrow(new IllegalArgumentException("Choose between 1 and 5 interests."))
-                .thenThrow(new AccesoDenegadoException("This reservation does not belong to you."))
-                .thenThrow(new RecursoNoEncontradoException("Reserva no encontrada: 12"))
-                .thenThrow(new IllegalStateException("Only pending, confirmed or in-progress reservations can have a visit plan."))
-                .thenThrow(new LimiteExcedidoException("You have reached today's limit of 5 plans for this stay. Try again tomorrow."))
+                .thenThrow(ReglaNegocioException.badRequest("plan.intereses-rango", 1, 5))
+                .thenThrow(AccesoDenegadoException.conCodigo("plan.reserva-ajena"))
+                .thenThrow(RecursoNoEncontradoException.conCodigo("reserva.no-encontrada", 12L))
+                .thenThrow(ReglaNegocioException.conflict("plan.estado-reserva-invalido"))
+                .thenThrow(LimiteExcedidoException.conCodigo("plan.limite-diario", 5))
                 .thenThrow(new PlanNoConfiableException())
-                .thenThrow(new ServicioNoDisponibleException("The planner is unavailable right now."));
+                .thenThrow(ServicioNoDisponibleException.conCodigo("plan.no-disponible"));
 
         // Act & Assert
-        generarYEsperar(400, "Choose between 1 and 5 interests.");
-        generarYEsperar(403, "This reservation does not belong to you.");
-        generarYEsperar(404, "Reserva no encontrada: 12");
-        generarYEsperar(409, "Only pending, confirmed or in-progress reservations can have a visit plan.");
-        generarYEsperar(429, "You have reached today's limit of 5 plans for this stay. Try again tomorrow.");
-        generarYEsperar(502, "We could not build a reliable plan. Please try again.");
-        generarYEsperar(503, "The planner is unavailable right now.");
+        generarYEsperar(400, "plan.intereses-rango", "Choose between 1 and 5 interests.");
+        generarYEsperar(403, "plan.reserva-ajena", "This reservation does not belong to you.");
+        generarYEsperar(404, "reserva.no-encontrada", "Reservation not found: 12");
+        generarYEsperar(409, "plan.estado-reserva-invalido",
+                "Only pending, confirmed or in-progress reservations can have a visit plan.");
+        generarYEsperar(429, "plan.limite-diario", "You have reached today's limit of 5 plans.");
+        generarYEsperar(502, "plan.no-confiable", "We could not build a reliable plan. Please try again.");
+        generarYEsperar(503, "plan.no-disponible", "The planner is unavailable right now.");
     }
 
     @Test
@@ -186,7 +188,7 @@ class PlanVisitaRestControllerTest {
     void planVisitaController_interpretar_limitePorIp_retorna429() throws Exception {
         // Arrange
         when(planVisitaService.interpretar(eq(12L), any(InterpretarPlanRequest.class), anyString()))
-                .thenThrow(new LimiteExcedidoException("Too many messages, please try again in a few minutes."));
+                .thenThrow(LimiteExcedidoException.conCodigo("chat.limite-mensajes", 20));
 
         // Act & Assert
         mockMvc.perform(post(PLAN + "/interpretar").contentType(MediaType.APPLICATION_JSON)
@@ -199,7 +201,8 @@ class PlanVisitaRestControllerTest {
     void planVisitaController_obtener_retorna200O404() throws Exception {
         // Arrange
         when(planVisitaService.obtener(12L, 8L)).thenReturn(plan());
-        when(planVisitaService.obtener(12L, 9L)).thenThrow(new RecursoNoEncontradoException("No plan yet for this reservation."));
+        when(planVisitaService.obtener(12L, 9L))
+                .thenThrow(RecursoNoEncontradoException.conCodigo("plan.no-encontrado"));
 
         // Act & Assert
         mockMvc.perform(get(PLAN).param("clienteId", "8"))
@@ -207,6 +210,7 @@ class PlanVisitaRestControllerTest {
                 .andExpect(jsonPath("$.dias", hasSize(1)));
         mockMvc.perform(get(PLAN).param("clienteId", "9"))
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.codigo", is("plan.no-encontrado")))
                 .andExpect(jsonPath("$.message", is("No plan yet for this reservation.")));
         mockMvc.perform(get(PLAN))
                 .andExpect(status().isBadRequest());
@@ -242,7 +246,7 @@ class PlanVisitaRestControllerTest {
     @Test
     void planVisitaController_eliminar_retorna204O403() throws Exception {
         // Arrange
-        doThrow(new AccesoDenegadoException("This reservation does not belong to you."))
+        doThrow(AccesoDenegadoException.conCodigo("plan.reserva-ajena"))
                 .when(planVisitaService).eliminar(12L, 9L);
 
         // Act & Assert
@@ -271,9 +275,9 @@ class PlanVisitaRestControllerTest {
     void planVisitaController_agregarACuenta_cuentaNoAbiertaONoEsServicio() throws Exception {
         // Arrange
         when(planVisitaService.agregarACuenta(eq(12L), eq("pendiente"), any(AgregarBloqueRequest.class)))
-                .thenThrow(new IllegalStateException("This reservation does not have an account yet: confirm it first."));
+                .thenThrow(ReglaNegocioException.conflict("cuenta.no-existe"));
         when(planVisitaService.agregarACuenta(eq(12L), eq("lugar"), any(AgregarBloqueRequest.class)))
-                .thenThrow(new IllegalArgumentException("Only hotel services can be added to your stay."));
+                .thenThrow(ReglaNegocioException.badRequest("plan.solo-servicios-hotel"));
 
         // Act & Assert
         mockMvc.perform(post(PLAN + "/bloques/pendiente/agregar-a-cuenta").contentType(MediaType.APPLICATION_JSON)
@@ -282,14 +286,17 @@ class PlanVisitaRestControllerTest {
         mockMvc.perform(post(PLAN + "/bloques/lugar/agregar-a-cuenta").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"clienteId\":8}"))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo", is("plan.solo-servicios-hotel")))
                 .andExpect(jsonPath("$.message", is("Only hotel services can be added to your stay.")));
     }
 
     // ===== Ayudas =====
-    private void generarYEsperar(int codigo, String mensaje) throws Exception {
+    // estado HTTP, codigo del contrato y mensaje de respaldo ya resuelto por MessageSource
+    private void generarYEsperar(int estado, String codigo, String mensaje) throws Exception {
         mockMvc.perform(post(PLAN).contentType(MediaType.APPLICATION_JSON).content(CUERPO_GENERAR))
-                .andExpect(status().is(codigo))
-                .andExpect(jsonPath("$.status", is(codigo)))
+                .andExpect(status().is(estado))
+                .andExpect(jsonPath("$.status", is(estado)))
+                .andExpect(jsonPath("$.codigo", is(codigo)))
                 .andExpect(jsonPath("$.message", is(mensaje)));
     }
 

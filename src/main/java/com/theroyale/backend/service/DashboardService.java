@@ -233,7 +233,7 @@ public class DashboardService {
         validarPeriodo(desde, hasta);
         String modo = agrupacion == null || agrupacion.isBlank() ? "dia" : agrupacion.trim().toLowerCase(Locale.ROOT);
         if (!List.of("dia", "semana", "mes").contains(modo)) {
-            throw new IllegalArgumentException("La agrupación debe ser dia, semana o mes.");
+            throw new IllegalArgumentException("Grouping must be dia, semana or mes.");
         }
 
         Map<LocalDate, BigDecimal> habitaciones = new LinkedHashMap<>();
@@ -648,13 +648,13 @@ public class DashboardService {
 
     private void validarPeriodo(LocalDate desde, LocalDate hasta) {
         if (desde == null || hasta == null) {
-            throw new IllegalArgumentException("El período necesita las fechas desde y hasta.");
+            throw new IllegalArgumentException("The period needs both the desde and hasta dates.");
         }
         if (desde.isAfter(hasta)) {
-            throw new IllegalArgumentException("La fecha desde no puede ser posterior a hasta.");
+            throw new IllegalArgumentException("The desde date cannot be later than hasta.");
         }
         if (diasDe(desde, hasta) > MAX_DIAS_PERIODO) {
-            throw new IllegalArgumentException("El período no puede superar " + MAX_DIAS_PERIODO + " días.");
+            throw new IllegalArgumentException("The period cannot be longer than " + MAX_DIAS_PERIODO + " days.");
         }
     }
 
@@ -733,7 +733,7 @@ public class DashboardService {
         if (valor instanceof java.sql.Timestamp instante) {
             return instante.toLocalDateTime().toLocalDate();
         }
-        throw new IllegalStateException("Tipo de fecha inesperado en la serie: " + valor);
+        throw new IllegalStateException("Unexpected date type in the series: " + valor);
     }
 
     private static BigDecimal dividir(BigDecimal numerador, BigDecimal denominador) {

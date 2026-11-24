@@ -2,6 +2,7 @@ package com.theroyale.backend.service;
 
 import com.theroyale.backend.dto.CuentaResponse;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Cuenta;
 import com.theroyale.backend.model.EstadoCuenta;
 import com.theroyale.backend.model.EstadoReserva;
@@ -46,7 +47,7 @@ public class CuentaService {
     public CuentaResponse obtenerRespuestaPorReserva(Long reservaId) {
         return CuentaResponse.desde(cuentaRepository.findByReservaId(reservaId)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
-                        "La reserva " + reservaId + " no tiene cuenta asociada.")));
+                        "Reservation " + reservaId + " has no associated account.")));
     }
 
     @Transactional
@@ -54,11 +55,11 @@ public class CuentaService {
         Cuenta cuenta = obtenerCuentaAbierta(reservaId);
 
         if (cantidad == null || cantidad < 1) {
-            throw new IllegalArgumentException("Quantity must be at least 1.");
+            throw ReglaNegocioException.badRequest("cuenta.cantidad-minima");
         }
 
         if (servicioId == null) {
-            throw new IllegalArgumentException("Service is required.");
+            throw ReglaNegocioException.badRequest("cuenta.servicio-requerido");
         }
         Servicio servicio = servicioService.buscarPorId(servicioId);
         Operador operador = operadorService.obtenerOPredeterminado(operadorId);
@@ -85,7 +86,7 @@ public class CuentaService {
         ItemConsumo item = cuenta.getItemsConsumo().stream()
                 .filter(i -> i.getId().equals(itemId))
                 .findFirst()
-                .orElseThrow(() -> new RecursoNoEncontradoException("Cargo no encontrado: " + itemId));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Charge not found: " + itemId));
 
         if (Boolean.TRUE.equals(item.getPagado())) {
             throw new IllegalStateException("This charge has already been paid and cannot be removed.");
@@ -160,15 +161,15 @@ public class CuentaService {
     // Services can only be charged to a confirmed or in-progress reservation
     private Cuenta obtenerCuentaAbierta(Long reservaId) {
         Cuenta cuenta = cuentaRepository.findByReservaId(reservaId)
-                .orElseThrow(() -> new IllegalStateException("This reservation does not have an account yet: confirm it first."));
+                .orElseThrow(() -> ReglaNegocioException.conflict("cuenta.no-existe"));
 
         if (cuenta.getEstado() != EstadoCuenta.ABIERTA) {
-            throw new IllegalStateException("The account for this reservation is already closed.");
+            throw ReglaNegocioException.conflict("cuenta.cerrada");
         }
 
         EstadoReserva estado = cuenta.getReserva().getEstado();
         if (estado != EstadoReserva.CONFIRMADA && estado != EstadoReserva.EN_CURSO) {
-            throw new IllegalStateException("Services can only be charged to confirmed or in-progress reservations.");
+            throw ReglaNegocioException.conflict("cuenta.estado-reserva-invalido");
         }
         return cuenta;
     }

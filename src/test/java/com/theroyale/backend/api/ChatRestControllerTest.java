@@ -3,6 +3,7 @@ package com.theroyale.backend.api;
 import com.theroyale.backend.dto.ChatRequest;
 import com.theroyale.backend.dto.TurnoChatRequest;
 import com.theroyale.backend.errors.LimiteExcedidoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.errors.ServicioNoDisponibleException;
 import com.theroyale.backend.service.chat.ChatService;
 import org.junit.jupiter.api.Test;
@@ -74,7 +75,7 @@ class ChatRestControllerTest {
         emisor.send(SseEmitter.event().name("fin").data(Map.of(), MediaType.APPLICATION_JSON));
         emisor.complete();
         when(chatService.iniciarConversacion(eq(new ChatRequest("Hello",
-                List.of(new TurnoChatRequest("usuario", "Hi")))), anyString()))
+                List.of(new TurnoChatRequest("usuario", "Hi")))), anyString(), any()))
                 .thenReturn(emisor);
 
         // Act
@@ -98,8 +99,8 @@ class ChatRestControllerTest {
     @Test
     void chatController_conversar_mensajeInvalido_retorna400EnJson() throws Exception {
         // Arrange
-        when(chatService.iniciarConversacion(any(), anyString()))
-                .thenThrow(new IllegalArgumentException("The message cannot be empty."));
+        when(chatService.iniciarConversacion(any(), anyString(), any()))
+                .thenThrow(ReglaNegocioException.badRequest("chat.mensaje-vacio"));
 
         // Act & Assert
         mockMvc.perform(post("/api/chat")
@@ -109,6 +110,7 @@ class ChatRestControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.codigo", is("chat.mensaje-vacio")))
                 .andExpect(jsonPath("$.message", is("The message cannot be empty.")));
     }
 
@@ -126,8 +128,8 @@ class ChatRestControllerTest {
     @Test
     void chatController_conversar_limiteExcedido_retorna429() throws Exception {
         // Arrange
-        when(chatService.iniciarConversacion(any(), anyString()))
-                .thenThrow(new LimiteExcedidoException("Too many messages, please try again in a few minutes."));
+        when(chatService.iniciarConversacion(any(), anyString(), any()))
+                .thenThrow(LimiteExcedidoException.conCodigo("chat.limite-mensajes", 20));
 
         // Act & Assert
         mockMvc.perform(post("/api/chat")
@@ -136,14 +138,15 @@ class ChatRestControllerTest {
                         .content(CUERPO))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(jsonPath("$.status", is(429)))
-                .andExpect(jsonPath("$.message", is("Too many messages, please try again in a few minutes.")));
+                .andExpect(jsonPath("$.codigo", is("chat.limite-mensajes")))
+                .andExpect(jsonPath("$.message", is("You have reached today's limit of 20 messages.")));
     }
 
     @Test
     void chatController_conversar_sinClave_retorna503() throws Exception {
         // Arrange
-        when(chatService.iniciarConversacion(any(), anyString()))
-                .thenThrow(new ServicioNoDisponibleException("The concierge is offline right now."));
+        when(chatService.iniciarConversacion(any(), anyString(), any()))
+                .thenThrow(ServicioNoDisponibleException.conCodigo("chat.no-disponible"));
 
         // Act & Assert
         mockMvc.perform(post("/api/chat")
@@ -152,6 +155,7 @@ class ChatRestControllerTest {
                         .content(CUERPO))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.status", is(503)))
-                .andExpect(jsonPath("$.message", is("The concierge is offline right now.")));
+                .andExpect(jsonPath("$.codigo", is("chat.no-disponible")))
+                .andExpect(jsonPath("$.message", is("The concierge is unavailable right now.")));
     }
 }

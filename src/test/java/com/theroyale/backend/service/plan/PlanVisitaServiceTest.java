@@ -20,6 +20,7 @@ import com.theroyale.backend.dto.plan.RegenerarDiaRequest;
 import com.theroyale.backend.errors.AccesoDenegadoException;
 import com.theroyale.backend.errors.LimiteExcedidoException;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.errors.ServicioNoDisponibleException;
 import com.theroyale.backend.model.CategoriaLugar;
 import com.theroyale.backend.model.Cliente;
@@ -41,6 +42,7 @@ import com.theroyale.backend.repository.ReservaRepository;
 import com.theroyale.backend.service.CuentaService;
 import com.theroyale.backend.service.chat.GeminiClient;
 import com.theroyale.backend.service.chat.LimiteMensajesService;
+import org.springframework.http.HttpStatus;
 import com.theroyale.backend.service.plan.ContextoPlan.LugarContexto;
 import com.theroyale.backend.service.plan.ContextoPlan.RestauranteContexto;
 import com.theroyale.backend.service.plan.ContextoPlan.ServicioContexto;
@@ -229,7 +231,8 @@ class PlanVisitaServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.generar(12L, ajena))
                 .isInstanceOf(AccesoDenegadoException.class)
-                .hasMessage("This reservation does not belong to you.");
+                .extracting(ex -> ((AccesoDenegadoException) ex).getCodigo())
+                .isEqualTo("plan.reserva-ajena");
         assertThat(gemini.solicitudes).isEmpty();
     }
 
@@ -245,25 +248,31 @@ class PlanVisitaServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = EstadoReserva.class, names = {"CANCELADA", "FINALIZADA"})
-    void planVisitaService_generar_estadoNoPlanificable_lanzaIllegalState(EstadoReserva estado) {
+    void planVisitaService_generar_estadoNoPlanificable_lanzaConflicto(EstadoReserva estado) {
         // Arrange
         reserva.setEstado(estado);
 
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.generar(12L, solicitud(preferencias())))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("plan.estado-reserva-invalido");
         assertThat(gemini.solicitudes).isEmpty();
     }
 
     @Test
-    void planVisitaService_generar_masDe14Noches_lanzaIllegalArgument() {
+    void planVisitaService_generar_masDe14Noches_lanzaConflictoConElMaximo() {
         // Arrange
         reserva.setFechaFin(LLEGADA.plusDays(15));
 
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.generar(12L, solicitud(preferencias())))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("14 nights");
+                .isInstanceOf(ReglaNegocioException.class)
+                .satisfies(ex -> {
+                    ReglaNegocioException regla = (ReglaNegocioException) ex;
+                    assertThat(regla.getCodigo()).isEqualTo("plan.estadia-demasiado-larga");
+                    assertThat(regla.getArgs()).containsExactly(PlanVisitaService.MAXIMO_NOCHES);
+                });
     }
 
     @Test
@@ -295,20 +304,25 @@ class PlanVisitaServiceTest {
 
     @ParameterizedTest
     @MethodSource("preferenciasInvalidas")
-    void planVisitaService_generar_preferenciasInvalidas_lanzaIllegalArgument(PreferenciasPlan invalidas) {
+    void planVisitaService_generar_preferenciasInvalidas_lanzaReglaNegocio400(PreferenciasPlan invalidas) {
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.generar(12L, solicitud(invalidas)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getEstado())
+                .isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(gemini.solicitudes).isEmpty();
     }
 
     @Test
-    void planVisitaService_generar_descripcionDeMasDe1000_lanzaIllegalArgument() {
+    void planVisitaService_generar_descripcionDeMasDe1000_lanzaReglaNegocio() {
         // Arrange
         GenerarPlanRequest larga = new GenerarPlanRequest(8L, preferencias(), "x".repeat(1001), null);
 
         // Act & Assert
-        assertThatThrownBy(() -> planVisitaService.generar(12L, larga)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> planVisitaService.generar(12L, larga))
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("plan.descripcion-longitud");
     }
 
     @Test
@@ -319,7 +333,8 @@ class PlanVisitaServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.generar(12L, solicitud(preferencias())))
                 .isInstanceOf(ServicioNoDisponibleException.class)
-                .hasMessage("The planner is unavailable right now.");
+                .extracting(ex -> ((ServicioNoDisponibleException) ex).getCodigo())
+                .isEqualTo("plan.no-disponible");
         assertThat(planVisitaService.estaDisponible()).isFalse();
         verify(contextoPlanService, never()).construir(anyList(), any());
     }
@@ -356,7 +371,8 @@ class PlanVisitaServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.generar(12L, solicitud(preferencias())))
                 .isInstanceOf(LimiteExcedidoException.class)
-                .hasMessage("You have reached today's limit of 5 plans for this stay. Try again tomorrow.");
+                .extracting(ex -> ((LimiteExcedidoException) ex).getCodigo())
+                .isEqualTo("plan.limite-diario");
         assertThatThrownBy(() -> planVisitaService.ajustar(12L, new AjustarPlanRequest(8L, "More museums")))
                 .isInstanceOf(LimiteExcedidoException.class);
         assertThatThrownBy(() -> planVisitaService.regenerarDia(12L, LLEGADA.plusDays(1), new RegenerarDiaRequest(8L, null)))
@@ -416,16 +432,20 @@ class PlanVisitaServiceTest {
     }
 
     @Test
-    void planVisitaService_regenerarDia_fechaFueraDelPlanOIndicacionLarga_lanzaIllegalArgument() {
+    void planVisitaService_regenerarDia_fechaFueraDelPlanOIndicacionLarga_lanzaReglaNegocio() {
         // Arrange
         PlanVisita plan = planGuardado(1, LocalDate.of(2026, 11, 11), List.of());
         when(planVisitaRepository.findByReservaId(12L)).thenReturn(Optional.of(plan));
 
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.regenerarDia(12L, LocalDate.of(2026, 12, 20), new RegenerarDiaRequest(8L, null)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("plan.dia-fuera-del-plan");
         assertThatThrownBy(() -> planVisitaService.regenerarDia(12L, LLEGADA, new RegenerarDiaRequest(8L, "x".repeat(201))))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("plan.ajuste-longitud");
     }
 
     @Test
@@ -433,7 +453,8 @@ class PlanVisitaServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.regenerarDia(12L, LLEGADA, new RegenerarDiaRequest(8L, null)))
                 .isInstanceOf(RecursoNoEncontradoException.class)
-                .hasMessage("No plan yet for this reservation.");
+                .extracting(ex -> ((RecursoNoEncontradoException) ex).getCodigo())
+                .isEqualTo("plan.no-encontrado");
     }
 
     // ===== Ajustar el plan entero =====
@@ -456,12 +477,16 @@ class PlanVisitaServiceTest {
     }
 
     @Test
-    void planVisitaService_ajustar_indicacionVaciaOLarga_lanzaIllegalArgument() {
+    void planVisitaService_ajustar_indicacionVaciaOLarga_lanzaReglaNegocio() {
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.ajustar(12L, new AjustarPlanRequest(8L, "  ")))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("plan.ajuste-longitud");
         assertThatThrownBy(() -> planVisitaService.ajustar(12L, new AjustarPlanRequest(8L, "x".repeat(201))))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("plan.ajuste-longitud");
     }
 
     // ===== Add to my stay =====
@@ -510,8 +535,9 @@ class PlanVisitaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.agregarACuenta(12L, lugarId, new AgregarBloqueRequest(8L)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Only hotel services can be added to your stay.");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("plan.solo-servicios-hotel");
         assertThatThrownBy(() -> planVisitaService.agregarACuenta(12L, "no-existe", new AgregarBloqueRequest(8L)))
                 .isInstanceOf(RecursoNoEncontradoException.class);
         assertThatThrownBy(() -> planVisitaService.agregarACuenta(12L, lugarId, new AgregarBloqueRequest(99L)))
@@ -525,7 +551,8 @@ class PlanVisitaServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> planVisitaService.obtener(12L, 8L))
                 .isInstanceOf(RecursoNoEncontradoException.class)
-                .hasMessage("No plan yet for this reservation.");
+                .extracting(ex -> ((RecursoNoEncontradoException) ex).getCodigo())
+                .isEqualTo("plan.no-encontrado");
         assertThatThrownBy(() -> planVisitaService.obtener(12L, 99L)).isInstanceOf(AccesoDenegadoException.class);
     }
 
@@ -554,7 +581,9 @@ class PlanVisitaServiceTest {
         verify(limiteMensajesService).registrar("10.0.0.1");
         verify(interpretePlanService).interpretar(eq("Our anniversary, slow mornings."), any(DatosEstadia.class));
         assertThatThrownBy(() -> planVisitaService.interpretar(12L, new InterpretarPlanRequest(8L, "short"), "10.0.0.1"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("plan.descripcion-longitud");
         geminiProperties.setApiKey("");
         assertThatThrownBy(() -> planVisitaService.interpretar(12L, valida, "10.0.0.1"))
                 .isInstanceOf(ServicioNoDisponibleException.class);

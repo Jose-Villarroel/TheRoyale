@@ -387,7 +387,8 @@ class ValidadorPlanServiceTest {
             return new PlanGenerado.Respuesta(malo, "m");
         }, contexto, ESTADIA, List.of(COMPLETO), preferencias()))
                 .isInstanceOf(PlanNoConfiableException.class)
-                .hasMessage("We could not build a reliable plan. Please try again.");
+                .extracting(ex -> ((PlanNoConfiableException) ex).getCodigo())
+                .isEqualTo(PlanNoConfiableException.CODIGO);
         assertThat(llamadas.get()).isEqualTo(2);
     }
 

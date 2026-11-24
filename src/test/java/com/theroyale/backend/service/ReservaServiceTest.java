@@ -1,6 +1,7 @@
 package com.theroyale.backend.service;
 
 import com.theroyale.backend.dto.CrearReservaRequest;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.Cuenta;
 import com.theroyale.backend.model.EstadoHabitacion;
@@ -95,7 +96,9 @@ class ReservaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> reservaService.crear(new CrearReservaRequest(1L, 1L, INICIO, FIN, 2)))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("reserva.sin-disponibilidad");
         verify(reservaRepository, never()).save(any());
     }
 
@@ -107,8 +110,9 @@ class ReservaServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> reservaService.crear(solicitud))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("check-out");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("reserva.fecha-fin-anterior");
         verify(reservaRepository, never()).save(any());
     }
 

@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 public class ContextoHotelService {
 
     static final String RECURSO_INFORMACION = "chatbot/informacion-hotel.md";
+    static final String RECURSO_INFORMACION_ES = "chatbot/informacion-hotel-es.md";
     static final String TELEFONO_RECEPCION = "+1 507 3165 232";
 
     private static final Map<RestauranteHotel, String> NOMBRES_RESTAURANTE = new EnumMap<>(Map.of(
@@ -95,6 +96,7 @@ public class ContextoHotelService {
     private final InterfaceService servicioService;
     private final PlatoMenuService platoMenuService;
     private final String informacionHotel;
+    private final String informacionHotelEs;
 
     public ContextoHotelService(TipoHabitacionService tipoHabitacionService, HabitacionService habitacionService,
                                 ResenaService resenaService, InterfaceService servicioService,
@@ -104,10 +106,12 @@ public class ContextoHotelService {
         this.resenaService = resenaService;
         this.servicioService = servicioService;
         this.platoMenuService = platoMenuService;
-        this.informacionHotel = leerInformacionHotel();
+        this.informacionHotel = leerRecurso(RECURSO_INFORMACION, true);
+        // El archivo en espanol es opcional: si falta se usa el ingles (igual que MessageSource)
+        this.informacionHotelEs = leerRecurso(RECURSO_INFORMACION_ES, false);
     }
 
-    public String construirInstruccionSistema() {
+    public String construirInstruccionSistema(Locale idioma) {
         LocalDate hoy = LocalDate.now();
         StringBuilder texto = new StringBuilder(PERSONA_Y_REGLAS.formatted(TELEFONO_RECEPCION));
 
@@ -119,8 +123,40 @@ public class ContextoHotelService {
         agregarTiposHabitacion(texto);
         agregarServicios(texto);
         agregarMenu(texto);
-        texto.append("\nGeneral information:\n").append(informacionHotel.trim()).append('\n');
+        texto.append("\nGeneral information:\n").append(informacionDe(idioma).trim()).append('\n');
+        texto.append(directivaDeIdioma(idioma));
         return texto.toString();
+    }
+
+    // ===== Idioma de la respuesta del modelo =====
+    // Va al FINAL del system instruction, despues de los datos, porque es lo ultimo que lee el
+    // modelo y manda sobre la regla 1 (que solo decia "responde en el idioma del huesped"): el
+    // idioma lo decide el Accept-Language de la peticion, no lo que el modelo crea adivinar.
+    static String directivaDeIdioma(Locale idioma) {
+        if (SugerenciasPredeterminadas.esEspanol(idioma)) {
+            return """
+
+                    OUTPUT LANGUAGE (overrides rule 1 and anything in the conversation): write your \
+                    whole reply, and the follow-up questions in the [[SUGERENCIAS: ...]] line, in \
+                    neutral Latin American Spanish, addressing the guest formally as "usted" (never \
+                    "tu"), with the warm register of a luxury hotel. Do NOT translate: "The Royale", \
+                    the room type names, the service names, the dish names, "check-in", "check-out", \
+                    "Concierge", or place names such as "Fifth Avenue" or "Rockefeller Center". \
+                    Prices stay in US dollars and in the en-US format ($1,250.00).
+                    """;
+        }
+        return """
+
+                OUTPUT LANGUAGE (overrides rule 1 and anything in the conversation): write your \
+                whole reply, and the follow-up questions in the [[SUGERENCIAS: ...]] line, in English.
+                """;
+    }
+
+    private String informacionDe(Locale idioma) {
+        if (SugerenciasPredeterminadas.esEspanol(idioma) && informacionHotelEs != null) {
+            return informacionHotelEs;
+        }
+        return informacionHotel;
     }
 
     // ===== Tipos de habitación con su tarifa "desde" y el resumen de reseñas =====
@@ -192,11 +228,19 @@ public class ContextoHotelService {
                 : String.format(Locale.US, "$%,.2f", monto);
     }
 
-    private String leerInformacionHotel() {
-        try (InputStream entrada = new ClassPathResource(RECURSO_INFORMACION).getInputStream()) {
+    // obligatorio = true: sin el archivo base la aplicacion no puede arrancar el chat
+    private String leerRecurso(String recurso, boolean obligatorio) {
+        ClassPathResource archivo = new ClassPathResource(recurso);
+        if (!obligatorio && !archivo.exists()) {
+            return null;
+        }
+        try (InputStream entrada = archivo.getInputStream()) {
             return new String(entrada.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException ex) {
-            throw new UncheckedIOException("No se pudo leer " + RECURSO_INFORMACION, ex);
+            if (!obligatorio) {
+                return null;
+            }
+            throw new UncheckedIOException(recurso + " could not be read.", ex);
         }
     }
 }

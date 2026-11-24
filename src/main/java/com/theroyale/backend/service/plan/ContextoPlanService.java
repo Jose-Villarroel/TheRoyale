@@ -285,7 +285,7 @@ public class ContextoPlanService {
                                                      Function<ClimaClient, List<ClimaDia>> consulta) {
         ClimaClient cliente = climaClients.get(fuente);
         if (cliente == null) {
-            return CompletableFuture.failedFuture(new IllegalStateException("Sin cliente de clima " + fuente));
+            return CompletableFuture.failedFuture(new IllegalStateException("No weather client for " + fuente));
         }
         return conTimeout(() -> consulta.apply(cliente));
     }
@@ -304,7 +304,7 @@ public class ContextoPlanService {
             return futuro.join();
         } catch (CompletionException ex) {
             Throwable causa = ex.getCause() == null ? ex : ex.getCause();
-            String motivo = causa instanceof TimeoutException ? "no respondió a tiempo" : causa.getMessage();
+            String motivo = causa instanceof TimeoutException ? "did not answer in time" : causa.getMessage();
             log.warn("Fuente {} no disponible para el plan: {}", fuente, motivo);
             fallidas.add(fuente);
             return null;

@@ -64,6 +64,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -132,6 +133,74 @@ public class DataLoader implements CommandLineRunner {
     private Role rolAdmin;
     private Role rolOperador;
     private Role rolCliente;
+
+
+    // ===== Versiones en español del contenido de la base que ve el huésped =====
+    // El inglés es el idioma base; estas tablas son lo que guardan nombreEs / descripcionEs. Van
+    // juntas aquí (y no intercaladas en los bloques de arriba) para poder revisar la traducción de
+    // un tirón, y se aplican al insertar: una pasada posterior con save() haría merge sobre una
+    // entidad desacoplada y Hibernate no puede reemplazar las listas inmutables (List.of) de
+    // caracteristicas y galeriaUrls. Hoy esta es la única forma de cargar estos valores: el panel
+    // de administración todavía no tiene formulario para ellos.
+    //
+    // Reglas de docs/i18n-glosario.md: la marca "The Royale", los nombres de tipo de habitación y
+    // de servicio tal como están en la base, los nombres de plato que son nombres propios de cocina
+    // ("Eggs Benedict", "Buddha Bowl", "The Royale Manhattan") y los topónimos NO se traducen. Lo
+    // que no está en la tabla queda en null y el DTO de respuesta cae al inglés (TextoPorIdioma).
+
+    // Servicios: el nombre es el de la base ("Wellness", "Dining"...), así que solo la descripción
+    private static final Map<String, String> SERVICIOS_DESCRIPCION_ES = Map.of(
+            "Wellness", "Sumérjase en una relajación total en The Royale Spa. Nuestro santuario de bienestar está diseñado alrededor de su descanso: de los rituales termales de siempre al fitness más moderno, cada detalle está pensado para el huésped más exigente.",
+            "Dining", "Disfrute de una cocina excepcional sin salir de The Royale. Nuestro restaurante de autor sirve cocina neoyorquina contemporánea desde el desayuno hasta la cena. El servicio a la habitación está disponible las 24 horas.",
+            "Business", "Siga siendo productivo en el corazón de Manhattan. The Royale Business Center ofrece todo lo que necesita un huésped corporativo, de la tecnología de reuniones más avanzada al apoyo ejecutivo completo, a pocos pasos de su habitación.",
+            "Concierge", "Nuestro equipo de Concierge multilingüe está disponible a toda hora para orquestar cada detalle de su experiencia en New York. Ninguna solicitud es demasiado extraordinaria: nos especializamos en convertir lo imposible en inolvidable.",
+            "Transportation", "Recorra New York con la misma comodidad y discreción que espera dentro de The Royale. Nuestro servicio de transporte coordina traslados privados, vehículos con chofer y rutas por la ciudad para huéspedes que valoran la puntualidad, el confort y la privacidad.");
+
+    // Platos: solo los que no son nombres propios de cocina llevan nombre en español
+    private static final Map<String, String> PLATOS_NOMBRE_ES = Map.ofEntries(
+            Map.entry("Yellowfin Tuna Tartare", "Tartar de atún aleta amarilla"),
+            Map.entry("Pan-Seared Atlantic Salmon", "Salmón del Atlántico sellado a la sartén"),
+            Map.entry("Wild Mushroom Risotto", "Risotto de hongos silvestres"),
+            Map.entry("Spiced Cauliflower Steak", "Coliflor asada especiada"),
+            Map.entry("Maine Lobster Linguine", "Linguine con langosta de Maine"),
+            Map.entry("Dark Chocolate Mousse", "Mousse de chocolate amargo"),
+            Map.entry("Truffle Parmesan Fries", "Papas fritas con trufa y parmesano"),
+            Map.entry("Classic Cheeseburger", "Hamburguesa clásica con queso"),
+            Map.entry("Chicken Caesar Salad", "Ensalada César con pollo"),
+            Map.entry("Seasonal Fruit Platter", "Tabla de frutas de temporada"),
+            Map.entry("Buttermilk Pancakes", "Panqueques de buttermilk"),
+            Map.entry("Smoked Salmon Bagel", "Bagel con salmón ahumado"),
+            Map.entry("Greek Yogurt Parfait", "Parfait de yogur griego"),
+            Map.entry("Cold-Pressed Green Juice", "Jugo verde prensado en frío"));
+
+    private static final Map<String, String> PLATOS_DESCRIPCION_ES = Map.ofEntries(
+            Map.entry("Burrata and Heirloom Tomatoes", "Burrata cremosa, tomates heirloom del Hudson Valley, aceite de albahaca y sal marina."),
+            Map.entry("Yellowfin Tuna Tartare", "Atún aleta amarilla cortado a mano, palta, aderezo de yuzu y crocante de sésamo."),
+            Map.entry("Dry-Aged New York Strip", "Bife de chorizo madurado 28 días en seco, mantequilla de tuétano asado y puré de papa."),
+            Map.entry("Pan-Seared Atlantic Salmon", "Salmón de piel crocante, beurre blanc de limón, espárragos asados y papas fingerling."),
+            Map.entry("Wild Mushroom Risotto", "Arroz carnaroli, hongos de bosque, parmesano añejo y aceite de trufa blanca."),
+            Map.entry("Spiced Cauliflower Steak", "Coliflor asada con harissa, tahini, granada y quinua con hierbas."),
+            Map.entry("Maine Lobster Linguine", "Linguine fresco, langosta de Maine pochada en mantequilla, tomates cherry y chile. De temporada."),
+            Map.entry("Classic New York Cheesecake", "Cheesecake de vainilla sobre base de galleta graham con compota de frutos rojos."),
+            Map.entry("Dark Chocolate Mousse", "Mousse sedosa de chocolate amargo 70 % y coco con frambuesas."),
+            Map.entry("The Royale Manhattan", "Whiskey de centeno, vermut dulce, bitters de la casa y cereza al brandy, batido al momento."),
+            Map.entry("Fifth Avenue Spritz", "Licor de flor de saúco, prosecco, durazno blanco y soda."),
+            Map.entry("Smoky Jalapeno Margarita", "Mezcal, limón fresco, agave y jalapeño con borde de sal y chile."),
+            Map.entry("Garden Mocktail", "Mezcla sin alcohol de pepino, menta, limón y tónica."),
+            Map.entry("Truffle Parmesan Fries", "Papas cortadas a mano, trufa negra, parmesano y alioli de romero."),
+            Map.entry("Wagyu Sliders", "Tres mini hamburguesas de wagyu con cheddar añejo y cebolla caramelizada."),
+            Map.entry("The Royale Club Sandwich", "Pavo asado, tocino, palta, tomate y mayonesa de hierbas en brioche tostado, con papas fritas."),
+            Map.entry("Classic Cheeseburger", "Medallón de res prime, cheddar, lechuga, tomate y salsa de la casa, con papas fritas."),
+            Map.entry("Buddha Bowl", "Quinua, camote asado, garbanzos, kale, palta y aderezo de miso y jengibre."),
+            Map.entry("Chicken Caesar Salad", "Pollo a la parrilla, corazones de lechuga romana, parmesano, croutones y aderezo César clásico."),
+            Map.entry("Seasonal Fruit Platter", "Selección de frutas frescas de temporada con menta."),
+            Map.entry("Eggs Benedict", "Huevos pochados, jamón ahumado y holandesa sobre un English muffin tostado."),
+            Map.entry("Avocado Toast", "Palta machacada, tomates cherry, hojuelas de chile y brotes sobre pan de masa madre."),
+            Map.entry("Buttermilk Pancakes", "Torre esponjosa con jarabe de maple de Vermont, frutos rojos y mantequilla batida."),
+            Map.entry("Acai Bowl", "Açaí, banano, crocante de semillas tostadas, frutos rojos frescos y coco."),
+            Map.entry("Smoked Salmon Bagel", "Bagel neoyorquino, salmón ahumado, queso crema, alcaparras y cebolla morada."),
+            Map.entry("Greek Yogurt Parfait", "Yogur griego, granola sin gluten, miel y frutos rojos de temporada."),
+            Map.entry("Cold-Pressed Green Juice", "Kale, pepino, manzana verde, apio, limón y jengibre."));
 
     private void cargarRoles() {
         rolAdmin = roleRepository.findByName("ROLE_ADMIN")
@@ -453,6 +522,9 @@ public class DataLoader implements CommandLineRunner {
         platoMenuRepository.save(PlatoMenu.builder()
                 .nombre(nombre)
                 .descripcion(descripcion)
+                // null si el plato no esta en la tabla: el DTO cae al ingles (TextoPorIdioma)
+                .nombreEs(PLATOS_NOMBRE_ES.get(nombre))
+                .descripcionEs(PLATOS_DESCRIPCION_ES.get(nombre))
                 .precio(new BigDecimal(precio))
                 .restaurante(restaurante)
                 .categoria(categoria)
@@ -482,30 +554,36 @@ public class DataLoader implements CommandLineRunner {
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("Normal")
                 .descripcion("Elegant essentials for a refined stay. 1-2 guests, double bed, private bathroom, premium Wi-Fi.")
+                // nombreEs se queda en null: los nombres de tipo de habitación no se traducen
+                .descripcionEs("Lo esencial con elegancia para una estadía refinada. 1-2 huéspedes, cama doble, baño privado, Wi-Fi premium.")
                 .imagenUrl("/images/hotel/hab-normal-4x3.jpg")
                 .build());
 
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("Executive")
                 .descripcion("Designed for those who work while they travel. 1-2 guests, executive workspace, king bed, premium Wi-Fi.")
+                .descripcionEs("Pensada para quienes trabajan mientras viajan. 1-2 huéspedes, escritorio ejecutivo, cama king, Wi-Fi premium.")
                 .imagenUrl("/images/hotel/hab-executive-4x3.jpg")
                 .build());
 
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("VIP")
                 .descripcion("A private space to relax and unwind. Up to 3 guests, separate living area, premium amenities, city views.")
+                .descripcionEs("Un espacio privado para relajarse. Hasta 3 huéspedes, sala independiente, amenidades premium y vistas a la ciudad.")
                 .imagenUrl("/images/hotel/hab-vip-4x3.jpg")
                 .build());
 
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("Luxury")
                 .descripcion("The ultimate expression of The Royale. Up to 4 guests, full suite, jacuzzi, privileged city view.")
+                .descripcionEs("La máxima expresión de The Royale. Hasta 4 huéspedes, suite completa, jacuzzi y vista privilegiada de la ciudad.")
                 .imagenUrl("/images/hotel/hab-luxury-4x3.jpg")
                 .build());
 
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("Presidential Suite")
                 .descripcion("Unmatched exclusivity. Up to 6 guests, private terrace, butler service, panoramic city view, private dining.")
+                .descripcionEs("Exclusividad sin igual. Hasta 6 huéspedes, terraza privada, servicio de mayordomo, vista panorámica y comedor privado.")
                 .imagenUrl("/images/hotel/suite-presidencial-4x3.jpg")
                 .build());
     }
@@ -767,6 +845,8 @@ public class DataLoader implements CommandLineRunner {
         servicioRepository.save(Servicio.builder()
                 .nombre(nombre)
                 .descripcion(descripcion)
+                // nombreEs se queda en null: los nombres de servicio no se traducen
+                .descripcionEs(SERVICIOS_DESCRIPCION_ES.get(nombre))
                 .precio(precio)
                 .imagenUrl(imagenUrl)
                 .caracteristicas(caracteristicas)
@@ -1092,6 +1172,7 @@ public class DataLoader implements CommandLineRunner {
     private static final List<String> RESENAS_MALAS = List.of(
             "Room was not ready|We waited two hours past check-in and nobody explained why.",
             "Not what was promised|The suite we booked was unavailable and the replacement was much smaller.");
+
 
     private void cargarHistorialDashboard() {
         Random aleatorio = new Random(SEMILLA_HISTORIAL);

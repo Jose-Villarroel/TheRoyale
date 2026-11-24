@@ -4,6 +4,7 @@ import com.theroyale.backend.dto.ChatRequest;
 import com.theroyale.backend.dto.EstadoChatResponse;
 import com.theroyale.backend.service.chat.ChatService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,7 @@ public class ChatRestController {
     // La IP del cliente se usa solo para el límite de mensajes (no se guarda ni se envía a Gemini)
     @PostMapping
     public SseEmitter conversar(@RequestBody ChatRequest solicitud, HttpServletRequest peticion) {
-        return chatService.iniciarConversacion(solicitud, peticion.getRemoteAddr());
+        // El Locale se lee aqui, dentro del hilo de la peticion: el stream corre en otro hilo
+        return chatService.iniciarConversacion(solicitud, peticion.getRemoteAddr(), LocaleContextHolder.getLocale());
     }
 }

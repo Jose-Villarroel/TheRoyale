@@ -1,5 +1,6 @@
 package com.theroyale.backend.security;
 
+import com.theroyale.backend.errors.UsuarioNoEncontradoException;
 import com.theroyale.backend.model.Role;
 import com.theroyale.backend.model.UserEntity;
 import com.theroyale.backend.repository.RoleRepository;
@@ -29,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con username: " + username));
+                .orElseThrow(() -> new UsuarioNoEncontradoException(username));
 
         return new User(user.getUsername(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
     }

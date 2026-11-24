@@ -82,21 +82,21 @@ public class InterpretePlanService {
                     List.of(new MensajeGemini("user", List.of(ParteGemini.deTexto(objectMapper.writeValueAsString(mensaje))))),
                     List.of(), false);
         } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("No se pudo armar el mensaje de interpretación", ex);
+            throw new IllegalStateException("The interpretation message could not be built.", ex);
         }
 
         String json;
         try {
             json = geminiClient.generarJson(solicitud, esquema()).json();
         } catch (GeminiException ex) {
-            log.warn("Gemini no pudo interpretar la descripción: {}", ex.getMessage());
-            throw new ServicioNoDisponibleException(GeneradorPlanService.MENSAJE_NO_DISPONIBLE);
+            log.warn("Gemini could not read the description: {}", ex.getMessage());
+            throw ServicioNoDisponibleException.conCodigo(GeneradorPlanService.CODIGO_NO_DISPONIBLE);
         }
 
         try {
             return normalizar(objectMapper.readValue(json, InterpretacionCruda.class));
         } catch (JsonProcessingException ex) {
-            log.warn("Gemini devolvió una interpretación ilegible: {}", ex.getOriginalMessage());
+            log.warn("Gemini returned an unreadable interpretation: {}", ex.getOriginalMessage());
             throw new PlanNoConfiableException();
         }
     }
@@ -195,7 +195,7 @@ public class InterpretePlanService {
             try {
                 instruccion = new ClassPathResource(RUTA_INSTRUCCION).getContentAsString(StandardCharsets.UTF_8);
             } catch (IOException ex) {
-                throw new UncheckedIOException("No se encontró " + RUTA_INSTRUCCION, ex);
+                throw new UncheckedIOException(RUTA_INSTRUCCION + " could not be read.", ex);
             }
         }
         return instruccion;

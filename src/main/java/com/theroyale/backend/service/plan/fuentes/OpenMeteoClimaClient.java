@@ -138,11 +138,11 @@ public class OpenMeteoClimaClient implements ClimaClient {
 
     private static JsonNode diario(JsonNode respuesta) {
         if (respuesta.path("error").asBoolean(false)) {
-            throw new FuenteNoDisponibleException("Open-Meteo respondió con error: " + respuesta.path("reason").asText());
+            throw new FuenteNoDisponibleException("Open-Meteo answered with an error: " + respuesta.path("reason").asText());
         }
         JsonNode diario = respuesta.path("daily");
         if (!diario.path("time").isArray()) {
-            throw new FuenteNoDisponibleException("Open-Meteo no devolvió datos diarios.");
+            throw new FuenteNoDisponibleException("Open-Meteo did not return daily data.");
         }
         return diario;
     }

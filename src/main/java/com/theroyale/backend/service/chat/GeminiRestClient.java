@@ -89,11 +89,11 @@ public class GeminiRestClient implements GeminiClient {
                 if (entregoAlgo[0]) {
                     throw ex;
                 }
-                log.warn("Gemini falló con el modelo {}; se prueba el siguiente si hay: {}", modelo, ex.getMessage());
+                log.warn("Gemini failed with model {}; trying the next one if there is any: {}", modelo, ex.getMessage());
                 ultimoError = ex;
             }
         }
-        throw ultimoError != null ? ultimoError : new GeminiException("No hay ningún modelo de Gemini configurado.");
+        throw ultimoError != null ? ultimoError : new GeminiException("No Gemini model is configured.");
     }
 
     private void llamarModelo(String modelo, Map<String, Object> cuerpo, Consumer<ParteGemini> alRecibirParte) {
@@ -107,14 +107,14 @@ public class GeminiRestClient implements GeminiClient {
                     .exchange((peticion, respuesta) -> {
                         if (respuesta.getStatusCode().isError()) {
                             String detalle = new String(respuesta.getBody().readAllBytes(), StandardCharsets.UTF_8);
-                            throw new GeminiException("Gemini respondió " + respuesta.getStatusCode().value()
+                            throw new GeminiException("Gemini answered " + respuesta.getStatusCode().value()
                                     + ": " + recortar(detalle));
                         }
                         leerEventos(respuesta.getBody(), alRecibirParte);
                         return null;
                     });
         } catch (RestClientException ex) {
-            throw new GeminiException("No se pudo completar la llamada a Gemini: " + ex.getMessage(), ex);
+            throw new GeminiException("The call to Gemini could not be completed: " + ex.getMessage(), ex);
         }
     }
 
@@ -136,7 +136,7 @@ public class GeminiRestClient implements GeminiClient {
     private void procesarFragmento(JsonNode fragmento, Consumer<ParteGemini> alRecibirParte) {
         JsonNode bloqueo = fragmento.path("promptFeedback").path("blockReason");
         if (!bloqueo.isMissingNode()) {
-            throw new GeminiException("Gemini bloqueó la consulta: " + bloqueo.asText());
+            throw new GeminiException("Gemini blocked the request: " + bloqueo.asText());
         }
 
         JsonNode candidato = fragmento.path("candidates").path(0);
@@ -172,14 +172,14 @@ public class GeminiRestClient implements GeminiClient {
             try {
                 long inicio = System.currentTimeMillis();
                 String json = llamarModeloJson(modelo, cuerpo);
-                log.info("Gemini respondió JSON con el modelo {} en {} ms", modelo, System.currentTimeMillis() - inicio);
+                log.info("Gemini answered JSON with model {} in {} ms", modelo, System.currentTimeMillis() - inicio);
                 return new RespuestaJson(json, modelo);
             } catch (GeminiException ex) {
-                log.warn("Gemini (JSON) falló con el modelo {}; se prueba el siguiente si hay: {}", modelo, ex.getMessage());
+                log.warn("Gemini (JSON) failed with model {}; trying the next one if there is any: {}", modelo, ex.getMessage());
                 ultimoError = ex;
             }
         }
-        throw ultimoError != null ? ultimoError : new GeminiException("No hay ningún modelo de Gemini configurado.");
+        throw ultimoError != null ? ultimoError : new GeminiException("No Gemini model is configured.");
     }
 
     private String llamarModeloJson(String modelo, Map<String, Object> cuerpo) {
@@ -194,20 +194,20 @@ public class GeminiRestClient implements GeminiClient {
                     .exchange((peticion, res) -> {
                         String texto = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
                         if (res.getStatusCode().isError()) {
-                            throw new GeminiException("Gemini respondió " + res.getStatusCode().value()
+                            throw new GeminiException("Gemini answered " + res.getStatusCode().value()
                                     + ": " + recortar(texto));
                         }
                         return texto;
                     });
         } catch (RestClientException ex) {
-            throw new GeminiException("No se pudo completar la llamada a Gemini: " + ex.getMessage(), ex);
+            throw new GeminiException("The call to Gemini could not be completed: " + ex.getMessage(), ex);
         }
 
         try {
             JsonNode raiz = objectMapper.readTree(respuesta);
             JsonNode bloqueo = raiz.path("promptFeedback").path("blockReason");
             if (!bloqueo.isMissingNode()) {
-                throw new GeminiException("Gemini bloqueó la consulta: " + bloqueo.asText());
+                throw new GeminiException("Gemini blocked the request: " + bloqueo.asText());
             }
             StringBuilder texto = new StringBuilder();
             for (JsonNode parte : raiz.path("candidates").path(0).path("content").path("parts")) {
@@ -216,12 +216,12 @@ public class GeminiRestClient implements GeminiClient {
                 }
             }
             if (texto.isEmpty()) {
-                throw new GeminiException("Gemini no devolvió contenido (finishReason="
+                throw new GeminiException("Gemini returned no content (finishReason="
                         + raiz.path("candidates").path(0).path("finishReason").asText("?") + ").");
             }
             return texto.toString();
         } catch (IOException ex) {
-            throw new GeminiException("Gemini devolvió una respuesta ilegible: " + ex.getMessage(), ex);
+            throw new GeminiException("Gemini returned an unreadable answer: " + ex.getMessage(), ex);
         }
     }
 

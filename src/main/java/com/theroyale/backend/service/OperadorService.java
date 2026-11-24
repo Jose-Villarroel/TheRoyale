@@ -65,7 +65,7 @@ public class OperadorService {
 
     public Operador obtenerPorId(Long id) {
         return buscarPorId(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Operador no encontrado: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Operator not found: " + id));
     }
 
     // /operator no exige login por ahora: si no hay operador en la sesion (o ya no existe),
@@ -73,7 +73,7 @@ public class OperadorService {
     public Operador obtenerOPredeterminado(Long id) {
         return buscarPorId(id)
                 .or(() -> operadorRepository.findAll().stream().findFirst())
-                .orElseThrow(() -> new IllegalStateException("No hay operadores registrados en el sistema."));
+                .orElseThrow(() -> new IllegalStateException("There are no operators registered in the system."));
     }
 
     @Transactional

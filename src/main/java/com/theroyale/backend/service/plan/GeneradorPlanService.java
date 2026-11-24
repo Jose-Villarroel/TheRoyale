@@ -43,7 +43,8 @@ import java.util.Map;
 @Service
 public class GeneradorPlanService {
 
-    static final String MENSAJE_NO_DISPONIBLE = "The planner is unavailable right now.";
+    // Codigo del contrato: el texto sale de messages[_es].properties
+    static final String CODIGO_NO_DISPONIBLE = "plan.no-disponible";
     private static final String RUTA_INSTRUCCION = "plan/instruccion-plan.md";
     private static final Logger log = LoggerFactory.getLogger(GeneradorPlanService.class);
 
@@ -75,17 +76,17 @@ public class GeneradorPlanService {
             try {
                 respuesta = geminiClient.generarJson(peticion, esquema());
             } catch (GeminiException ex) {
-                log.warn("Gemini no pudo generar el plan: {}", ex.getMessage());
-                throw new ServicioNoDisponibleException(MENSAJE_NO_DISPONIBLE);
+                log.warn("Gemini could not generate the plan: {}", ex.getMessage());
+                throw ServicioNoDisponibleException.conCodigo(CODIGO_NO_DISPONIBLE);
             }
             try {
                 PlanGenerado plan = objectMapper.readValue(respuesta.json(), PlanGenerado.class);
                 if (plan.dias() != null) {
                     return new PlanGenerado.Respuesta(plan, respuesta.modelo());
                 }
-                log.warn("Gemini devolvió un plan sin días (intento {})", intento);
+                log.warn("Gemini returned a plan with no days (attempt {})", intento);
             } catch (JsonProcessingException ex) {
-                log.warn("Gemini devolvió un plan ilegible (intento {}): {}", intento, ex.getOriginalMessage());
+                log.warn("Gemini returned an unreadable plan (attempt {}): {}", intento, ex.getOriginalMessage());
             }
         }
         throw new PlanNoConfiableException();
@@ -173,7 +174,7 @@ public class GeneradorPlanService {
         try {
             return objectMapper.writeValueAsString(mensaje);
         } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("No se pudo armar el mensaje del plan", ex);
+            throw new IllegalStateException("The plan message could not be built.", ex);
         }
     }
 
@@ -249,7 +250,7 @@ public class GeneradorPlanService {
             try {
                 instruccion = new ClassPathResource(RUTA_INSTRUCCION).getContentAsString(StandardCharsets.UTF_8);
             } catch (IOException ex) {
-                throw new UncheckedIOException("No se encontró " + RUTA_INSTRUCCION, ex);
+                throw new UncheckedIOException(RUTA_INSTRUCCION + " could not be read.", ex);
             }
         }
         return instruccion;

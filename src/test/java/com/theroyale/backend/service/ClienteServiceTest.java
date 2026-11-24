@@ -1,5 +1,6 @@
 package com.theroyale.backend.service;
 
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Cliente;
 import com.theroyale.backend.model.UserEntity;
 import com.theroyale.backend.repository.ClienteRepository;
@@ -73,8 +74,9 @@ class ClienteServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> clienteService.actualizar(1L, datosNuevos("laura@theroyale.com")))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("already used");
+                .isInstanceOf(ReglaNegocioException.class)
+                .extracting(ex -> ((ReglaNegocioException) ex).getCodigo())
+                .isEqualTo("cliente.email-en-uso");
         assertThat(existente.getUser().getUsername()).isEqualTo("ana@email.com");
         verify(clienteRepository, never()).save(any(Cliente.class));
     }

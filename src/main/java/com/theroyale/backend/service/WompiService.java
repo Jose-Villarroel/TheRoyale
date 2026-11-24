@@ -8,6 +8,7 @@ import com.theroyale.backend.dto.wompi.WompiPrepararRequest;
 import com.theroyale.backend.dto.wompi.WompiPrepararResponse;
 import com.theroyale.backend.dto.wompi.WompiVerificarResponse;
 import com.theroyale.backend.errors.RecursoNoEncontradoException;
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.model.Cuenta;
 import com.theroyale.backend.model.EstadoCuenta;
 import com.theroyale.backend.model.EstadoReserva;
@@ -73,7 +74,7 @@ public class WompiService {
      */
     public String calcularFirmaIntegridad(String reference, long amountInCents, String currency) {
         String cadena = reference.trim() + amountInCents + currency.trim() + integritySecret.trim();
-        log.info("Wompi - Cadena a firmar: {}", cadena);
+        log.info("Wompi - string to sign: {}", cadena);
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(cadena.getBytes(StandardCharsets.UTF_8));
@@ -84,10 +85,10 @@ public class WompiService {
                 hexString.append(hex);
             }
             String firma = hexString.toString();
-            log.info("Wompi - Firma generada: {}", firma);
+            log.info("Wompi - signature generated: {}", firma);
             return firma;
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error calculando hash SHA-256 para Wompi", e);
+            throw new IllegalStateException("The SHA-256 hash for Wompi could not be computed.", e);
         }
     }
 
@@ -97,7 +98,7 @@ public class WompiService {
     @Transactional
     public WompiPrepararResponse prepararPago(WompiPrepararRequest request) {
         if (request == null || request.clienteId() == null || request.tipoHabitacionId() == null) {
-            throw new IllegalArgumentException("Datos incompletos para preparar la reserva.");
+            throw ReglaNegocioException.badRequest("pago.datos-incompletos");
         }
 
         // 1. Crear reserva inicial en estado PENDIENTE
@@ -146,11 +147,11 @@ public class WompiService {
     @Transactional
     public WompiVerificarResponse verificarYConfirmar(String transactionId, Long reservaId) {
         if (transactionId == null || transactionId.isBlank()) {
-            throw new IllegalArgumentException("El transactionId de Wompi es requerido.");
+            throw ReglaNegocioException.badRequest("pago.transaccion-requerida");
         }
 
         Reserva reserva = reservaRepository.findById(reservaId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada: " + reservaId));
+                .orElseThrow(() -> RecursoNoEncontradoException.conCodigo("reserva.no-encontrada", reservaId));
 
         try {
             // Consultar transacción directamente a la API de Wompi
@@ -161,7 +162,7 @@ public class WompiService {
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                return new WompiVerificarResponse(false, "ERROR", "No se pudo consultar la transacción en Wompi", transactionId, "", null);
+                return new WompiVerificarResponse(false, "ERROR", "The transaction could not be looked up in Wompi.", transactionId, "", null);
             }
 
             JsonNode root = objectMapper.readTree(response.getBody());
@@ -208,44 +209,24 @@ public class WompiService {
                 return new WompiVerificarResponse(
                         true,
                         "APPROVED",
-                        "Pago procesado y aprobado exitosamente con Wompi.",
+                        "Payment processed and approved by Wompi.",
                         transactionId,
                         paymentMethodType,
                         ReservaResponse.from(reserva)
                 );
-            } else if ("DECLINED".equalsIgnoreCase(status)) {
-                return new WompiVerificarResponse(
-                        false,
-                        "DECLINED",
-                        "La transacción fue rechazada por la entidad bancaria.",
-                        transactionId,
-                        paymentMethodType,
-                        null
-                );
-            } else if ("PENDING".equalsIgnoreCase(status)) {
-                return new WompiVerificarResponse(
-                        false,
-                        "PENDING",
-                        "La transacción está pendiente de confirmación por la red bancaria (ej. PSE).",
-                        transactionId,
-                        paymentMethodType,
-                        null
-                );
-            } else {
-                return new WompiVerificarResponse(
-                        false,
-                        status,
-                        "Transacción no aprobada: " + status,
-                        transactionId,
-                        paymentMethodType,
-                        null
-                );
             }
+            // Rechazada, pendiente o cualquier otro estado: el contrato le da 409 y un solo codigo
+            // (pago.no-aprobado) con el estado de Wompi como parametro, para que el frontend lo
+            // muestre traducido en vez de recibir un 200 con exitoso=false y un texto en espanol.
+            throw ReglaNegocioException.conflict("pago.no-aprobado", status.isBlank() ? "UNKNOWN" : status);
+        } catch (ReglaNegocioException e) {
+            // No la atrapa el catch de abajo: es la regla de negocio, no un fallo de la pasarela
+            throw e;
         } catch (Exception e) {
             return new WompiVerificarResponse(
                     false,
                     "ERROR",
-                    "Error al comunicarse con la pasarela Wompi: " + e.getMessage(),
+                    "The Wompi payment gateway could not be reached: " + e.getMessage(),
                     transactionId,
                     "",
                     null

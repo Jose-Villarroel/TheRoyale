@@ -118,12 +118,14 @@ class ReservaRestControllerTest {
     @Test
     void reservaController_obtenerPorId_inexistente_retorna404ConMensaje() throws Exception {
         // Arrange
-        when(reservaService.obtenerPorId(99L)).thenThrow(new RecursoNoEncontradoException("Reserva no encontrada: 99"));
+        when(reservaService.obtenerPorId(99L))
+                .thenThrow(RecursoNoEncontradoException.conCodigo("reserva.no-encontrada", 99L));
 
         // Act & Assert: ApiExceptionHandler convierte la excepción en el JSON que lee Angular
         mockMvc.perform(get("/api/reservas/99"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message", is("Reserva no encontrada: 99")));
+                .andExpect(jsonPath("$.codigo", is("reserva.no-encontrada")))
+                .andExpect(jsonPath("$.message", is("Reservation not found: 99")));
     }
 
     // ===== 4. PUT: modificar =====
@@ -158,7 +160,7 @@ class ReservaRestControllerTest {
     @Test
     void reservaController_listar_clienteConIdAjeno_retorna403() throws Exception {
         // Arrange: el token es del cliente 1 y pide las reservas del cliente 2
-        doThrow(new AccesoDenegadoException("You can only access your own data."))
+        doThrow(AccesoDenegadoException.conCodigo("auth.datos-ajenos"))
                 .when(usuarioActualService).exigirClientePropio(2L);
 
         // Act & Assert

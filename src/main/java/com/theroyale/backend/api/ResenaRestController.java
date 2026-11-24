@@ -1,5 +1,6 @@
 package com.theroyale.backend.api;
 
+import com.theroyale.backend.errors.ReglaNegocioException;
 import com.theroyale.backend.dto.CrearResenaRequest;
 import com.theroyale.backend.dto.ResenaResponse;
 import com.theroyale.backend.dto.ResumenResenasResponse;
@@ -56,7 +57,7 @@ public class ResenaRestController {
         } else if (tipoHabitacionId != null) {
             resenas = resenaService.listarPorTipo(tipoHabitacionId);
         } else {
-            throw new IllegalArgumentException("Specify tipoHabitacionId, clienteId or incluirOcultas=true.");
+            throw ReglaNegocioException.badRequest("resena.filtro-requerido");
         }
         return resenas.stream().map(ResenaResponse::from).toList();
     }

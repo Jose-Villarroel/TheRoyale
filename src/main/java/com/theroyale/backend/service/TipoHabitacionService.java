@@ -38,7 +38,7 @@ public class TipoHabitacionService {
 
     public TipoHabitacion obtenerPorId(Long id) {
         return tipoHabitacionRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Tipo de habitacion no encontrado: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Room type not found: " + id));
     }
 
     // Al editar se copian solo los campos del formulario sobre la entidad existente:

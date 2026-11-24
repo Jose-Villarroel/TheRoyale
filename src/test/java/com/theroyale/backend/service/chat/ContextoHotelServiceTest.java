@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +83,7 @@ class ContextoHotelServiceTest {
     @Test
     void contextoHotelService_construirInstruccionSistema_incluyePreciosYResenasDeLosTipos() {
         // Act
-        String instruccion = contextoHotelService.construirInstruccionSistema();
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.ENGLISH);
 
         // Assert
         assertThat(instruccion)
@@ -93,7 +94,7 @@ class ContextoHotelServiceTest {
     @Test
     void contextoHotelService_construirInstruccionSistema_incluyeServiciosConCaracteristicasYPrecio() {
         // Act
-        String instruccion = contextoHotelService.construirInstruccionSistema();
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.ENGLISH);
 
         // Assert
         assertThat(instruccion)
@@ -104,7 +105,7 @@ class ContextoHotelServiceTest {
     @Test
     void contextoHotelService_construirInstruccionSistema_incluyeElMenuPorRestauranteConEtiquetas() {
         // Act
-        String instruccion = contextoHotelService.construirInstruccionSistema();
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.ENGLISH);
 
         // Assert
         assertThat(instruccion)
@@ -115,7 +116,7 @@ class ContextoHotelServiceTest {
     @Test
     void contextoHotelService_construirInstruccionSistema_incluyeReglasFechaDeHoyEInformacionFija() {
         // Act
-        String instruccion = contextoHotelService.construirInstruccionSistema();
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.ENGLISH);
 
         // Assert
         assertThat(instruccion)
@@ -131,10 +132,59 @@ class ContextoHotelServiceTest {
                 .contains("+1 507 3165 232");
     }
 
+    // ===== Idioma de salida: la directiva final y el archivo de informacion por idioma =====
+    @Test
+    void contextoHotelService_construirInstruccionSistema_enIngles_pideLaRespuestaEnInglesYUsaElArchivoBase() {
+        // Act
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.ENGLISH);
+
+        // Assert
+        assertThat(instruccion)
+                .contains("OUTPUT LANGUAGE")
+                .contains("in English.")
+                .contains("Check-in from 15:00")
+                .doesNotContain("Check-in a partir de las 15:00");
+    }
+
+    @Test
+    void contextoHotelService_construirInstruccionSistema_enEspanol_pideEspanolNeutroDeUstedYUsaElArchivoEs() {
+        // Act
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.forLanguageTag("es"));
+
+        // Assert: la directiva va al final, para que mande sobre la regla 1
+        assertThat(instruccion)
+                .contains("OUTPUT LANGUAGE")
+                .contains("neutral Latin American Spanish")
+                .contains("usted")
+                .contains("Check-in a partir de las 15:00");
+        assertThat(instruccion.indexOf("OUTPUT LANGUAGE"))
+                .isGreaterThan(instruccion.indexOf("===== HOTEL DATA ====="));
+    }
+
+    // "es-CO", "es-419"... cualquier variante regional es espanol
+    @Test
+    void contextoHotelService_construirInstruccionSistema_varianteRegionalDeEspanol_tambienEsEspanol() {
+        // Act
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.forLanguageTag("es-CO"));
+
+        // Assert
+        assertThat(instruccion).contains("neutral Latin American Spanish");
+    }
+
+    // Un idioma que no se soporta cae al ingles (el Locale ya llega resuelto por I18nConfig)
+    @Test
+    void contextoHotelService_construirInstruccionSistema_otroIdioma_caeAlIngles() {
+        // Act
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.FRENCH);
+
+        // Assert
+        assertThat(instruccion).contains("in English.").doesNotContain("Latin American Spanish");
+    }
+
     @Test
     void contextoHotelService_construirInstruccionSistema_noIncluyeDatosPrivadosDeClientes() {
         // Act
-        String instruccion = contextoHotelService.construirInstruccionSistema();
+        String instruccion = contextoHotelService.construirInstruccionSistema(Locale.ENGLISH);
 
         // Assert: ni emails ni números largos tipo cédula
         assertThat(instruccion).doesNotContainPattern("[\\w.+-]+@[\\w-]+\\.[\\w.]+");

@@ -143,7 +143,8 @@ class InterpretePlanServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> interpretePlanService.interpretar("A trip with friends.", ESTADIA))
                 .isInstanceOf(ServicioNoDisponibleException.class)
-                .hasMessage("The planner is unavailable right now.");
+                .extracting(ex -> ((ServicioNoDisponibleException) ex).getCodigo())
+                .isEqualTo("plan.no-disponible");
     }
 
     @Test

@@ -67,7 +67,7 @@ public class ModeloOcupacion {
         try (InputStream entrada = new ClassPathResource(recurso).getInputStream()) {
             return objectMapper.readTree(entrada);
         } catch (IOException ex) {
-            throw new UncheckedIOException("No se pudo leer el modelo de ocupación " + recurso, ex);
+            throw new UncheckedIOException("The occupancy model " + recurso + " could not be read.", ex);
         }
     }
 
