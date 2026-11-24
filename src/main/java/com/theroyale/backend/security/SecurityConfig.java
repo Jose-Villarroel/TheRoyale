@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -20,6 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+// Habilita @PreAuthorize en los controladores: el del dashboard lo usa como segunda barrera,
+// para que un cambio descuidado en los matchers de abajo no exponga las finanzas del hotel.
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -51,6 +55,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/chat/**").permitAll()
 
                         // ===== Rutas de administración (catálogo, clientes y moderación) =====
+                        // El dashboard de direccion expone ingresos, caja y saldos de los huespedes:
+                        // es la informacion mas sensible del sistema y solo la ve el administrador.
+                        // Esta regla debe ir ANTES de anyRequest(), que solo exige estar autenticado.
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/operadores/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/menu/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/menu/**").hasAuthority("ROLE_ADMIN")

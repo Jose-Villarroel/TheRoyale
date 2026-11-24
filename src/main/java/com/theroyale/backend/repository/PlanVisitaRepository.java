@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,4 +28,20 @@ public interface PlanVisitaRepository extends JpaRepository<PlanVisita, Long> {
     List<PlanVisita> buscarConDiasEntre(@Param("desde") LocalDate desde,
                                         @Param("hasta") LocalDate hasta,
                                         @Param("estados") List<EstadoReserva> estados);
+
+    // ===== Dashboard: planes marcados para revisión en estadías próximas (alerta) =====
+    // requiereRevision lo pone ValidadorPlanService cuando la IA propuso algo que no pudo verificar.
+    // Solo molesta avisarlo si el huésped llega pronto: un plan dudoso de dentro de tres meses
+    // puede esperar, el de pasado mañana no.
+    @Query("""
+            SELECT p FROM PlanVisita p
+            WHERE p.requiereRevision = true
+              AND p.reserva.fechaFin >= :desde
+              AND p.reserva.fechaInicio <= :hasta
+              AND p.reserva.estado IN :estados
+            ORDER BY p.reserva.fechaInicio
+            """)
+    List<PlanVisita> buscarQueRequierenRevision(@Param("desde") LocalDate desde,
+                                                @Param("hasta") LocalDate hasta,
+                                                @Param("estados") Collection<EstadoReserva> estados);
 }

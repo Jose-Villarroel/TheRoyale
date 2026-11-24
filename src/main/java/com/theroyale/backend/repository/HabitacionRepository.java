@@ -59,4 +59,11 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
     List<Habitacion> findAllByOrderByNumeroAsc();
 
     long countByEstado(EstadoHabitacion estado);
+
+    // ===== Dashboard: inventario sobre el que se mide la ocupacion =====
+    // Una habitacion DESHABILITADA esta fuera del inventario (no se puede vender ni se podra), asi
+    // que no entra en el denominador de la ocupacion. MANTENIMIENTO si cuenta como inventario y se
+    // informa aparte: es temporal, y esconderla maquillaria la ocupacion hacia arriba.
+    @Query("SELECT COUNT(h) FROM Habitacion h WHERE h.estado <> :estadoExcluido")
+    long contarInventario(@Param("estadoExcluido") EstadoHabitacion estadoExcluido);
 }
