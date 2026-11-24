@@ -335,92 +335,121 @@ public class DataLoader implements CommandLineRunner {
     private void cargarPlatosMenu() {
         // Signature Restaurant: cocina contemporánea de Nueva York
         guardarPlato("Roasted Beet Carpaccio", "Thinly sliced roasted beets, citrus segments, pistachio crumble and aged balsamic.",
-                "17.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true,
+                "17.00",
+                "/images/menu/roasted-beet-carpaccio.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Burrata and Heirloom Tomatoes", "Creamy burrata, heirloom tomatoes from the Hudson Valley, basil oil and sea salt.",
-                "19.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true,
+                "19.00",
+                "/images/menu/burrata-heirloom-tomatoes.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true,
                 EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Yellowfin Tuna Tartare", "Hand-cut yellowfin tuna, avocado, yuzu dressing and sesame tuile.",
-                "24.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true);
+                "24.00",
+                "/images/menu/yellowfin-tuna-tartare.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.ENTRADA, true);
         guardarPlato("Dry-Aged New York Strip", "28-day dry-aged strip steak, roasted bone marrow butter and pommes puree.",
-                "58.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                "58.00",
+                "/images/menu/dry-aged-ny-strip.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
                 EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Pan-Seared Atlantic Salmon", "Crispy-skin salmon, lemon beurre blanc, charred asparagus and fingerling potatoes.",
-                "42.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                "42.00",
+                "/images/menu/pan-seared-salmon.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
                 EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Wild Mushroom Risotto", "Carnaroli rice, forest mushrooms, aged parmesan and white truffle oil.",
-                "34.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                "34.00",
+                "/images/menu/wild-mushroom-risotto.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
                 EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Spiced Cauliflower Steak", "Harissa-roasted cauliflower, tahini, pomegranate and herb quinoa.",
-                "29.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
+                "29.00",
+                "/images/menu/spiced-cauliflower-steak.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN, EtiquetaPlato.PICANTE);
         guardarPlato("Maine Lobster Linguine", "Fresh linguine, butter-poached Maine lobster, cherry tomatoes and chili. Seasonal.",
-                "49.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, false,
+                "49.00",
+                "/images/menu/maine-lobster-linguine.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.PRINCIPAL, false,
                 EtiquetaPlato.PICANTE);
         guardarPlato("Classic New York Cheesecake", "Vanilla bean cheesecake on a graham cracker crust with berry compote.",
-                "14.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.POSTRE, true,
+                "14.00",
+                "/images/menu/ny-cheesecake.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.POSTRE, true,
                 EtiquetaPlato.VEGETARIANO);
         guardarPlato("Dark Chocolate Mousse", "Silky 70% dark chocolate and coconut mousse with raspberries.",
-                "13.00", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.POSTRE, true,
+                "13.00",
+                "/images/menu/dark-chocolate-mousse.jpg", RestauranteHotel.SIGNATURE_RESTAURANT, CategoriaPlato.POSTRE, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
 
         // Craft Cocktail Bar: cócteles de autor y algo para picar
         guardarPlato("The Royale Manhattan", "Rye whiskey, sweet vermouth, house bitters and a brandied cherry, stirred to order.",
-                "22.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                "22.00",
+                "/images/menu/royale-manhattan.jpg", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Fifth Avenue Spritz", "Elderflower liqueur, prosecco, white peach and soda.",
-                "19.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                "19.00",
+                "/images/menu/fifth-avenue-spritz.jpg", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Smoky Jalapeno Margarita", "Mezcal, fresh lime, agave and jalapeno with a chili-salt rim.",
-                "20.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                "20.00",
+                "/images/menu/smoky-jalapeno-margarita.jpg", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN, EtiquetaPlato.PICANTE);
         guardarPlato("Garden Mocktail", "Alcohol-free blend of cucumber, mint, lime and sparkling tonic.",
-                "12.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
+                "12.00",
+                "/images/menu/garden-mocktail.jpg", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.BEBIDA, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Truffle Parmesan Fries", "Hand-cut fries, black truffle, parmesan and rosemary aioli.",
-                "14.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.ENTRADA, true,
+                "14.00",
+                "/images/menu/truffle-parmesan-fries.jpg", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.ENTRADA, true,
                 EtiquetaPlato.VEGETARIANO);
         guardarPlato("Wagyu Sliders", "Three mini wagyu burgers with aged cheddar and caramelized onions.",
-                "24.00", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.ENTRADA, true);
+                "24.00",
+                "/images/menu/wagyu-sliders.jpg", RestauranteHotel.COCKTAIL_BAR, CategoriaPlato.ENTRADA, true);
 
         // 24h Room Service: carta a la habitación a cualquier hora
         guardarPlato("The Royale Club Sandwich", "Roasted turkey, bacon, avocado, tomato and herb mayo on toasted brioche, with fries.",
-                "26.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+                "26.00",
+                "/images/menu/royale-club-sandwich.jpg", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
         guardarPlato("Classic Cheeseburger", "Prime beef patty, cheddar, lettuce, tomato and house sauce, with fries.",
-                "28.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+                "28.00",
+                "/images/menu/classic-cheeseburger.jpg", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
         guardarPlato("Buddha Bowl", "Quinoa, roasted sweet potato, chickpeas, kale, avocado and miso-ginger dressing.",
-                "24.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true,
+                "24.00",
+                "/images/menu/buddha-bowl.jpg", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Chicken Caesar Salad", "Grilled chicken, romaine hearts, parmesan, croutons and classic Caesar dressing.",
-                "22.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
+                "22.00",
+                "/images/menu/chicken-caesar-salad.jpg", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.PRINCIPAL, true);
         guardarPlato("Seasonal Fruit Platter", "A selection of fresh seasonal fruit with mint.",
-                "15.00", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.POSTRE, true,
+                "15.00",
+                "/images/menu/seasonal-fruit-platter.jpg", RestauranteHotel.ROOM_SERVICE, CategoriaPlato.POSTRE, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
 
         // Breakfast Lounge
         guardarPlato("Eggs Benedict", "Poached eggs, smoked ham and hollandaise on a toasted English muffin.",
-                "24.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true);
+                "24.00",
+                "/images/menu/eggs-benedict.jpg", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true);
         guardarPlato("Avocado Toast", "Smashed avocado, cherry tomatoes, chili flakes and microgreens on sourdough.",
-                "19.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                "19.00",
+                "/images/menu/avocado-toast.jpg", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
                 EtiquetaPlato.VEGANO);
         guardarPlato("Buttermilk Pancakes", "Fluffy stack with Vermont maple syrup, berries and whipped butter.",
-                "18.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                "18.00",
+                "/images/menu/buttermilk-pancakes.jpg", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
                 EtiquetaPlato.VEGETARIANO);
         guardarPlato("Acai Bowl", "Acai, banana, toasted seed crunch, fresh berries and coconut.",
-                "16.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                "16.00",
+                "/images/menu/acai-bowl.jpg", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Smoked Salmon Bagel", "New York bagel, smoked salmon, cream cheese, capers and red onion.",
-                "22.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true);
+                "22.00",
+                "/images/menu/smoked-salmon-bagel.jpg", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true);
         guardarPlato("Greek Yogurt Parfait", "Greek yogurt, gluten-free granola, honey and seasonal berries.",
-                "14.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
+                "14.00",
+                "/images/menu/greek-yogurt-parfait.jpg", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.DESAYUNO, true,
                 EtiquetaPlato.VEGETARIANO, EtiquetaPlato.SIN_GLUTEN);
         guardarPlato("Cold-Pressed Green Juice", "Kale, cucumber, green apple, celery, lemon and ginger.",
-                "11.00", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.BEBIDA, true,
+                "11.00",
+                "/images/menu/green-juice.jpg", RestauranteHotel.BREAKFAST_LOUNGE, CategoriaPlato.BEBIDA, true,
                 EtiquetaPlato.VEGANO, EtiquetaPlato.SIN_GLUTEN);
     }
 
-    private void guardarPlato(String nombre, String descripcion, String precio, RestauranteHotel restaurante,
-            CategoriaPlato categoria, boolean disponible, EtiquetaPlato... etiquetas) {
+    private void guardarPlato(String nombre, String descripcion, String precio, String imagenUrl,
+            RestauranteHotel restaurante, CategoriaPlato categoria, boolean disponible,
+            EtiquetaPlato... etiquetas) {
         platoMenuRepository.save(PlatoMenu.builder()
                 .nombre(nombre)
                 .descripcion(descripcion)
@@ -428,6 +457,7 @@ public class DataLoader implements CommandLineRunner {
                 .restaurante(restaurante)
                 .categoria(categoria)
                 .disponible(disponible)
+                .imagenUrl(imagenUrl)
                 .etiquetas(new LinkedHashSet<>(List.of(etiquetas)))
                 .build());
     }
@@ -452,31 +482,31 @@ public class DataLoader implements CommandLineRunner {
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("Normal")
                 .descripcion("Elegant essentials for a refined stay. 1-2 guests, double bed, private bathroom, premium Wi-Fi.")
-                .imagenUrl("/images/suite-3.webp")
+                .imagenUrl("/images/hotel/hab-normal-4x3.jpg")
                 .build());
 
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("Executive")
                 .descripcion("Designed for those who work while they travel. 1-2 guests, executive workspace, king bed, premium Wi-Fi.")
-                .imagenUrl("/images/suite-1.webp")
+                .imagenUrl("/images/hotel/hab-executive-4x3.jpg")
                 .build());
 
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("VIP")
                 .descripcion("A private space to relax and unwind. Up to 3 guests, separate living area, premium amenities, city views.")
-                .imagenUrl("/images/suite-2.webp")
+                .imagenUrl("/images/hotel/hab-vip-4x3.jpg")
                 .build());
 
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("Luxury")
                 .descripcion("The ultimate expression of The Royale. Up to 4 guests, full suite, jacuzzi, privileged city view.")
-                .imagenUrl("/images/suite-4.webp")
+                .imagenUrl("/images/hotel/hab-luxury-4x3.jpg")
                 .build());
 
         tipoHabitacionRepository.save(TipoHabitacion.builder()
                 .nombre("Presidential Suite")
                 .descripcion("Unmatched exclusivity. Up to 6 guests, private terrace, butler service, panoramic city view, private dining.")
-                .imagenUrl("/images/luxury 1.jpg")
+                .imagenUrl("/images/hotel/suite-presidencial-4x3.jpg")
                 .build());
     }
 
@@ -650,7 +680,7 @@ public class DataLoader implements CommandLineRunner {
         guardarServicio("Wellness",
                 "Immerse yourself in total relaxation at The Royale Spa. Our full wellness sanctuary is designed around your wellbeing - from ancient thermal rituals to modern fitness, every detail is curated for the discerning guest.",
                 45.0,
-                "/images/spa.webp",
+                "/images/hotel/spa-piscina-4x3.jpg",
                 List.of(
                         "Heated Indoor Pool - Open daily 06:00 to 22:00",
                         "Finnish Sauna - Dry heat up to 90 degrees, private sessions available",
@@ -661,12 +691,12 @@ public class DataLoader implements CommandLineRunner {
                         "Organic Facials - Premium skincare with ESPA and La Mer products",
                         "Private Couple Suite - Exclusive treatment room for two"
                 ),
-                List.of("/images/spa.webp", "/images/architecture.jpg", "/images/new_spa.jpg"));
+                List.of("/images/hotel/spa-piscina-16x9.jpg", "/images/hotel/spa-hammam-4x3.jpg", "/images/hotel/gimnasio-4x3.jpg"));
 
         guardarServicio("Dining",
                 "Experience exceptional cuisine without leaving The Royale. Our signature restaurant serves contemporary New York cuisine from breakfast through late-night dining. In-room service is available 24 hours a day.",
                 60.0,
-                "/images/dinningroom-1.webp",
+                "/images/hotel/restaurante-4x3.jpg",
                 List.of(
                         "24h Room Service - Full a la carte menu delivered to your suite",
                         "Signature Restaurant - Contemporary New York cuisine, breakfast to dinner",
@@ -677,12 +707,12 @@ public class DataLoader implements CommandLineRunner {
                         "Private Bar Service - Butler-attended bar set up in your suite",
                         "Dietary Menus - Vegan, gluten-free and allergen-aware options available"
                 ),
-                List.of("/images/dinningroom-1.webp", "/images/restaurant.jpg", "/images/new_dining.jpg"));
+                List.of("/images/hotel/restaurante-16x9.jpg", "/images/hotel/restaurante-4x3.jpg", "/images/hotel/salon-ejecutivo-4x3.jpg"));
 
         guardarServicio("Business",
                 "Stay productive from the heart of Manhattan. The Royale Business Center delivers everything corporate guests need - from state-of-the-art meeting technology to full executive support, all within steps of your room.",
                 35.0,
-                "/images/meeting-room.jpg",
+                "/images/hotel/sala-juntas-4x3.jpg",
                 List.of(
                         "Private Meeting Rooms - Up to 3 rooms, capacity 4 to 20 persons",
                         "4K Video Conferencing - Integrated Zoom and Teams, global connectivity",
@@ -693,12 +723,12 @@ public class DataLoader implements CommandLineRunner {
                         "Event Planning - Full AV setup and catering coordination",
                         "Concierge Business Support - Courier, notary and translation services"
                 ),
-                List.of("/images/meeting-room.jpg", "/images/skyline.jpg", "/images/new_lounge.jpg"));
+                List.of("/images/hotel/sala-juntas-16x9.jpg", "/images/hotel/salon-ejecutivo-4x3.jpg", "/images/skyline.jpg"));
 
         guardarServicio("Concierge",
                 "Our multilingual concierge team is available around the clock to orchestrate every aspect of your New York experience. No request is too extraordinary - we specialise in turning the impossible into the unforgettable.",
                 25.0,
-                "/images/concierge.jpg",
+                "/images/hotel/recepcion-4x3.jpg",
                 List.of(
                         "Broadway and Show Tickets - Priority access to sold-out performances",
                         "Fine Dining Reservations - Michelin-starred restaurants and exclusive tables",
@@ -709,7 +739,7 @@ public class DataLoader implements CommandLineRunner {
                         "Floral and Gift Arrangements - Bespoke in-suite welcome experiences",
                         "Multilingual Assistance - Staff fluent in 8+ languages"
                 ),
-                List.of("/images/concierge.jpg", "/images/broadway.jpg", "/images/new_concierge.jpg"));
+                List.of("/images/hotel/recepcion-16x9.jpg", "/images/hotel/galeria-4x3.jpg", "/images/broadway.jpg"));
 
         guardarServicio("Transportation",
                 "Move through New York with the same ease and discretion you expect inside The Royale. Our transportation service coordinates private transfers, chauffeured vehicles and curated city routes for guests who value punctuality, comfort and privacy.",
