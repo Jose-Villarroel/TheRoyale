@@ -131,9 +131,10 @@ def main() -> None:
     resultado = {
         "version": 1,
         "entrenadoEl": FECHA_REFERENCIA.isoformat(),
-        "fuente": ("Historial simulado de 2 años para The Royale, calibrado con el dataset público "
-                   "Hotel Booking Demand (City Hotel; Antonio, Almeida y Nunes, 2019) y con niveles "
-                   "aproximados de ocupación mensual de hoteles en Nueva York."),
+        # Se muestra tal cual en el panel del admin (en inglés, como el resto de la interfaz)
+        "fuente": ("Trained on two years of simulated bookings for The Royale, calibrated with the public "
+                   "Hotel Booking Demand dataset (City Hotel; Antonio, Almeida & Nunes, 2019) and with "
+                   "approximate monthly hotel occupancy levels in New York City."),
         "algoritmo": "Ridge (alpha=1.0)",
         "anticipaciones": ANTICIPACIONES,
         "variables": nombres,
