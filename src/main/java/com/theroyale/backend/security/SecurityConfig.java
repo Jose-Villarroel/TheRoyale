@@ -52,6 +52,8 @@ public class SecurityConfig {
 
                         // ===== Rutas de administración (catálogo, clientes y moderación) =====
                         .requestMatchers("/api/operadores/**").hasAuthority("ROLE_ADMIN")
+                        // Pronóstico de ocupación, temporadas y recomendaciones de precio
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/menu/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/menu/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/habitaciones/**", "/api/tipos-habitacion/**", "/api/servicios/**", "/api/menu/**", "/api/clientes/**").hasAuthority("ROLE_ADMIN")

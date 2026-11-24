@@ -46,6 +46,10 @@ import com.theroyale.backend.service.plan.PlanGenerado;
 import com.theroyale.backend.service.plan.PlanGenerado.BloqueGenerado;
 import com.theroyale.backend.service.plan.PlanGenerado.DiaGenerado;
 import com.theroyale.backend.service.plan.PlanVisitaService;
+import com.theroyale.backend.model.Temporada;
+import com.theroyale.backend.repository.TemporadaRepository;
+import com.theroyale.backend.service.ocupacion.HistoricoOcupacionService;
+import com.theroyale.backend.service.ocupacion.PronosticoOcupacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -114,6 +118,12 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private TemporadaRepository temporadaRepository;
+
+    @Autowired
+    private HistoricoOcupacionService historicoOcupacionService;
+
     private Role rolAdmin;
     private Role rolOperador;
     private Role rolCliente;
@@ -151,6 +161,25 @@ public class DataLoader implements CommandLineRunner {
         cargarPlatosMenu();
         cargarLugaresNyc();
         cargarPlanDeEjemplo();
+        cargarTemporadas();
+        // Historial simulado para el pronóstico de ocupación (ver Docs/modelo/README.md)
+        historicoOcupacionService.cargar(LocalDate.now(PronosticoOcupacionService.ZONA_NUEVA_YORK));
+    }
+
+    // ===== Temporadas de precios iniciales, para este año y el siguiente =====
+    // Solo alimentan las recomendaciones: el admin decide si aplica el precio que se le propone.
+    private void cargarTemporadas() {
+        int anio = LocalDate.now(PronosticoOcupacionService.ZONA_NUEVA_YORK).getYear();
+        for (int a = anio; a <= anio + 1; a++) {
+            guardarTemporada("Low season", LocalDate.of(a, 1, 3), LocalDate.of(a, 3, 15), 0.85);
+            guardarTemporada("Summer", LocalDate.of(a, 6, 1), LocalDate.of(a, 8, 31), 1.15);
+            guardarTemporada("Holiday season", LocalDate.of(a, 12, 15), LocalDate.of(a + 1, 1, 2), 1.35);
+        }
+    }
+
+    private void guardarTemporada(String nombre, LocalDate inicio, LocalDate fin, double factor) {
+        temporadaRepository.save(Temporada.builder()
+                .nombre(nombre).fechaInicio(inicio).fechaFin(fin).factor(factor).build());
     }
 
     // ===== Catálogo curado de 25 lugares de Nueva York para el plan de visita =====

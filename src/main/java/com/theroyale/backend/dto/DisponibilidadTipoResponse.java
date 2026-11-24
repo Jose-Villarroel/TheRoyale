@@ -10,6 +10,14 @@ public record DisponibilidadTipoResponse(
         String descripcion,
         String imagenUrl,
         int habitacionesDisponibles,
-        BigDecimal precioDesde
+        BigDecimal precioDesde,
+        // "High season", "High demand" o "Special rate" si el admin aprobó un precio especial para
+        // alguna noche de esas fechas; null con el precio base
+        String etiquetaPrecio
 ) {
+
+    public DisponibilidadTipoResponse(Long tipoHabitacionId, String nombre, String descripcion, String imagenUrl,
+                                      int habitacionesDisponibles, BigDecimal precioDesde) {
+        this(tipoHabitacionId, nombre, descripcion, imagenUrl, habitacionesDisponibles, precioDesde, null);
+    }
 }

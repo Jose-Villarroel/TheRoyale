@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "entrenadoEl": "2026-11-23",
+  "fuente": "Historial simulado de 2 años para The Royale, calibrado con el dataset público Hotel Booking Demand (City Hotel; Antonio, Almeida y Nunes, 2019) y con niveles aproximados de ocupación mensual de hoteles en Nueva York.",
+  "algoritmo": "Ridge (alpha=1.0)",
+  "anticipaciones": [
+    0,
+    7,
+    14,
+    30,
+    60,
+    90
+  ],
+  "variables": [
+    "reservada",
+    "anticipacion",
+    "reservadaPorAnticipacion",
+    "ocupacionAnioAnterior",
+    "feriado",
+    "dia_1",
+    "dia_2",
+    "dia_3",
+    "dia_4",
+    "dia_5",
+    "dia_6",
+    "dia_7",
+    "mes_1",
+    "mes_2",
+    "mes_3",
+    "mes_4",
+    "mes_5",
+    "mes_6",
+    "mes_7",
+    "mes_8",
+    "mes_9",
+    "mes_10",
+    "mes_11",
+    "mes_12",
+    "tipo_Normal",
+    "tipo_Executive",
+    "tipo_VIP",
+    "tipo_Luxury",
+    "tipo_Presidential Suite"
+  ],
+  "intercepto": 0.53790237,
+  "coeficientes": {
+    "reservada": 0.17681748,
+    "anticipacion": 0.12761587,
+    "reservadaPorAnticipacion": -0.02641131,
+    "ocupacionAnioAnterior": -0.04609147,
+    "feriado": -0.01058075,
+    "dia_1": 0.00108004,
+    "dia_2": -0.01842483,
+    "dia_3": -0.00721555,
+    "dia_4": 0.00987839,
+    "dia_5": 0.01030254,
+    "dia_6": 0.01154863,
+    "dia_7": -0.00716922,
+    "mes_1": -0.10560093,
+    "mes_2": -0.02439052,
+    "mes_3": -0.0087549,
+    "mes_4": -0.00077521,
+    "mes_5": 0.00288095,
+    "mes_6": 0.01470505,
+    "mes_7": 0.02217105,
+    "mes_8": -0.00651499,
+    "mes_9": 0.03281294,
+    "mes_10": 0.00082433,
+    "mes_11": 0.01295106,
+    "mes_12": 0.05969117,
+    "tipo_Normal": 0.0701776,
+    "tipo_Executive": 0.07376686,
+    "tipo_VIP": 0.02226652,
+    "tipo_Luxury": -0.04060243,
+    "tipo_Presidential Suite": -0.12560855
+  },
+  "maeModelo": 0.1138,
+  "maeIngenuo": 0.1616,
+  "maePorAnticipacion": {
+    "0": 0.1061,
+    "7": 0.1111,
+    "14": 0.1139,
+    "30": 0.1164,
+    "60": 0.1173,
+    "90": 0.1177
+  },
+  "filasEntrenamiento": 7380,
+  "filasPrueba": 2700,
+  "ejemplos": [
+    {
+      "variables": {
+        "reservada": 1.2,
+        "ocupacionAnioAnterior": 0.6,
+        "feriado": 1.0,
+        "dia_1": 1.0,
+        "mes_12": 1.0,
+        "tipo_Normal": 1.0
+      },
+      "prediccion": 0.842797
+    },
+    {
+      "variables": {
+        "reservada": 1.2,
+        "ocupacionAnioAnterior": 0.8,
+        "dia_1": 1.0,
+        "mes_6": 1.0,
+        "tipo_VIP": 1.0
+      },
+      "prediccion": 0.751262
+    },
+    {
+      "variables": {
+        "reservada": 0.1,
+        "anticipacion": 1.0,
+        "reservadaPorAnticipacion": 0.1,
+        "ocupacionAnioAnterior": 0.4,
+        "dia_7": 1.0,
+        "mes_11": 1.0,
+        "tipo_Presidential Suite": 1.0
+      },
+      "prediccion": 0.542296
+    }
+  ]
+}

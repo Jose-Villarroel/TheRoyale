@@ -330,6 +330,36 @@ class SecurityRulesTest {
         void eliminarResena_retorna403() throws Exception {
             mockMvc.perform(delete("/api/resenas/1").param("clienteId", "1")).andExpect(status().isForbidden());
         }
+
+        // Pronóstico de ocupación y precios dinámicos: solo el admin
+        @Test
+        void ocupacionYPrecios_loPermiteLaRegla() throws Exception {
+            mockMvc.perform(get("/api/admin/ocupacion").param("dias", "30")).andExpect(status().isOk());
+            mockMvc.perform(get("/api/admin/temporadas")).andExpect(status().isOk());
+            mockMvc.perform(get("/api/admin/precios/tarifas")).andExpect(status().isOk());
+        }
+    }
+
+    // ===== /api/admin/** es exclusivo del admin =====
+    @Nested
+    class PanelAdminPrivado {
+
+        @Test
+        void ocupacion_sinToken_retorna401() throws Exception {
+            mockMvc.perform(get("/api/admin/ocupacion")).andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @WithMockUser(username = EMAIL_CLIENTE, authorities = "ROLE_CLIENTE")
+        void ocupacion_comoCliente_retorna403() throws Exception {
+            mockMvc.perform(get("/api/admin/ocupacion")).andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(username = "operador.reglas@theroyale.com", authorities = "ROLE_OPERADOR")
+        void aplicarPrecio_comoOperador_retorna403() throws Exception {
+            mockMvc.perform(post("/api/admin/precios/recomendaciones/1/aplicar")).andExpect(status().isForbidden());
+        }
     }
 
     // Un id distinto al del cliente simulado (no hace falta que exista: se compara con el del token)

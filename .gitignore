@@ -34,3 +34,7 @@ build/
 
 ### Secretos locales (clave de Gemini) ###
 .env
+
+### Dataset de terceros para entrenar el modelo (ver Docs/modelo/README.md) ###
+Docs/modelo/datos/
+__pycache__/
