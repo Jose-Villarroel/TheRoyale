@@ -57,7 +57,7 @@ public class SecurityConfig {
 
                         // Rutas de cliente y generales autenticadas
                         .requestMatchers(HttpMethod.POST, "/api/reservas").hasAnyAuthority("ROLE_CLIENTE", "ROLE_OPERADOR", "ROLE_ADMIN")
-                        .requestMatchers("/api/clientes/**", "/api/reservas/**", "/api/chat/**", "/api/plan-visita/**").authenticated()
+                        .requestMatchers("/api/clientes/**", "/api/reservas/**", "/api/pagos/**", "/api/chat/**", "/api/plan-visita/**").authenticated()
 
                         .anyRequest().authenticated()
                 );
