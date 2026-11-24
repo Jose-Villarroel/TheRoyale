@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 // ===== API REST de la cuenta de consumo de una reserva, consumida por el portal del operador =====
-// Equivale a los POST de OperatorController, que siguen sirviendo a las vistas Thymeleaf.
 // Las reglas viven en CuentaService; aqui solo se exponen. ApiExceptionHandler traduce
 // IllegalState -> 409 (cuenta cerrada, cargo ya pagado, pago mayor al saldo) e IllegalArgument -> 400.
 @RestController

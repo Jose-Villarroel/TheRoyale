@@ -7,7 +7,6 @@ import com.theroyale.backend.errors.ServicioNoDisponibleException;
 import com.theroyale.backend.service.chat.ChatService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -38,10 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // @WebMvcTest levanta solo el controlador y ApiExceptionHandler; ChatService se simula.
 // Se comprueba el stream SSE (Content-Type y eventos con nombre) y que los errores previos al
 // stream salgan como JSON {status, message} aunque el navegador pida text/event-stream.
-@WebMvcTest(
-        controllers = ChatRestController.class,
-        excludeAutoConfiguration = ThymeleafAutoConfiguration.class
-)
+@WebMvcTest(controllers = ChatRestController.class)
 // addFilters = false: aquí se prueba la lógica del controlador; las reglas de acceso las cubre SecurityRulesTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")

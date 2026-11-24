@@ -25,7 +25,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CuentaService {
 
-    // Únicos medios de pago que acepta el hotel; la vista del operador arma su selector con esta lista
+    // Únicos medios de pago que acepta el hotel; registrarPago rechaza cualquier otro
     public static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER");
 
     @Autowired
@@ -46,14 +46,6 @@ public class CuentaService {
         return CuentaResponse.desde(cuentaRepository.findByReservaId(reservaId)
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "La reserva " + reservaId + " no tiene cuenta asociada.")));
-    }
-
-    public List<String> listarMetodosPago() {
-        return METODOS_PAGO;
-    }
-
-    public long contarAbiertas() {
-        return cuentaRepository.countByEstado(EstadoCuenta.ABIERTA);
     }
 
     @Transactional

@@ -31,7 +31,6 @@ import com.theroyale.backend.model.TipoClima;
 import com.theroyale.backend.service.plan.PlanVisitaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -62,10 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // ===== Pruebas de PlanVisitaRestController con mocks =====
 // @WebMvcTest levanta solo el controlador y ApiExceptionHandler; PlanVisitaService se simula.
 // Se cubren los códigos 201/200/204/400/403/404/409/429/502/503 y la forma del JSON del contrato.
-@WebMvcTest(
-        controllers = PlanVisitaRestController.class,
-        excludeAutoConfiguration = ThymeleafAutoConfiguration.class
-)
+@WebMvcTest(controllers = PlanVisitaRestController.class)
 // addFilters = false: aquí se prueba la lógica del controlador; las reglas de acceso las cubre SecurityRulesTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")

@@ -12,8 +12,6 @@ public interface InterfaceService {
 
     Servicio buscarPorId(Long id);
 
-    Servicio buscarPorNombre(String nombre);
-
     Servicio guardar(Servicio servicio);
 
     // Alta: ignora cualquier id que traiga el objeto, para que nunca sobreescriba uno existente

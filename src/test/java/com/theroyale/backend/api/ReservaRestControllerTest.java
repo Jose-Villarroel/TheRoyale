@@ -14,7 +14,6 @@ import com.theroyale.backend.security.UsuarioActualService;
 import com.theroyale.backend.service.ReservaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,11 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // ===== Pruebas de ReservaRestController con mocks =====
 // @WebMvcTest levanta solo la capa web (el controlador y ApiExceptionHandler) y el servicio se simula
 // con @MockBean. Se cubren los 5 tipos de consulta: POST, GET de lista, GET por id, PUT y DELETE.
-// Se excluye la autoconfiguración de Thymeleaf para evitar que intente resolver vistas HTML.
-@WebMvcTest(
-        controllers = ReservaRestController.class,
-        excludeAutoConfiguration = ThymeleafAutoConfiguration.class
-)
+@WebMvcTest(controllers = ReservaRestController.class)
 // addFilters = false: aquí se prueba la lógica del controlador; las reglas de acceso las cubre SecurityRulesTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")

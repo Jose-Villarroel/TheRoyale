@@ -16,7 +16,6 @@ import com.theroyale.backend.model.TipoHabitacion;
 import com.theroyale.backend.service.ResenaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -52,10 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // @WebMvcTest levanta solo el controlador y ApiExceptionHandler; ResenaService se simula.
 // Se cubren los códigos 201/200/204/400/403/404/409, la precedencia de los parámetros del GET
 // y la forma del JSON: aplanado y sin datos privados del autor (email, cédula, teléfono).
-@WebMvcTest(
-        controllers = ResenaRestController.class,
-        excludeAutoConfiguration = ThymeleafAutoConfiguration.class
-)
+@WebMvcTest(controllers = ResenaRestController.class)
 // addFilters = false: aquí se prueba la lógica del controlador; las reglas de acceso las cubre SecurityRulesTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")

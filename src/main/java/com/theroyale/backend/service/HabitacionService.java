@@ -19,8 +19,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 // ===== Reglas de las habitaciones físicas: CRUD, estado operativo y resúmenes por tipo =====
-// Los resúmenes (precio "desde" y cuántas quedan disponibles) viven aquí y no en los
-// controladores para que la vista Thymeleaf y cualquier endpoint futuro calculen lo mismo.
+// Los resúmenes (precio "desde" por tipo) viven aquí y no en los controladores para que
+// todos los endpoints que los expongan calculen lo mismo.
 @Service
 @Transactional(readOnly = true)
 public class HabitacionService {
@@ -49,11 +49,7 @@ public class HabitacionService {
         return habitacionRepository.findByTipoHabitacionIdOrderByNumeroAsc(tipoHabitacionId);
     }
 
-    public long contarPorEstado(EstadoHabitacion estado) {
-        return habitacionRepository.countByEstado(estado);
-    }
-
-    // ===== Resúmenes por tipo de habitación (listado y detalle de /rooms) =====
+    // ===== Resúmenes por tipo de habitación (catálogo de habitaciones de la SPA) =====
     // Precio más bajo de cada tipo, sin importar el estado de la habitación
     public Map<Long, Double> preciosDesdePorTipo() {
         return habitacionRepository.findAll().stream()
@@ -66,26 +62,10 @@ public class HabitacionService {
                 ));
     }
 
-    // Habitaciones en estado DISPONIBLE de cada tipo; los tipos sin ninguna no aparecen en el mapa
-    public Map<Long, Long> disponiblesPorTipo() {
-        return habitacionRepository.findAll().stream()
-                .filter(habitacion -> EstadoHabitacion.DISPONIBLE.equals(habitacion.getEstado()))
-                .collect(Collectors.groupingBy(
-                        habitacion -> habitacion.getTipoHabitacion().getId(),
-                        Collectors.counting()
-                ));
-    }
-
     public Optional<Double> precioDesde(Long tipoHabitacionId) {
         return listarPorTipoHabitacion(tipoHabitacionId).stream()
                 .map(Habitacion::getPrecio)
                 .min(Comparator.naturalOrder());
-    }
-
-    public long contarDisponibles(Long tipoHabitacionId) {
-        return listarPorTipoHabitacion(tipoHabitacionId).stream()
-                .filter(habitacion -> EstadoHabitacion.DISPONIBLE.equals(habitacion.getEstado()))
-                .count();
     }
 
     public Habitacion buscarPorId(Long id) {
@@ -113,19 +93,8 @@ public class HabitacionService {
         return guardar(habitacion);
     }
 
-    // ===== Alta y edición desde el formulario Thymeleaf, que manda el tipo como parámetro aparte =====
-    // Se deja el tipo resuelto en el objeto recibido para que, si falla la validación,
-    // el formulario se vuelva a pintar con el tipo seleccionado.
-    @Transactional
-    public Habitacion guardar(Habitacion habitacion, Long tipoHabitacionId) {
-        if (habitacion != null && tipoHabitacionId != null) {
-            habitacion.setTipoHabitacion(tipoHabitacionService.obtenerPorId(tipoHabitacionId));
-        }
-        return guardar(habitacion);
-    }
-
-    // Al editar se copian solo los campos del formulario sobre la entidad existente,
-    // para no reemplazar sus relaciones (reservas) con las del objeto enlazado.
+    // Al editar se copian solo los campos recibidos sobre la entidad existente,
+    // para no reemplazar sus relaciones (reservas) con las del objeto nuevo.
     @Transactional
     public Habitacion guardar(Habitacion habitacion) {
         if (habitacion == null) {
