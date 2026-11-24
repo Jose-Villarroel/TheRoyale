@@ -53,11 +53,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 // ===== Carga datos iniciales de prueba cada vez que la aplicación arranca =====
 // Necesario porque ddl-auto=create-drop borra y recrea la base de datos en cada reinicio.
@@ -151,6 +156,8 @@ public class DataLoader implements CommandLineRunner {
         cargarPlatosMenu();
         cargarLugaresNyc();
         cargarPlanDeEjemplo();
+        // Al final a proposito: solo lee lo ya sembrado y no mueve ningun indice
+        cargarHistorialDashboard();
     }
 
     // ===== Catálogo curado de 25 lugares de Nueva York para el plan de visita =====
@@ -966,5 +973,323 @@ public class DataLoader implements CommandLineRunner {
                 .metodoPago(metodo)
                 .build());
         cuentaRepository.save(cuenta);
+    }
+
+    // =========================================================================================
+    // ===== Historial de 90 días para que el dashboard de dirección tenga tendencias =====
+    //
+    // El resto del DataLoader siembra el presente (unas 24 reservas alrededor de hoy), que basta
+    // para probar las pantallas pero deja el panel de dirección sin nada que graficar: sin pasado
+    // no hay tendencia, ni período anterior con el que comparar, ni ocupación media creíble.
+    //
+    // Reglas que se respetan a propósito, porque hay pruebas que dependen de los datos existentes:
+    //
+    //  1. Solo fechas PASADAS, en [hoy-90, hoy-1]. No se crea ni una reserva que toque hoy o el
+    //     futuro, así no interfiere con la ventana de disponibilidad (tipo Normal entre hoy+7 y
+    //     hoy+11) que busca NuevoUsuarioReservaE2ETest.
+    //  2. Nunca se usan las habitaciones 101, 901 y 902: son las que los E2E tienen escritas a mano
+    //     (EstadiaOperadorE2ETest hace el check-in de la 101, PlanVisitaE2ETest usa la 901).
+    //  3. No se inserta ningún cliente: solo se leen los que ya existen, para no mover los índices
+    //     clientes.get(0..9) de los que dependen las demás reservas y los E2E.
+    //  4. Este método se llama al FINAL de run(), cuando todo lo demás ya está sembrado.
+    //
+    // El Random lleva semilla fija: dos arranques dan exactamente los mismos datos, así una cifra
+    // del panel se puede verificar a mano y sigue valiendo mañana.
+    //
+    // Estacionalidad: viernes y sábados se llenan mucho más que el resto de la semana, como en un
+    // hotel de verdad, para que la gráfica de ocupación tenga forma y no sea una línea plana.
+    // =========================================================================================
+
+    private static final long SEMILLA_HISTORIAL = 20261123L;
+    private static final int DIAS_HISTORIAL = 90;
+
+    // Las que los E2E Selenium tienen escritas a mano: el historial no las toca
+    private static final List<String> HABITACIONES_RESERVADAS_E2E = List.of("101", "901", "902");
+
+    // Ventana futura que la gráfica de ocupación muestra como ya reservado
+    private static final int DIAS_ON_THE_BOOKS = 30;
+
+    // NuevoUsuarioReservaE2ETest busca disponibilidad de este tipo: el seed no lo ocupa nunca
+    private static final String TIPO_PROTEGIDO_E2E = "Normal";
+
+    // ResenaHuespedE2ETest exige que este tipo no tenga NINGUNA reseña visible: su primer paso
+    // comprueba que la página pública muestre "No reviews yet" antes de que el huésped escriba la
+    // suya. El historial sí le crea reservas e ingresos (alimentan el desglose), pero nunca reseñas.
+    private static final String TIPO_SIN_RESENAS_E2E = "Presidential Suite";
+
+    private static final List<String> METODOS_PAGO = List.of("CARD", "CASH", "TRANSFER");
+
+    private static final List<String> RESENAS_BUENAS = List.of(
+            "Flawless from start to finish|The staff remembered our names and the room was spotless every single day.",
+            "Worth every penny|Quiet, elegant and perfectly located. We will be coming back in the spring.",
+            "A proper boutique hotel|Breakfast was excellent and the concierge found us tickets we could not get ourselves.",
+            "Exceeded expectations|The bed, the linens, the silence. We slept better here than at home.");
+
+    private static final List<String> RESENAS_REGULARES = List.of(
+            "Lovely room, slow service|The room was beautiful but room service took almost an hour.",
+            "Good stay with small details to fix|Great location and comfortable bed, though the bathroom light flickered.",
+            "Nice but noisy|Everything was pleasant except the street noise in the early morning.");
+
+    private static final List<String> RESENAS_MALAS = List.of(
+            "Room was not ready|We waited two hours past check-in and nobody explained why.",
+            "Not what was promised|The suite we booked was unavailable and the replacement was much smaller.");
+
+    private void cargarHistorialDashboard() {
+        Random aleatorio = new Random(SEMILLA_HISTORIAL);
+        LocalDate hoy = LocalDate.now();
+
+        List<Cliente> clientes = clienteRepository.findAll();
+        List<Operador> operadores = operadorRepository.findAll();
+        List<Servicio> servicios = servicioRepository.findAll();
+
+        // Si alguien cambia el orden de run() y este método queda primero, se sale sin hacer nada
+        // en lugar de reventar el arranque de la aplicación.
+        if (clientes.isEmpty() || operadores.isEmpty() || servicios.isEmpty()) {
+            return;
+        }
+
+        List<Habitacion> habitaciones = habitacionRepository.findAllByOrderByNumeroAsc().stream()
+                .filter(habitacion -> habitacion.getEstado() != EstadoHabitacion.DESHABILITADA)
+                .filter(habitacion -> !HABITACIONES_RESERVADAS_E2E.contains(habitacion.getNumero()))
+                .toList();
+
+        int reservasCreadas = 0;
+        int resenasNegativasRecientes = 0;
+
+        for (Habitacion habitacion : habitaciones) {
+            LocalDate cursor = hoy.minusDays(DIAS_HISTORIAL);
+
+            // Se avanza habitación por habitación colocando estadías seguidas con huecos entre
+            // ellas: así, por construcción, una habitación nunca queda con dos reservas solapadas.
+            while (cursor.isBefore(hoy)) {
+                boolean finDeSemana = esFinDeSemana(cursor);
+                if (aleatorio.nextDouble() > (finDeSemana ? 0.92 : 0.55)) {
+                    cursor = cursor.plusDays(1);
+                    continue;
+                }
+
+                int noches = 2 + aleatorio.nextInt(5);           // de 2 a 6 noches
+                LocalDate fin = cursor.plusDays(noches);
+                if (!fin.isBefore(hoy)) {
+                    break;                                       // nada que toque hoy ni el futuro
+                }
+
+                Cliente cliente = clientes.get(aleatorio.nextInt(clientes.size()));
+                int personas = 1 + aleatorio.nextInt(3);
+
+                // Lead time variado para que el KPI no salga constante
+                LocalDateTime creada = cursor.minusDays(2L + aleatorio.nextInt(44)).atTime(10, 30);
+
+                // Una de cada diez se cancela: suficiente para que la tasa de cancelación sea real
+                if (aleatorio.nextInt(10) == 0) {
+                    guardarReservaHistorica(cliente, habitacion, cursor, fin,
+                            EstadoReserva.CANCELADA, personas, creada);
+                    reservasCreadas++;
+                    cursor = fin.plusDays(1L + aleatorio.nextInt(5));
+                    continue;
+                }
+
+                Reserva reserva = guardarReservaHistorica(cliente, habitacion, cursor, fin,
+                        EstadoReserva.FINALIZADA, personas, creada);
+                reservasCreadas++;
+
+                Cuenta cuenta = abrirCuenta(reserva, cursor);
+                BigDecimal totalConsumido = BigDecimal.ZERO;
+                int cuantosConsumos = aleatorio.nextInt(4);       // de 0 a 3 servicios por estadía
+                for (int i = 0; i < cuantosConsumos; i++) {
+                    Servicio servicio = servicios.get(aleatorio.nextInt(servicios.size()));
+                    Operador operador = operadores.get(aleatorio.nextInt(operadores.size()));
+                    LocalDateTime cuando = cursor.plusDays(aleatorio.nextInt(noches))
+                            .atTime(9 + aleatorio.nextInt(12), 15);
+                    totalConsumido = totalConsumido.add(agregarConsumoHistorico(
+                            cuenta, servicio, operador, 1 + aleatorio.nextInt(3), cuando));
+                }
+
+                // Una reserva FINALIZADA solo puede quedar así con la cuenta saldada (saldo 0):
+                // se cobra el total el día de la salida y la cuenta se cierra.
+                if (totalConsumido.signum() > 0) {
+                    agregarPagoHistorico(cuenta,
+                            operadores.get(aleatorio.nextInt(operadores.size())),
+                            totalConsumido,
+                            METODOS_PAGO.get(aleatorio.nextInt(METODOS_PAGO.size())),
+                            fin.atTime(11, 0));
+                }
+                cuenta.setEstado(EstadoCuenta.CERRADA);
+                cuentaRepository.save(cuenta);
+
+                // Cuatro de cada diez huéspedes dejan reseña, salvo en el tipo que los E2E
+                // necesitan ver sin ninguna
+                boolean tipoAdmiteResenas = !TIPO_SIN_RESENAS_E2E.equals(
+                        habitacion.getTipoHabitacion().getNombre());
+                if (tipoAdmiteResenas && aleatorio.nextInt(10) < 4) {
+                    // Dos quejas recientes a propósito: sin ellas la alerta de reseñas de 1 y 2
+                    // estrellas nunca se vería en el panel, y es una de las más útiles.
+                    boolean recienteYNegativa = fin.isAfter(hoy.minusDays(7))
+                            && resenasNegativasRecientes < RESENAS_MALAS.size();
+                    if (recienteYNegativa) {
+                        guardarResenaHistorica(reserva, 1 + aleatorio.nextInt(2),
+                                RESENAS_MALAS.get(resenasNegativasRecientes));
+                        resenasNegativasRecientes++;
+                    } else if (aleatorio.nextInt(5) == 0) {
+                        guardarResenaHistorica(reserva, 3,
+                                RESENAS_REGULARES.get(aleatorio.nextInt(RESENAS_REGULARES.size())));
+                    } else {
+                        guardarResenaHistorica(reserva, 4 + aleatorio.nextInt(2),
+                                RESENAS_BUENAS.get(aleatorio.nextInt(RESENAS_BUENAS.size())));
+                    }
+                }
+
+                cursor = fin.plusDays(1L + aleatorio.nextInt(5));
+            }
+        }
+
+        int futuras = cargarReservasFuturasParaOnTheBooks(aleatorio, hoy, clientes);
+
+        System.out.println("DataLoader: historial del dashboard cargado ("
+                + reservasCreadas + " reservas en los ultimos " + DIAS_HISTORIAL + " dias, "
+                + futuras + " futuras para el on the books)");
+    }
+
+    // Viernes y sábado son los días que llenan un hotel de ciudad
+    private boolean esFinDeSemana(LocalDate fecha) {
+        return fecha.getDayOfWeek() == DayOfWeek.FRIDAY || fecha.getDayOfWeek() == DayOfWeek.SATURDAY;
+    }
+
+    // ===== Variantes con fecha explícita de los helpers de arriba =====
+    // Los originales fijan la fecha a LocalDateTime.now() menos unas horas, que es lo que necesitan
+    // las reservas del presente. El historial necesita colocar cada movimiento en su día real, o
+    // todas las series del dashboard se apilarían en la fecha de hoy.
+
+    private Reserva guardarReservaHistorica(Cliente cliente, Habitacion habitacion,
+                                            LocalDate inicio, LocalDate fin,
+                                            EstadoReserva estado, int personas, LocalDateTime creada) {
+        return reservaRepository.save(Reserva.builder()
+                .cliente(cliente)
+                .habitacion(habitacion)
+                .fechaInicio(inicio)
+                .fechaFin(fin)
+                .estado(estado)
+                .cantidadPersonas(personas)
+                .precioNocheAcordado(BigDecimal.valueOf(habitacion.getPrecio()))
+                .fechaCreacion(creada)
+                .build());
+    }
+
+    // Devuelve el importe del consumo, para poder saldar la cuenta exactamente
+    private BigDecimal agregarConsumoHistorico(Cuenta cuenta, Servicio servicio, Operador operador,
+                                               int cantidad, LocalDateTime fechaHora) {
+        BigDecimal precioUnitario = BigDecimal.valueOf(servicio.getPrecio());
+        cuenta.getItemsConsumo().add(ItemConsumo.builder()
+                .cuenta(cuenta)
+                .servicio(servicio)
+                .operador(operador)
+                .cantidad(cantidad)
+                .fechaHora(fechaHora)
+                .precioUnitario(precioUnitario)
+                .pagado(true)
+                .build());
+        cuentaRepository.save(cuenta);
+        return precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+    }
+
+    private void agregarPagoHistorico(Cuenta cuenta, Operador operador, BigDecimal monto,
+                                      String metodo, LocalDateTime fecha) {
+        cuenta.getPagos().add(Pago.builder()
+                .cuenta(cuenta)
+                .operador(operador)
+                .monto(monto)
+                .fecha(fecha)
+                .metodoPago(metodo)
+                .build());
+        cuentaRepository.save(cuenta);
+    }
+
+    // El texto viene como "titulo|comentario" para tenerlos juntos en la lista de ejemplos
+    private void guardarResenaHistorica(Reserva reserva, int calificacion, String tituloYComentario) {
+        String[] partes = tituloYComentario.split("\\|", 2);
+        resenaRepository.save(Resena.builder()
+                .reserva(reserva)
+                .cliente(reserva.getCliente())
+                .tipoHabitacion(reserva.getHabitacion().getTipoHabitacion())
+                .calificacion(calificacion)
+                .titulo(partes[0])
+                .comentario(partes[1])
+                .visible(true)
+                .fechaCreacion(reserva.getFechaFin().atTime(18, 30))
+                .build());
+    }
+
+    // =========================================================================================
+    // ===== Reservas futuras: lo que la gráfica de ocupación muestra como "on the books" =====
+    //
+    // El historial de arriba es solo pasado, así que sin esto la zona futura de la gráfica saldría
+    // plana en cero y el administrador no vería lo que ya está vendido, que es justo lo que le
+    // sirve para decidir tarifas esta semana.
+    //
+    // Tres candados para no romper los E2E Selenium, que buscan disponibilidad real:
+    //
+    //  1. Solo tipos distintos de "Normal". NuevoUsuarioReservaE2ETest busca una habitación Normal
+    //     entre hoy+7 y hoy+11: si este método ocupara alguna, esa prueba fallaría.
+    //  2. Nunca las habitaciones 101, 901 ni 902 (las que los E2E tienen escritas a mano).
+    //  3. Se salta cualquier habitación que ya tenga una reserva futura, sea del DataLoader o de
+    //     los E2E, así que tampoco puede solaparse con lo ya sembrado.
+    //
+    // La densidad baja con la distancia: los próximos días están casi llenos y a 30 días vista
+    // queda poco vendido. Es la curva real de reservas de un hotel, y hace que la zona sombreada
+    // de la gráfica se lea como una rampa descendente en lugar de un bloque uniforme.
+    // =========================================================================================
+    private int cargarReservasFuturasParaOnTheBooks(Random aleatorio, LocalDate hoy,
+                                                    List<Cliente> clientes) {
+        // Cualquier habitación con algo ya reservado de hoy en adelante queda intocable
+        Set<Long> yaOcupadasEnElFuturo = reservaRepository.findAll().stream()
+                .filter(reserva -> reserva.getEstado() != EstadoReserva.CANCELADA)
+                .filter(reserva -> !reserva.getFechaFin().isBefore(hoy))
+                .map(reserva -> reserva.getHabitacion().getId())
+                .collect(Collectors.toSet());
+
+        List<Habitacion> habitaciones = habitacionRepository.findAllByOrderByNumeroAsc().stream()
+                .filter(habitacion -> habitacion.getEstado() != EstadoHabitacion.DESHABILITADA)
+                .filter(habitacion -> !HABITACIONES_RESERVADAS_E2E.contains(habitacion.getNumero()))
+                .filter(habitacion -> !TIPO_PROTEGIDO_E2E.equals(habitacion.getTipoHabitacion().getNombre()))
+                .filter(habitacion -> !yaOcupadasEnElFuturo.contains(habitacion.getId()))
+                .toList();
+
+        int creadas = 0;
+        for (Habitacion habitacion : habitaciones) {
+            LocalDate cursor = hoy.plusDays(1);
+            while (cursor.isBefore(hoy.plusDays(DIAS_ON_THE_BOOKS))) {
+                long diasAdelante = ChronoUnit.DAYS.between(hoy, cursor);
+
+                // Curva de reservas: muy probable a pocos días, poco probable a un mes
+                double probabilidad = (esFinDeSemana(cursor) ? 0.9 : 0.6)
+                        * (1.0 - (diasAdelante / (double) (DIAS_ON_THE_BOOKS + 10)));
+                if (aleatorio.nextDouble() > probabilidad) {
+                    cursor = cursor.plusDays(1);
+                    continue;
+                }
+
+                int noches = 2 + aleatorio.nextInt(4);
+                LocalDate fin = cursor.plusDays(noches);
+                if (!fin.isBefore(hoy.plusDays(DIAS_ON_THE_BOOKS + 1L))) {
+                    break;
+                }
+
+                // La mayoría ya confirmadas; algunas quedan PENDIENTE, que es lo normal en una
+                // reserva reciente y además da contenido a la alerta de "sin confirmar".
+                EstadoReserva estado = aleatorio.nextInt(8) == 0
+                        ? EstadoReserva.PENDIENTE
+                        : EstadoReserva.CONFIRMADA;
+
+                guardarReservaHistorica(
+                        clientes.get(aleatorio.nextInt(clientes.size())),
+                        habitacion, cursor, fin, estado,
+                        1 + aleatorio.nextInt(3),
+                        hoy.minusDays(aleatorio.nextInt(20)).atTime(16, 45));
+                creadas++;
+
+                cursor = fin.plusDays(1L + aleatorio.nextInt(4));
+            }
+        }
+        return creadas;
     }
 }

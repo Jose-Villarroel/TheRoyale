@@ -66,6 +66,12 @@ class SecurityRulesTest {
     @Nested
     class Anonimo {
 
+        // ===== El dashboard de direccion no se consulta sin sesion =====
+        @Test
+        void dashboardDeAdmin_sinToken_retorna401() throws Exception {
+            mockMvc.perform(get("/api/admin/dashboard/resumen")).andExpect(status().isUnauthorized());
+        }
+
         @Test
         void reservas_sinToken_retorna401() throws Exception {
             mockMvc.perform(get("/api/reservas")).andExpect(status().isUnauthorized());
@@ -98,6 +104,14 @@ class SecurityRulesTest {
     @Nested
     @WithMockUser(username = EMAIL_CLIENTE, authorities = "ROLE_CLIENTE")
     class ClienteAutenticado {
+
+        // ===== Ingresos, caja y saldos de los huespedes no son datos del huesped =====
+        // Sin la regla explicita de /api/admin/**, esta peticion caeria en
+        // anyRequest().authenticated() y devolveria 200 a cualquier cliente con sesion.
+        @Test
+        void dashboardDeAdmin_retorna403() throws Exception {
+            mockMvc.perform(get("/api/admin/dashboard/resumen")).andExpect(status().isForbidden());
+        }
 
         @Test
         void crearPlato_retorna403() throws Exception {
@@ -241,6 +255,12 @@ class SecurityRulesTest {
     @WithMockUser(username = "operador.reglas@theroyale.com", authorities = "ROLE_OPERADOR")
     class OperadorAutenticado {
 
+        // ===== El operador opera, no dirige: no ve las finanzas del hotel =====
+        @Test
+        void dashboardDeAdmin_retorna403() throws Exception {
+            mockMvc.perform(get("/api/admin/dashboard/resumen")).andExpect(status().isForbidden());
+        }
+
         @Test
         void checkIn_loPermiteLaRegla() throws Exception {
             mockMvc.perform(post("/api/reservas/1/check-in")).andExpect(permitido());
@@ -298,6 +318,20 @@ class SecurityRulesTest {
     @Nested
     @WithMockUser(username = "admin.reglas@theroyale.com", authorities = "ROLE_ADMIN")
     class AdminAutenticado {
+
+        // ===== El administrador si entra, y con la base vacia responde ceros, no un error =====
+        @Test
+        void dashboardDeAdmin_retorna200() throws Exception {
+            mockMvc.perform(get("/api/admin/dashboard/resumen")).andExpect(status().isOk());
+        }
+
+        @Test
+        void dashboardDeAdmin_conFechasInvertidas_retorna400() throws Exception {
+            mockMvc.perform(get("/api/admin/dashboard/resumen")
+                            .param("desde", "2026-03-10")
+                            .param("hasta", "2026-03-01"))
+                    .andExpect(status().isBadRequest());
+        }
 
         @Test
         void todasLasReservas_retorna200() throws Exception {

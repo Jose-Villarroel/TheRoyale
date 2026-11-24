@@ -76,8 +76,8 @@ class SesionPestanasE2ETest {
 
     @Test
     void casoCinco_otraPestanaCambiaDeUsuario_laPestanaDelAdminSePoneAlDia() {
-        // ===== Paso 1: pestaña A, el admin entra a su panel de reservas =====
-        iniciarSesion(ADMIN_EMAIL, ADMIN_PASSWORD, "/admin/reservas");
+        // ===== Paso 1: pestaña A, el admin entra a su panel de dirección =====
+        iniciarSesion(ADMIN_EMAIL, ADMIN_PASSWORD, "/admin/dashboard");
         esperarVisible(NAV_ADMIN_RESENAS);
         String pestanaAdmin = driver.getWindowHandle();
 

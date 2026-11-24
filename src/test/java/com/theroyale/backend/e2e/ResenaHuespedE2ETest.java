@@ -219,7 +219,14 @@ class ResenaHuespedE2ETest {
         // ===== Paso 6: en otro navegador entra el admin y abre la moderación de reseñas =====
         // El token vive en localStorage, que es propio de cada navegador: las dos sesiones conviven.
         usar(abrirNavegador());
-        iniciarSesion(ADMIN_EMAIL, ADMIN_PASSWORD, "/admin/reservas");
+        // El admin entra al panel de dirección, que es su pantalla de inicio; desde su barra de
+        // navegación se llega a la moderación de reseñas.
+        iniciarSesion(ADMIN_EMAIL, ADMIN_PASSWORD, "/admin/dashboard");
+        // El panel de direccion pide sus datos despues del HTML y luego dibuja dos graficas en
+        // canvas: se espera a que todo eso acabe antes de pulsar el menu, porque mientras la
+        // pagina sigue repintando Chrome descarta el clic sin lanzar ningun error.
+        esperarVisible(By.cssSelector(".dash-kpi"));
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.tagName("canvas"), 2));
         clic(NAV_ADMIN_RESENAS);
         wait.until(ExpectedConditions.urlContains("/admin/resenas"));
 
@@ -285,13 +292,15 @@ class ResenaHuespedE2ETest {
         campo.sendKeys(texto);
     }
 
+    // ===== Se pulsa por JavaScript, no con el clic nativo del navegador =====
+    // Chrome solo entrega un clic nativo a la ventana que tiene el foco del sistema operativo.
+    // Esta prueba abre DOS navegadores a la vez (uno por rol), asi que el segundo nunca lo tiene:
+    // alli el clic nativo se descarta sin lanzar ninguna excepcion, el plan B de abajo no llegaba
+    // a ejecutarse nunca y la prueba se quedaba esperando una navegacion que no ocurria.
+    // El clic por JavaScript no depende del foco y dispara el mismo evento que recibe el router.
     private void clic(By localizador) {
         WebElement elemento = wait.until(ExpectedConditions.elementToBeClickable(localizador));
-        try {
-            elemento.click();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", elemento);
-        }
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", elemento);
     }
 
     // textContent devuelve el texto tal como está en el HTML, sin que el CSS lo altere (mayúsculas, etc.)
