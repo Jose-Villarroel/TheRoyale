@@ -84,7 +84,8 @@ public class SecurityConfig {
                         // El cliente solo puede cancelar las suyas: lo valida ReservaRestController
                         .requestMatchers(HttpMethod.POST, "/api/reservas/*/cancelar").hasAnyAuthority("ROLE_CLIENTE", "ROLE_OPERADOR")
                         .requestMatchers(HttpMethod.POST, "/api/reservas").hasAnyAuthority("ROLE_CLIENTE", "ROLE_OPERADOR", "ROLE_ADMIN")
-                        .requestMatchers("/api/clientes/**", "/api/reservas/**").authenticated()
+                        // La pasarela Wompi (/api/pagos/wompi/**) la usa el cliente al confirmar su reserva
+                        .requestMatchers("/api/clientes/**", "/api/reservas/**", "/api/pagos/**").authenticated()
 
                         .anyRequest().authenticated()
                 );

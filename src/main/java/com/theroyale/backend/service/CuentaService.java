@@ -25,8 +25,9 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CuentaService {
 
-    // Únicos medios de pago que acepta el hotel; registrarPago rechaza cualquier otro
-    public static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER");
+    // Únicos medios de pago que acepta el hotel; registrarPago rechaza cualquier otro.
+    // WOMPI lo registra la pasarela al verificar la transacción, no el operador a mano.
+    public static final List<String> METODOS_PAGO = List.of("CASH", "CARD", "TRANSFER", "WOMPI");
 
     @Autowired
     private CuentaRepository cuentaRepository;
